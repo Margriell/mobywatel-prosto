@@ -1,6 +1,6 @@
 # Specyfikacja prototypu „mObywatel Prosto”
 
-Wersja 1.0 · 24.11.2026
+Wersja 1.1 · 24.11.2026 (zmiany uzgodnione z autorką po 1. rundzie wariantów Start)
 
 Budujemy klikalny prototyp aplikacji mObywatel na konkurs mObywatel Challenge i do pracy magisterskiej. Prototyp rozwija pomysł prototypu Janusza Cieszyńskiego (mobywatel.ai): zostawia nowoczesnego asystenta, ale opiera go na widocznej, przewidywalnej strukturze. Ma być czytelny dla seniorów, osób słabo obeznanych z technologią i osób z niepełnosprawnościami.
 
@@ -70,10 +70,10 @@ Mierzalne cele (te same pomiary zrobiono na prototypie Cieszyńskiego):
 | Ikony | Zawsze z podpisem tekstowym, także w nagłówku i na pasku |
 | Język | Prosty, zdania do 15 słów, zwracanie się na „Ty”, bez urzędowego żargonu. Formy neutralne płciowo („Co zginęło?” zamiast „Zgubiłam”) |
 | Układ | Jedna kolumna, treść w naturalnym przepływie (bez nakładania się elementów), jednostki rem. Działa przy szerokości 320 px i powiększeniu 200% |
-| Nawigacja | Dolny pasek zawsze widoczny (poza krokami sprawy). Na każdym podekranie przycisk „Wstecz” z napisem. W sprawach licznik „Krok 2 z 4” |
+| Nawigacja | Dolny pasek zawsze widoczny (poza krokami sprawy), zawsze w jednym rzędzie: 5 zakładek, podpisy mają stałe 16 px i nie rosną z ustawieniem rozmiaru tekstu. Na każdym podekranie przycisk „Wstecz” z napisem. W sprawach licznik „Krok 2 z 4” |
 | Czas i ruch | Brak limitów czasu i komunikatów, które same znikają. Animacje subtelne, wyłączone przy ustawieniu „ogranicz ruch” |
 | Czytniki ekranu | `lang="pl"`, prawdziwe nagłówki, etykiety pól, wiadomości asystenta ogłaszane (`aria-live`), zaznaczenie opcji ogłaszane (pola wyboru), widoczny fokus |
-| Oznaczenia | Neutralny znak zamiast godła i logo mObywatela. Stały pasek „Prototyp — to nie jest usługa rządowa”. Dane fikcyjne, awatary z inicjałów zamiast zdjęć |
+| Oznaczenia | W nagłówku nazwa „mObywatel” (bez „Prosto”) i neutralny znak zamiast godła i logo mObywatela. Bez paska „Prototyp” na ekranach aplikacji; informacja „Prototyp konkursowy, dane fikcyjne” tylko na ekranie wyboru osoby i w Ustawieniach. Dane fikcyjne, awatary z inicjałów zamiast zdjęć |
 
 ## Ekrany po kolei
 
@@ -81,19 +81,20 @@ Aplikacja ma 3 ekrany wejściowe, 5 zakładek na dolnym pasku i 4 ekrany wspóln
 
 **Wejście (pokazywane raz)**
 
-1. **Wybór osoby** (tylko w prototypie, dla jury). Trzy fikcyjne osoby z awatarem z inicjałów i jednym zdaniem o sytuacji:
-   - Halina, 71 lat, emerytka, pierwszy raz w aplikacji — domyślnie Duży tekst;
-   - Tomasz, 38 lat, kierowca — kończy mu się OC;
-   - Ola, 24 lata, studentka — właśnie się przeprowadziła.
+1. **Wybór osoby** (tylko w prototypie, dla jury). Informacja „Prototyp konkursowy, dane fikcyjne”. Trzy fikcyjne osoby z awatarem z inicjałów i jednym zdaniem o sytuacji:
+   - Halina, 71 lat, emerytka, pierwszy raz w aplikacji — domyślnie Duży tekst; karta pilna: nowe pismo w Skrzynce;
+   - Tomasz, 38 lat, kierowca — kończy mu się OC; karta pilna: OC kończy się za 12 dni (data liczona automatycznie: dziś + 12 dni);
+   - Ola, 24 lata, studentka — właśnie się przeprowadziła; karta pilna: dokończ zameldowanie.
 2. **Dopasuj wygląd.** Pytanie „Jak wygodnie Ci czytać?”. Trzy duże opcje rozmiaru tekstu z podglądem na żywo, przełącznik „Tryb prosty” (mniej elementów na Start, większe kafle), przycisk „Dalej”. Dopisek: „Możesz to zmienić później w Ustawieniach”.
 3. **Poznaj asystenta.** Jeden ekran: „Możesz napisać albo powiedzieć, co chcesz załatwić. Poprowadzę Cię krok po kroku. Nic nie wyślę bez Twojego potwierdzenia.” Przyciski „Zaczynam” i „Pomiń”.
 
 **Zakładki na dolnym pasku** (ikona + podpis, zakładka aktywna oznaczona kolorem, pogrubieniem i kreską)
 
 4. **Start**
-   - Nagłówek: „Dzień dobry, Halino” i przycisk „Ustawienia” (ikona z podpisem).
-   - „Wymaga Twojej uwagi”: najwyżej 2 karty, jedyne miejsce z czerwienią, np. „OC samochodu kończy się za 12 dni” → sprawa B.
-   - „Najczęstsze sprawy”: 6 dużych kafli w 2 kolumnach — Zgubione dokumenty, Mój samochód, Meldunek, Pokaż mDowód, Skrzynka, Wszystkie sprawy. W trybie prostym 4 kafle w 1 kolumnie.
+   - Nagłówek: nazwa „mObywatel” z neutralnym znakiem, „Dzień dobry, Halino” i przycisk „Ustawienia” (ikona z podpisem).
+   - Na ekranie 390 × 844 px bez przewijania widać: powitanie, kartę pilnej sprawy i pole asystenta. Pole asystenta może być u góry.
+   - „Wymaga Twojej uwagi”: najwyżej 2 karty, jedyne miejsce z czerwienią. Karta zależy od osoby: Halina — nowe pismo w Skrzynce; Tomasz — „OC samochodu kończy się za 12 dni” → sprawa B; Ola — dokończ zameldowanie → sprawa C.
+   - „Najczęstsze sprawy”: 6 dużych kafli w 1 lub 2 kolumnach (zależnie od wybranego wyglądu) — Zgubione dokumenty, Mój samochód, Meldunek, Pokaż mDowód, Skrzynka, Wszystkie sprawy. W trybie prostym 4 kafle w 1 kolumnie.
    - Pole asystenta: „Napisz lub powiedz, co chcesz załatwić”, przycisk mikrofonu z podpisem, 3 przykładowe podpowiedzi, które działają.
 5. **Dokumenty**
    - Lista kart dokumentów jedna pod drugą, bez nakładania. Na karcie nazwa i status („Ważny do 12.03.2031” z ikoną).
@@ -113,7 +114,7 @@ Aplikacja ma 3 ekrany wejściowe, 5 zakładek na dolnym pasku i 4 ekrany wspóln
 9. **Potwierdzenie.** „Sprawdź, zanim wyślemy”: lista „Co zrobimy” i „Twoje dane”. Przyciski „Potwierdzam i wysyłam” oraz „Wróć i popraw”. Potem symulowane potwierdzenie tożsamości: „Potwierdź odciskiem palca lub PIN-em” z przyciskiem „Potwierdź (w prototypie wystarczy kliknąć)”.
 10. **Gotowe.** Duża ikona sukcesu, jedno zdanie, co się stało, sekcja „Co dalej”, informacja „Potwierdzenie jest w Skrzynce”, przycisk „Wróć na Start”.
 11. **Niedostępne w prototypie** (okno). „Tej sprawy nie ma jeszcze w prototypie. Działają:” + 3 przyciski do działających spraw + „Zamknij”.
-12. **Ustawienia.** Rozmiar tekstu, wysoki kontrast, tryb prosty, czytanie na głos, „Pokaż wprowadzenie ponownie”, „Zmień osobę (prototyp)”.
+12. **Ustawienia.** Informacja „Prototyp konkursowy, dane fikcyjne”. Rozmiar tekstu, wysoki kontrast, tryb prosty, czytanie na głos, „Pokaż wprowadzenie ponownie”, „Zmień osobę (prototyp)”.
 
 ## Scenariusze
 
@@ -132,7 +133,7 @@ Trzy sprawy, każda innego typu: działanie w kilku krokach, szukanie informacji
 
 **B. Mój samochód: OC i badanie techniczne** (szukanie informacji)
 
-1. **Mój samochód.** Karta pojazdu: marka, numer rejestracyjny. Statusy z ikoną i słowem: „OC ważne do 1.12.2026 — zostało 12 dni” (ostrzeżenie), „Badanie techniczne ważne do 14.05.2027” (w porządku).
+1. **Mój samochód.** Karta pojazdu: marka, numer rejestracyjny. Statusy z ikoną i słowem: „OC ważne do [dziś + 12 dni] — zostało 12 dni” (ostrzeżenie; data liczona automatycznie przy każdym otwarciu), „Badanie techniczne ważne do 14.05.2027” (w porządku).
 2. **Przypomnienie.** Przycisk „Przypomnij mi 7 dni przed terminem” → wybór: powiadomienie w aplikacji lub SMS.
 3. **Gotowe.** „Przypomnienie ustawione”, wiadomość w Skrzynce.
 
@@ -181,6 +182,7 @@ Asystent jest obecny tak jak u Cieszyńskiego (pole na ekranie Start), a dodatko
 
 Zwykłe HTML, CSS i JavaScript, bez frameworków i bez budowania. Otwiera się `index.html` w przeglądarce i działa; ten sam folder idzie na GitHub Pages.
 
+- **Działa po dwukliku i na GitHub Pages.** Każda strona musi działać po otwarciu pliku dwuklikiem (adres `file://`, bez serwera) i tak samo na GitHub Pages. Dlatego: tylko zwykłe skrypty `<script src="…">` (bez modułów ES i bez `fetch` plików), bez ramek `iframe` wczytujących inne pliki projektu. Każdą zmianę sprawdzać przez otwarcie pliku w przeglądarce dokładnie w ten sposób, a nie tylko przez serwer podglądu.
 - **Pliki:** `index.html`, `style.css`, `app.js` (ekrany i nawigacja), `dane.js` (osoby, dokumenty, sprawy, wiadomości), `asystent.js`, `SPECYFIKACJA.md`, `POSTEP.md`.
 - **Każdy ekran ma własny adres** (np. `#/start`, `#/sprawy`, `#/sprawa/zameldowanie/krok-2`). Dzięki temu w badaniu każde zadanie zaczyna się z tego samego miejsca, a jury może dostać link do konkretnego ekranu.
 - **Parametry adresu:** `?osoba=halina`, `?tekst=duzy`, `?reset=1` (czysty stan dla kolejnego uczestnika badania).
@@ -192,6 +194,7 @@ Zwykłe HTML, CSS i JavaScript, bez frameworków i bez budowania. Otwiera się `
 
 ## Decyzje
 
-- Nazwa: mObywatel Prosto.
+- Nazwa projektu: mObywatel Prosto. W nagłówku aplikacji: „mObywatel”.
+- Kierunek wyglądu: wariant B (ciepły i przyjazny); szczegóły wybierane spośród B1–B3.
 - Asystent: pole na ekranie Start (jak u Cieszyńskiego) + osobna zakładka.
 - Sprawy A, B, C: autorka sprawdza, czy istnieją w oficjalnym mObywatelu. Nie zmieniaj ich bez polecenia.
