@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start, wariant A: spokojny i urzędowy · mObywatel Prosto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* ===== Wariant A — spokojny i urzędowy ===== */
+:root {
+  --tekst: 137.5%;            /* JEDNA zmienna rozmiaru: 112.5% = 18 px, 137.5% = 22 px, 162.5% = 26 px */
+  --granat: #123A6B;          /* akcje i przyciski (kontrast z białym 11,4:1) */
+  --granat-ciemny: #0C2A4F;
+  --granat-jasny: #E8EEF6;
+  --czerwien: #B42318;        /* tylko sprawy pilne i błędy (6,6:1) */
+  --czerwien-tlo: #FDF0EF;
+  --tekst-kolor: #1A1F27;     /* tekst podstawowy (16:1) */
+  --szary: #4A5563;           /* tekst pomocniczy (7,6:1) */
+  --ramka: #6B7A8C;           /* obramowania pól i kafli (4,4:1) */
+  --linia: #C9D1DB;           /* linie dekoracyjne */
+  --tlo-panelu: #F3F6F9;
+}
+html { font-size: var(--tekst); }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--tekst-kolor);
+  background: #fff;
+}
+h1, h2, p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; min-height: 48px; min-width: 48px; }
+:focus-visible { outline: 3px solid #1A1A1A; outline-offset: 3px; }
+.ikona { width: 1.5rem; height: 1.5rem; flex: none; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ukryty { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ===== Ramka telefonu (tylko na komputerze) ===== */
+.narzedzia { display: none; }
+.telefon { min-height: 100dvh; display: flex; flex-direction: column; background: #fff; }
+@media (min-width: 31em) and (min-height: 46em) {
+  body { background: #DDE2E8; min-height: 100dvh; display: flex; flex-direction: column;
+    align-items: center; padding: 1rem; gap: 1rem; }
+  .narzedzia { display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: .5rem 1.5rem; max-width: 60rem; }
+  .telefon { width: 410px; height: min(844px, calc(100dvh - 2rem)); min-height: 0;
+    flex: none; overflow-y: auto; border: 10px solid #1A1F27; border-radius: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+}
+.narzedzia p { font-weight: 700; }
+.narzedzia fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.narzedzia legend { float: left; margin-right: .5rem; }
+.narzedzia label { display: inline-flex; align-items: center; gap: .4rem; min-height: 48px;
+  padding: 0 .75rem; background: #fff; border: 2px solid var(--ramka); border-radius: 6px; cursor: pointer; }
+.narzedzia input { width: 1.25rem; height: 1.25rem; accent-color: var(--granat); }
+.narzedzia a { color: var(--granat); font-weight: 700; display: inline-flex; align-items: center; min-height: 48px; }
+
+/* ===== Pasek „Prototyp” ===== */
+.prototyp { position: sticky; top: 0; z-index: 3; background: #26303D; color: #fff;
+  padding: .35rem 1rem; font-size: max(16px, .75rem); text-align: center; font-weight: 700; }
+
+/* ===== Treść ===== */
+main { flex: 1; padding: 0 1rem 1.5rem; }
+.naglowek { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px; padding: .75rem 0; border-bottom: 1px solid var(--linia); }
+.marka { display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--granat);
+  font-size: max(16px, .85rem); }
+.marka svg { width: 2rem; height: 2rem; flex: none; }
+.przycisk-obrys { display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+  padding: .4rem .9rem; background: #fff; color: var(--granat); border: 2px solid var(--granat);
+  border-radius: 6px; font-weight: 700; }
+.powitanie { padding: 1.25rem 0 .25rem; }
+h1 { font-size: 1.4rem; line-height: 1.25; color: var(--granat-ciemny); }
+.powitanie p { color: var(--szary); margin-top: .25rem; }
+
+section { margin-top: 1.5rem; }
+h2 { font-size: 1.25rem; line-height: 1.3; margin-bottom: .75rem; color: var(--granat-ciemny);
+  padding-bottom: .35rem; border-bottom: 2px solid var(--granat); }
+
+.pilne { border: 2px solid var(--czerwien); border-left-width: 8px; border-radius: 6px;
+  background: var(--czerwien-tlo); padding: 1rem; display: grid; gap: .75rem; }
+.pilne-etykieta { display: flex; align-items: center; gap: .5rem; color: var(--czerwien); font-weight: 700; }
+.pilne-tekst { font-weight: 700; font-size: 1.1rem; line-height: 1.35; }
+
+.przycisk-glowny { display: flex; align-items: center; justify-content: center; gap: .5rem; width: 100%;
+  min-height: 56px; padding: .5rem 1rem; background: var(--granat); color: #fff;
+  border: 2px solid var(--granat); border-radius: 6px; font-weight: 700; text-align: center; }
+
+.kafle { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); }
+.kafel { width: 100%; height: 100%; min-height: 6rem; display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: space-between; gap: .6rem; padding: .75rem;
+  background: #fff; border: 2px solid var(--ramka); border-radius: 6px; text-align: left;
+  font-weight: 700; line-height: 1.3; color: var(--granat-ciemny); overflow-wrap: break-word; }
+.kafel-ikona { display: grid; place-items: center; width: 2.5rem; height: 2.5rem;
+  background: var(--granat-jasny); color: var(--granat); border-radius: 4px; }
+.kafel:hover { border-color: var(--granat); background: #F7F9FC; }
+
+.asystent { background: var(--tlo-panelu); border: 1px solid var(--linia); border-radius: 6px; padding: 1rem; }
+.asystent h2 { border-bottom: 0; padding-bottom: 0; margin-bottom: .25rem; }
+.asystent label { display: block; font-weight: 700; margin-bottom: .4rem; }
+.pole { width: 100%; min-height: 56px; padding: .5rem .75rem; background: #fff;
+  border: 2px solid var(--ramka); border-radius: 6px; }
+.rzad { display: flex; flex-wrap: wrap; gap: 8px; margin-top: .75rem; }
+.rzad > * { flex: 1 1 8rem; }
+.rzad .przycisk-glowny, .rzad .przycisk-obrys { width: auto; min-height: 56px; }
+.przyklady-tytul { margin-top: 1rem; margin-bottom: .4rem; color: var(--szary); }
+.przyklady { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.przyklad { width: 100%; display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem;
+  background: #fff; border: 2px solid var(--ramka); border-radius: 6px; text-align: left; color: var(--granat-ciemny); }
+
+/* ===== Dolny pasek ===== */
+.pasek-dolny { position: sticky; bottom: 0; z-index: 3; background: #fff;
+  border-top: 1px solid var(--linia); box-shadow: 0 -2px 8px rgba(0,0,0,.06); }
+.pasek-dolny ul { list-style: none; margin: 0; padding: 4px; display: flex; flex-wrap: wrap; gap: 8px; }
+.pasek-dolny li { flex: 1 0 auto; }
+.pasek-dolny button { position: relative; width: 100%; min-height: 56px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px; padding: .3rem 2px; background: none; border: 0;
+  color: var(--szary); font-size: max(16px, .72rem); line-height: 1.2; }
+.pasek-dolny button[aria-current="page"] { color: var(--granat); font-weight: 700; }
+.pasek-dolny button[aria-current="page"]::before { content: ""; position: absolute; top: -4px; left: 15%; right: 15%;
+  height: 4px; background: var(--granat); }
+
+/* ===== Okno „to tylko podgląd” ===== */
+dialog { width: min(22rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto;
+  border: 2px solid var(--granat); border-radius: 8px; padding: 1.25rem; color: var(--tekst-kolor); }
+dialog::backdrop { background: rgba(10, 20, 35, .55); }
+dialog h2 { border: 0; padding: 0; }
+dialog p { margin-bottom: 1rem; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-dom" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-dokument" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+  <symbol id="i-lista" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></symbol>
+  <symbol id="i-rozmowa" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-skrzynka" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="i-ustawienia" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-uwaga" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-portfel" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+  <symbol id="i-auto" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
+  <symbol id="i-pinezka" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-dowod" viewBox="0 0 24 24"><path d="M16 10h2"/><path d="M16 14h2"/><path d="M6.17 15a3 3 0 0 1 5.66 0"/><circle cx="9" cy="11" r="2"/><rect x="2" y="5" width="20" height="14" rx="2"/></symbol>
+  <symbol id="i-siatka" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="i-mikrofon" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+  <symbol id="i-wyslij" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="i-dalej" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-szukaj" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+</svg>
+
+<div class="narzedzia">
+  <p>Wariant A: spokojny i urzędowy</p>
+  <fieldset>
+    <legend>Rozmiar tekstu w podglądzie:</legend>
+    <label><input type="radio" name="rozmiar" value="standardowy"> Standardowy</label>
+    <label><input type="radio" name="rozmiar" value="duzy"> Duży</label>
+    <label><input type="radio" name="rozmiar" value="bardzo-duzy"> Bardzo duży</label>
+  </fieldset>
+  <a href="porownanie.html">Porównanie wariantów</a>
+</div>
+
+<div class="telefon">
+  <p class="prototyp" role="note">Prototyp — to nie jest usługa rządowa</p>
+
+  <main>
+    <header class="naglowek">
+      <div class="marka">
+        <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect width="32" height="32" rx="6" fill="#123A6B"/><path d="M9 16.5l4.5 4.5L23 11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>mObywatel Prosto</span>
+      </div>
+      <button type="button" class="przycisk-obrys" data-cel="Ustawienia">
+        <svg class="ikona" aria-hidden="true"><use href="#i-ustawienia"/></svg>
+        <span>Ustawienia</span>
+      </button>
+    </header>
+
+    <div class="powitanie">
+      <h1>Dzień dobry, Halino</h1>
+      <p>Tu załatwisz swoje sprawy urzędowe.</p>
+    </div>
+
+    <section aria-labelledby="h-uwaga">
+      <h2 id="h-uwaga">Wymaga Twojej uwagi</h2>
+      <div class="pilne">
+        <p class="pilne-etykieta">
+          <svg class="ikona" aria-hidden="true"><use href="#i-uwaga"/></svg>
+          <span>Pilne</span>
+        </p>
+        <p class="pilne-tekst">OC samochodu kończy się za 12 dni.</p>
+        <button type="button" class="przycisk-glowny" data-cel="sprawę „Mój samochód” (OC i badanie techniczne)">
+          <span>Sprawdź OC</span>
+          <svg class="ikona" aria-hidden="true"><use href="#i-dalej"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-sprawy">
+      <h2 id="h-sprawy">Najczęstsze sprawy</h2>
+      <ul class="kafle">
+        <li><button type="button" class="kafel" data-cel="sprawę „Zgubione dokumenty”"><span class="kafel-ikona"><svg class="ikona" aria-hidden="true"><use href="#i-portfel"/></svg></span><span>Zgubione dokumenty</span></button></li>
+        <li><button type="button" class="kafel" data-cel="sprawę „Mój samochód” (OC i badanie techniczne)"><span class="kafel-ikona"><svg class="ikona" aria-hidden="true"><use href="#i-auto"/></svg></span><span>Mój samochód</span></button></li>
+        <li><button type="button" class="kafel" data-cel="sprawę „Zameldowanie”"><span class="kafel-ikona"><svg class="ikona" aria-hidden="true"><use href="#i-pinezka"/></svg></span><span>Meldunek</span></button></li>
+        <li><button type="button" class="kafel" data-cel="Twój mDowód"><span class="kafel-ikona"><svg class="ikona" aria-hidden="true"><use href="#i-dowod"/></svg></span><span>Pokaż mDowód</span></button></li>
+        <li><button type="button" class="kafel" data-cel="Skrzynkę z wiadomościami"><span class="kafel-ikona"><svg class="ikona" aria-hidden="true"><use href="#i-skrzynka"/></svg></span><span>Skrzynka</span></button></li>
+        <li><button type="button" class="kafel" data-cel="listę wszystkich spraw"><span class="kafel-ikona"><svg class="ikona" aria-hidden="true"><use href="#i-siatka"/></svg></span><span>Wszystkie sprawy</span></button></li>
+      </ul>
+    </section>
+
+    <section class="asystent" aria-labelledby="h-asystent">
+      <h2 id="h-asystent">Asystent</h2>
+      <form id="formularz-asystenta">
+        <label for="pole-asystenta">Napisz lub powiedz, co chcesz załatwić</label>
+        <input id="pole-asystenta" class="pole" type="text" autocomplete="off">
+        <div class="rzad">
+          <button type="button" class="przycisk-obrys" data-opis="W gotowej aplikacji powiesz to głosem. Jeśli przeglądarka tego nie umie, przycisk wyjaśni, że trzeba pisać.">
+            <svg class="ikona" aria-hidden="true"><use href="#i-mikrofon"/></svg><span>Powiedz</span>
+          </button>
+          <button type="submit" class="przycisk-glowny">
+            <svg class="ikona" aria-hidden="true"><use href="#i-wyslij"/></svg><span>Wyślij</span>
+          </button>
+        </div>
+      </form>
+      <p class="przyklady-tytul" id="h-przyklady">Możesz też wybrać:</p>
+      <ul class="przyklady" aria-labelledby="h-przyklady">
+        <li><button type="button" class="przyklad" data-cel="asystenta z pytaniem „Zginął mi dowód”"><svg class="ikona" aria-hidden="true"><use href="#i-szukaj"/></svg><span>Zginął mi dowód</span></button></li>
+        <li><button type="button" class="przyklad" data-cel="asystenta z pytaniem „Do kiedy mam OC?”"><svg class="ikona" aria-hidden="true"><use href="#i-szukaj"/></svg><span>Do kiedy mam OC?</span></button></li>
+        <li><button type="button" class="przyklad" data-cel="asystenta z pytaniem „Jak się zameldować?”"><svg class="ikona" aria-hidden="true"><use href="#i-szukaj"/></svg><span>Jak się zameldować?</span></button></li>
+      </ul>
+    </section>
+  </main>
+
+  <nav class="pasek-dolny" aria-label="Menu główne">
+    <ul>
+      <li><button type="button" aria-current="page" data-akcja="gora"><svg class="ikona" aria-hidden="true"><use href="#i-dom"/></svg><span>Start</span></button></li>
+      <li><button type="button" data-cel="zakładkę Dokumenty"><svg class="ikona" aria-hidden="true"><use href="#i-dokument"/></svg><span>Dokumenty</span></button></li>
+      <li><button type="button" data-cel="zakładkę Sprawy"><svg class="ikona" aria-hidden="true"><use href="#i-lista"/></svg><span>Sprawy</span></button></li>
+      <li><button type="button" data-cel="zakładkę Asystent"><svg class="ikona" aria-hidden="true"><use href="#i-rozmowa"/></svg><span>Asystent</span></button></li>
+      <li><button type="button" data-cel="zakładkę Skrzynka"><svg class="ikona" aria-hidden="true"><use href="#i-skrzynka"/></svg><span>Skrzynka</span></button></li>
+    </ul>
+  </nav>
+</div>
+
+<dialog id="okno" aria-labelledby="okno-tytul" aria-describedby="okno-tekst">
+  <h2 id="okno-tytul">To jest podgląd wyglądu</h2>
+  <p id="okno-tekst"></p>
+  <button type="button" class="przycisk-glowny" id="okno-zamknij">Zamknij</button>
+</dialog>
+
+<script>
+(function () {
+  var rozmiary = { 'standardowy': '112.5%', 'duzy': '137.5%', 'bardzo-duzy': '162.5%' };
+  function ustawRozmiar(nazwa) {
+    if (!rozmiary[nazwa]) nazwa = 'duzy'; /* Halina: domyślnie Duży tekst */
+    document.documentElement.style.setProperty('--tekst', rozmiary[nazwa]);
+    var radio = document.querySelector('input[name="rozmiar"][value="' + nazwa + '"]');
+    if (radio) radio.checked = true;
+  }
+  ustawRozmiar(new URLSearchParams(location.search).get('tekst'));
+  document.querySelectorAll('input[name="rozmiar"]').forEach(function (radio) {
+    radio.addEventListener('change', function () {
+      ustawRozmiar(radio.value);
+      try { var u = new URL(location.href); u.searchParams.set('tekst', radio.value); history.replaceState(null, '', u); } catch (e) {}
+    });
+  });
+
+  var okno = document.getElementById('okno');
+  var oknoTekst = document.getElementById('okno-tekst');
+  function pokaz(opis) {
+    oknoTekst.textContent = opis;
+    if (okno.showModal) okno.showModal(); else okno.setAttribute('open', '');
+  }
+  document.getElementById('okno-zamknij').addEventListener('click', function () {
+    if (okno.close) okno.close(); else okno.removeAttribute('open');
+  });
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-cel], [data-opis], [data-akcja]');
+    if (!el) return;
+    if (el.dataset.akcja === 'gora') {
+      var t = document.querySelector('.telefon');
+      t.scrollTop = 0; window.scrollTo(0, 0);
+      return;
+    }
+    pokaz(el.dataset.opis || ('Ten plik pokazuje tylko wygląd ekranu Start. W gotowej aplikacji ten przycisk otworzy: ' + el.dataset.cel + '.'));
+  });
+  document.getElementById('formularz-asystenta').addEventListener('submit', function (e) {
+    e.preventDefault();
+    pokaz('W gotowej aplikacji asystent rozpozna Twoją sprawę. Potem poprowadzi Cię krok po kroku.');
+  });
+})();
+</script>
+</body>
+</html>

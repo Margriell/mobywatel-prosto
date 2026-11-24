@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Porównanie wariantów ekranu Start · mObywatel Prosto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root { --granat: #123A6B; --tekst-kolor: #1A1F27; --szary: #4A5563; --ramka: #6B7A8C; }
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 112.5%; }  /* 18 px */
+body { margin: 0; padding: 1.5rem 1rem 3rem; background: #EEF1F4; color: var(--tekst-kolor);
+  font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.5; }
+h1, h2, p { margin: 0; }
+:focus-visible { outline: 3px solid #1A1A1A; outline-offset: 3px; }
+.wstep { max-width: 60rem; margin: 0 auto 1.5rem; display: grid; gap: .75rem; }
+h1 { font-size: 1.55rem; line-height: 1.25; color: var(--granat); }
+.prototyp { display: inline-block; background: #26303D; color: #fff; font-weight: 700; padding: .2rem .75rem; border-radius: 4px; justify-self: start; }
+fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+legend { float: left; margin-right: .5rem; font-weight: 700; }
+fieldset label { display: inline-flex; align-items: center; gap: .4rem; min-height: 48px; padding: 0 .75rem;
+  background: #fff; border: 2px solid var(--ramka); border-radius: 6px; cursor: pointer; }
+fieldset input { width: 1.25rem; height: 1.25rem; accent-color: var(--granat); }
+.warianty { list-style: none; margin: 0 auto; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; }
+.wariant { width: 410px; max-width: 100%; display: grid; gap: .75rem; align-content: start; }
+.wariant h2 { font-size: 1.3rem; line-height: 1.3; color: var(--granat); }
+iframe { display: block; width: 410px; max-width: 100%; height: 864px; border: 10px solid #1A1F27; border-radius: 40px;
+  background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+.opis { display: grid; gap: .5rem; }
+.wariant a { color: var(--granat); font-weight: 700; display: inline-flex; align-items: center; min-height: 48px; }
+</style>
+</head>
+<body>
+  <div class="wstep">
+    <p class="prototyp">Prototyp — to nie jest usługa rządowa</p>
+    <h1>Ekran Start — trzy warianty do wyboru</h1>
+    <p>Każdy wariant pokazuje ten sam ekran dla Haliny (71 lat). Treść jest taka sama, różni się charakter i układ. Przyciski w podglądzie mówią, dokąd poprowadzą w gotowej aplikacji.</p>
+    <fieldset>
+      <legend>Rozmiar tekstu we wszystkich wariantach:</legend>
+      <label><input type="radio" name="rozmiar" value="standardowy"> Standardowy</label>
+      <label><input type="radio" name="rozmiar" value="duzy" checked> Duży</label>
+      <label><input type="radio" name="rozmiar" value="bardzo-duzy"> Bardzo duży</label>
+    </fieldset>
+  </div>
+
+  <ul class="warianty">
+    <li class="wariant">
+      <h2>A — spokojny i urzędowy</h2>
+      <iframe src="start-a.html?tekst=duzy" data-plik="start-a.html" title="Wariant A: spokojny i urzędowy"></iframe>
+      <div class="opis">
+        <p>Biały ekran, granatowe akcenty i linie pod nagłówkami porządkują treść jak dobrze zrobiony formularz.</p>
+        <p>Kolejność jest dokładnie taka jak w specyfikacji: sprawa pilna, kafle w dwóch kolumnach, asystent na dole.</p>
+        <p>Budzi zaufanie przez przewidywalność: nic nie zaskakuje, wszystko ma swoje stałe miejsce.</p>
+      </div>
+      <a href="start-a.html">Otwórz wariant A osobno</a>
+    </li>
+    <li class="wariant">
+      <h2>B — ciepły i przyjazny</h2>
+      <iframe src="start-b.html?tekst=duzy" data-plik="start-b.html" title="Wariant B: ciepły i przyjazny"></iframe>
+      <div class="opis">
+        <p>Kremowe tło, zaokrąglone karty i granatowa góra z inicjałem dają nowoczesny, „bankowy” charakter.</p>
+        <p>Pole asystenta stoi wyżej, od razu pod powitaniem — jak wyszukiwarka w dobrej aplikacji bankowej.</p>
+        <p>Asystent jest bardziej widoczny, ale wszystkie sprawy nadal są dostępne jako kafle poniżej.</p>
+      </div>
+      <a href="start-b.html">Otwórz wariant B osobno</a>
+    </li>
+    <li class="wariant">
+      <h2>C — maksymalnie prosty (75+)</h2>
+      <iframe src="start-c.html?tekst=duzy" data-plik="start-c.html" title="Wariant C: maksymalnie prosty"></iframe>
+      <div class="opis">
+        <p>Jedna kolumna, grube ramki i bardzo duże, szerokie przyciski, które łatwo trafić nawet drżącą ręką.</p>
+        <p>Każda sprawa ma pod nazwą krótkie wyjaśnienie, więc nie trzeba zgadywać, co kryje się za kaflem.</p>
+        <p>Mniej ozdób, więcej odstępów i prawie czarny tekst — dla osoby, która pierwszy raz używa aplikacji.</p>
+      </div>
+      <a href="start-c.html">Otwórz wariant C osobno</a>
+    </li>
+  </ul>
+
+<script>
+document.querySelectorAll('input[name="rozmiar"]').forEach(function (radio) {
+  radio.addEventListener('change', function () {
+    document.querySelectorAll('iframe[data-plik]').forEach(function (ramka) {
+      ramka.src = ramka.dataset.plik + '?tekst=' + radio.value;
+    });
+  });
+});
+</script>
+</body>
+</html>
