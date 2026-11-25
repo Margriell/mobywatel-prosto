@@ -1,5 +1,5 @@
 /* =====================================================================
-   mObywatel Prosto — szkielet aplikacji (etap 2).
+   mObywatel Prosto — szkielet aplikacji (etap 2 z poprawkami).
    Każdy ekran ma własny adres (#/dokumenty, #/uslugi …).
    Parametry: ?osoba=halina|tomasz|ola, ?reset=1.
    Zwykły skrypt (bez modułów, bez fetch, bez iframe): działa po dwukliku
@@ -27,6 +27,7 @@
     oko: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
     dalej: '<path d="m9 18 6-6-6-6"/>',
     wstecz: '<path d="m15 18-6-6 6-6"/>',
+    dol: '<path d="m6 9 6 6 6-6"/>',
     iskry: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>',
     mikrofon: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>',
     wyslij: '<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
@@ -51,10 +52,72 @@
     portfel: '<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
     czapka: '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
     uslugi: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
-    dokumenty: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'
+    dokumenty: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+    warstwy: '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/>',
+    wGore: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
+    wDol: '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+    strzalki: '<path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/>',
+    kosz: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>',
+    plus: '<circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/>',
+    autobus: '<path d="M8 6v6"/><path d="M15 6v6"/><path d="M2 12h19.6"/><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"/><circle cx="7" cy="18" r="2"/><path d="M9 18h5"/><circle cx="16" cy="18" r="2"/>',
+    wybory: '<path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/>',
+    osobaOk: '<path d="m16 11 2 2 4-4"/><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+    zegarek: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+    lista: '<path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/>',
+    kartyDuze: '<rect width="18" height="11" x="3" y="10" rx="2"/><path d="M5 7h14"/><path d="M7 4h10"/>'
   };
   function ikona(nazwa, klasa) {
     return '<svg' + (klasa ? ' class="' + klasa + '"' : '') + ' viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (IKONY[nazwa] || '') + '</svg>';
+  }
+  /* Sylwetka auta (zamiast zdjęcia na karcie Moje pojazdy) — własny rysunek */
+  var SYLWETKA_AUTA = '<svg class="sylwetka" viewBox="0 0 64 40" aria-hidden="true" focusable="false">' +
+    '<path d="M3 26.5C3 24.3 4.5 22.5 6.6 22l7.9-1.9 6.6-7.3A6 6 0 0 1 25.6 11h13.2a6 6 0 0 1 4.6 2.1l6.1 7.1 7.9 1.5A4 4 0 0 1 61 25.6V29a2 2 0 0 1-2 2h-3.6a6.6 6.6 0 0 0-13 0H21.6a6.6 6.6 0 0 0-13 0H5a2 2 0 0 1-2-2z"/>' +
+    '<path class="jasne" d="M20.6 20.2l5.3-5.9a3 3 0 0 1 2.2-1H31.5v6.9zM34.5 13.3h4.3a3 3 0 0 1 2.3 1.1l5 5.8H34.5z"/>' +
+    '<circle cx="15.1" cy="31" r="5.2"/><circle cx="48.9" cy="31" r="5.2"/>' +
+    '<circle class="jasne" cx="15.1" cy="31" r="2"/><circle class="jasne" cx="48.9" cy="31" r="2"/></svg>';
+
+  /* Kod kreskowy: paski z cyfr numeru (wzory cyfr jak w kodzie EAN; ilustracja w prototypie) */
+  var WZORY_CYFR = ['3211', '2221', '2122', '1411', '1132', '1231', '1114', '1312', '1213', '3112'];
+  function kodKreskowy(kod) {
+    var x = 0, paski = '';
+    function dodaj(szer, czarny) {
+      if (czarny) paski += '<rect x="' + x + '" y="0" width="' + szer + '" height="40"/>';
+      x += szer;
+    }
+    [1, 1, 1].forEach(function (s, i) { dodaj(s, i % 2 === 0); });
+    String(kod).split('').forEach(function (c) {
+      var w = WZORY_CYFR[+c] || WZORY_CYFR[0];
+      for (var i = 0; i < 4; i++) dodaj(+w.charAt(i), i % 2 === 1);
+    });
+    [1, 1, 1].forEach(function (s, i) { dodaj(s, i % 2 === 0); });
+    return '<svg class="kod-paski" viewBox="0 0 ' + x + ' 40" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true" focusable="false">' + paski + '</svg>';
+  }
+
+  /* Wzór giloszowy (jak na prawdziwych dokumentach): jasna rozeta z przeplatanych krzywych
+     i ciemne fale. Cienkie, prawie przezroczyste linie — tekst na karcie zostaje w pełni czytelny
+     (jasne linie są tak słabe, że nawet na ich skrzyżowaniu kontrast białego tekstu to min. 4,5:1;
+     ciemne fale kontrast tylko zwiększają). */
+  function ustawGilosz() {
+    function krzywa(cx, cy, r0, amp, platki, faza, kroki) {
+      var d = '';
+      for (var i = 0; i <= kroki; i++) {
+        var a = i / kroki * Math.PI * 2;
+        var r = r0 + amp * Math.sin(platki * a + faza);
+        d += (i ? 'L' : 'M') + (cx + r * Math.cos(a)).toFixed(1) + ' ' + (cy + r * Math.sin(a)).toFixed(1);
+      }
+      return '<path d="' + d + 'Z"/>';
+    }
+    var r = '', f = '', k, x;
+    for (k = 0; k < 10; k++) r += krzywa(150, 150, 112, 22, 9, k * Math.PI * 2 / 10, 216);
+    for (k = 0; k < 7; k++) r += krzywa(150, 150, 60, 12, 7, k * Math.PI * 2 / 7, 168);
+    for (k = 0; k < 5; k++) {
+      var d = '';
+      for (x = 0; x <= 400; x += 5) d += (x ? 'L' : 'M') + x + ' ' + (32 + 16 * Math.sin(x / 400 * Math.PI * 8 + k * Math.PI * 2 / 5)).toFixed(1);
+      f += '<path d="' + d + '"/>';
+    }
+    function adres(svg) { return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")'; }
+    html.style.setProperty('--gilosz-rozeta', adres('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none" stroke="#fff" stroke-opacity=".075" stroke-width="1">' + r + '</svg>'));
+    html.style.setProperty('--gilosz-fale', adres('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 64" preserveAspectRatio="none" fill="none" stroke="#000" stroke-opacity=".16" stroke-width="1.2">' + f + '</svg>'));
   }
 
   /* ---------- Pomocnicze ---------- */
@@ -76,13 +139,19 @@
     for (var i = 0; i < lista.length; i++) if (lista[i].id === id) return lista[i];
     return null;
   }
+  function ograniczRuch() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
 
   /* ---------- Stan i ustawienia (localStorage w try/catch) ---------- */
   var KLUCZ = 'mobywatel-prosto';
-  var DOMYSLNE = { osoba: null, tekst: 'standardowy', motyw: 'jasny', prosty: false, czytanie: false, przeczytane: {} };
+  var DOMYSLNE = { osoba: null, tekst: 'standardowy', motyw: 'jasny', prosty: false, czytanie: false, przeczytane: {}, kolejnosc: {}, uklady: {} };
   var ROZMIARY = ['standardowy', 'duzy', 'bardzo-duzy'];
   var MOTYWY = ['jasny', 'ciemny', 'kontrast'];
+  var UKLADY = ['duze', 'male', 'lista'];
+  var NAZWY_UKLADOW = { duze: 'Duże karty', male: 'Małe karty', lista: 'Lista' };
   var stan = wczytaj();
+  var przodPortfela = {}; /* która karta leży z przodu portfela (do końca wizyty) */
 
   function wczytaj() {
     var s = JSON.parse(JSON.stringify(DOMYSLNE));
@@ -95,6 +164,13 @@
         s.prosty = !!z.prosty;
         s.czytanie = !!z.czytanie;
         if (z.przeczytane && typeof z.przeczytane === 'object') s.przeczytane = z.przeczytane;
+        Object.keys(D.osoby).forEach(function (id) {
+          var k = z.kolejnosc && z.kolejnosc[id];
+          if (Array.isArray(k)) {
+            s.kolejnosc[id] = k.filter(function (x, i) { return typeof x === 'string' && znajdz(D.osoby[id].dokumenty, x) && k.indexOf(x) === i; });
+          }
+          if (z.uklady && UKLADY.indexOf(z.uklady[id]) >= 0) s.uklady[id] = z.uklady[id];
+        });
       }
     } catch (e) { /* bez localStorage aplikacja też działa */ }
     return s;
@@ -119,11 +195,26 @@
     stan.motyw = o.ustawienia.motyw;
     stan.prosty = o.ustawienia.prosty;
     stan.czytanie = o.ustawienia.czytanie;
-    stan.przeczytane[id] = {}; /* każdy wybór osoby zaczyna od świeżej Skrzynki */
+    /* Każdy wybór osoby zaczyna od nowa: świeża Skrzynka, wszystkie dokumenty, układ „Duże karty” */
+    stan.przeczytane[id] = {};
+    delete stan.kolejnosc[id];
+    delete stan.uklady[id];
+    delete przodPortfela[id];
     zapisz();
     zastosujUstawienia();
   }
   function osoba() { return D.osoby[stan.osoba] || D.osoby.halina; }
+  /* Dokumenty osoby w zapamiętanej kolejności (bez usuniętych) */
+  function dokumentyOsoby(o) {
+    var k = stan.kolejnosc[o.id];
+    if (!k) return o.dokumenty.slice();
+    return k.map(function (id) { return znajdz(o.dokumenty, id); }).filter(Boolean);
+  }
+  function ukladOsoby(o) { return stan.uklady[o.id] || 'duze'; }
+  function idPrzodu(o, docs) {
+    var p = przodPortfela[o.id];
+    return p && znajdz(docs, p) ? p : docs[docs.length - 1].id;
+  }
   function czyNowa(o, w) { return w.nowa && !(stan.przeczytane[o.id] && stan.przeczytane[o.id][w.id]); }
   function liczbaNowych(o) {
     var n = 0;
@@ -148,39 +239,121 @@
           (n ? '<span class="licznik" aria-hidden="true">' + n + '</span>' : '') + '</a>' +
       '</div></header>';
   }
-  function naglowekWstecz(rodzic) {
+  /* Podekrany: górny pasek z „Wstecz” i tytułem, przyklejony u góry */
+  function naglowekWstecz(rodzic, tytulEkranu) {
     return '<header class="naglowek naglowek-pod">' +
       '<button type="button" class="wstecz" data-akcja="wstecz" data-rodzic="' + rodzic + '">' + ikona('wstecz') + 'Wstecz</button>' +
-      '</header>';
+      '<h1 class="tytul-paska" tabindex="-1">' + tytulEkranu + '</h1></header>';
   }
   function przyciskCzytaj() {
     return '<button type="button" class="btn-czytaj tylko-czytanie" data-akcja="przeczytaj">' + ikona('glosnik') + '<span>Przeczytaj</span></button>';
   }
+  /* Ekrany główne (zakładki): tytuł w treści */
   function tytul(tekst, podtytul, klasa) {
     return '<div class="tytul-strony' + (klasa ? ' ' + klasa : '') + '"><h1 tabindex="-1">' + tekst + '</h1>' + przyciskCzytaj() + '</div>' +
       (podtytul ? '<p class="podtytul">' + podtytul + '</p>' : '');
   }
+  /* Podekrany: tytuł jest w górnym pasku; w treści „Przeczytaj” i podtytuł */
+  function wstep(podtytul) {
+    return '<div class="czytaj-wiersz">' + przyciskCzytaj() + '</div>' + (podtytul ? '<p class="podtytul">' + podtytul + '</p>' : '');
+  }
+
+  /* ---------- Karty dokumentów: jeden wspólny szablon ---------- */
   function statusKarty(d) {
-    return '<span class="status-karty">' + (d.ikonaStatusu ? ikona(d.ikonaStatusu) : '') + d.status + '</span>';
+    return '<span class="karta-status' + (d.alarm ? ' alarm' : '') + '">' + ikona(d.ikonaStatusu || 'ok') + d.status + '</span>';
   }
-  /* mDowód — karta z przodu portfela. tryb: 'portfel' | 'szczegoly' | 'podglad' */
-  function kartaDowodu(o, d, tryb) {
+  function poleKarty(p) {
+    var cechy = p[2] || '';
+    var wartosc = cechy.indexOf('alarm') >= 0 ? '<span class="pole-alarm">' + ikona('uwaga') + '<span>' + p[1] + '</span></span>' : p[1];
+    return '<div class="karta-pole' + (cechy.indexOf('dlugie') >= 0 ? ' dlugie' : '') + '"><dt>' + p[0] + '</dt><dd>' + wartosc + '</dd></div>';
+  }
+  function zdjecieKarty(o, d) {
+    if (d.rodzaj === 'pojazdy') return '<div class="karta-zdjecie auto" aria-hidden="true">' + SYLWETKA_AUTA + '</div>';
+    return '<div class="karta-zdjecie" aria-hidden="true">' + o.inicjaly + '</div>';
+  }
+  /* tryb: 'przod' (z przodu portfela), 'tyl' (karta z tyłu — przycisk), 'szczegoly',
+     'podglad' i 'tyl-podglad' (podgląd w ustawieniach, bez klikania), 'mala' (układ Małe karty) */
+  function kartaDokumentu(o, d, tryb) {
+    var klasa = 'karta k-' + d.kolor;
+    var nazwa = '<span class="karta-nazwa">' + d.nazwa + '</span>';
+    if (tryb === 'tyl') {
+      return '<div class="' + klasa + ' tyl" data-id="' + d.id + '">' +
+        '<button type="button" class="karta-gora" data-akcja="na-przod" data-id="' + d.id + '" aria-label="Pokaż ' + d.nazwa + ' na przodzie. ' + d.status + '">' +
+          nazwa + statusKarty(d) + '</button></div>';
+    }
+    if (tryb === 'tyl-podglad') {
+      return '<div class="' + klasa + ' tyl" data-id="' + d.id + '"><div class="karta-gora">' + nazwa + statusKarty(d) + '</div></div>';
+    }
+    if (tryb === 'mala') {
+      return '<a class="' + klasa + ' mala" href="#/dokument/' + d.id + '">' + nazwa + statusKarty(d) + '</a>';
+    }
+    var cialo = '<div class="karta-cialo">' + zdjecieKarty(o, d) + '<dl class="karta-pola">' + d.pola.map(poleKarty).join('') + '</dl></div>' +
+      (d.kod ? '<div class="karta-kod" role="img" aria-label="Kod kreskowy, numer ' + d.kod + '">' + kodKreskowy(d.kod) + '<span aria-hidden="true">' + d.kod + '</span></div>' : '');
     var przycisk = '';
-    if (tryb === 'portfel') przycisk = '<a class="btn-pokaz" href="#/dokument/dowod">' + ikona('oko') + 'Pokaż dane</a>';
-    if (tryb === 'podglad') przycisk = '<span class="btn-pokaz">' + ikona('oko') + 'Pokaż dane</span>';
-    return '<div class="karta dowod' + (tryb === 'szczegoly' ? ' pojedyncza' : '') + '">' +
-      '<div class="dowod-gora"><b>mDowód</b><span class="chip" aria-hidden="true"></span></div>' +
-      '<div class="dowod-srodek"><div class="zdjecie" aria-hidden="true">' + o.inicjaly + '</div>' +
-        '<div class="dowod-dane"><div class="imie">' + (o.id === 'ola' ? 'Aleksandra' : o.imie) + ' ' + o.nazwisko + '</div>' +
-        '<div class="waznosc">' + ikona('ok') + d.status + '</div></div></div>' +
-      przycisk + '</div>';
+    if (tryb === 'przod') przycisk = '<a class="btn-pokaz" href="#/dokument/' + d.id + '" aria-label="Pokaż szczegóły: ' + d.nazwa + '">' + ikona('oko') + 'Pokaż szczegóły</a>';
+    if (tryb === 'podglad') przycisk = '<span class="btn-pokaz">' + ikona('oko') + 'Pokaż szczegóły</span>';
+    return '<div class="' + klasa + (tryb === 'szczegoly' ? ' szczegoly' : ' przod') + '" data-id="' + d.id + '">' +
+      '<div class="karta-gora">' + nazwa + statusKarty(d) + '</div>' + cialo + przycisk + '</div>';
   }
-  /* Portfel: karty jedna za drugą, mDowód z przodu w całości */
+  function statusWiersza(d) {
+    return d.alarm ? '<span class="status-pilne">' + ikona('uwaga') + d.status + '</span>' :
+      '<span class="status-ok">' + ikona(d.ikonaStatusu || 'ok') + d.status + '</span>';
+  }
+  function wierszDokumentu(d) {
+    return '<li><a class="wiersz-listy" href="#/dokument/' + d.id + '"><span class="mini-karta k-' + d.kolor + '" aria-hidden="true"></span>' +
+      '<span class="tekst"><span class="tytul-wiersza">' + d.nazwa + '</span><span class="opis">' + statusWiersza(d) + '</span></span>' +
+      ikona('dalej', 'chevron') + '</a></li>';
+  }
+  function pustyPortfel() {
+    return '<div class="pusty-stan"><p><b>Nie masz dokumentów w aplikacji.</b></p>' +
+      '<p>W prototypie wrócą, gdy wybierzesz osobę jeszcze raz.</p>' +
+      '<div class="przyciski-pion"><a class="btn drugi" href="#/osoba">' + ikona('rodzina') + 'Zmień osobę</a></div></div>';
+  }
+  /* Dokumenty w wybranym układzie. Duże karty = portfel: karty jedna za drugą, jedna z przodu w całości */
   function portfel(o) {
-    return '<div class="portfel">' + o.dokumenty.map(function (d) {
-      if (d.rodzaj === 'dowod') return kartaDowodu(o, d, 'portfel');
-      return '<div class="karta ' + d.kolor + '"><a class="pasek-karty" href="#/dokument/' + d.id + '"><b>' + d.nazwa + '</b>' + statusKarty(d) + '</a></div>';
+    var docs = dokumentyOsoby(o);
+    if (!docs.length) return pustyPortfel();
+    var uklad = ukladOsoby(o);
+    if (uklad === 'lista') return '<ul class="lista portfel-lista">' + docs.map(wierszDokumentu).join('') + '</ul>';
+    if (uklad === 'male') return '<ul class="male-karty">' + docs.map(function (d) { return '<li>' + kartaDokumentu(o, d, 'mala') + '</li>'; }).join('') + '</ul>';
+    var przod = idPrzodu(o, docs);
+    var stos = docs.filter(function (d) { return d.id !== przod; }).concat([znajdz(docs, przod)]);
+    return '<div class="portfel" id="portfel">' + stos.map(function (d) {
+      return kartaDokumentu(o, d, d.id === przod ? 'przod' : 'tyl');
     }).join('') + '</div>';
+  }
+  /* Dotknięcie karty z tyłu przesuwa ją na przód — płynnie (bez animacji przy „ogranicz ruch”) */
+  function naPrzod(id) {
+    var o = osoba();
+    var stary = document.getElementById('portfel');
+    if (!stary) return;
+    var ruch = !ograniczRuch();
+    var przed = {};
+    function ruchome() { return Array.prototype.slice.call(document.querySelectorAll('#portfel .karta, [data-flip]')); }
+    function klucz(el) { return el.getAttribute('data-id') || el.getAttribute('data-flip'); }
+    if (ruch) ruchome().forEach(function (el) { przed[klucz(el)] = el.getBoundingClientRect().top; });
+    przodPortfela[o.id] = id;
+    var tymczasowy = document.createElement('div');
+    tymczasowy.innerHTML = portfel(o);
+    stary.parentNode.replaceChild(tymczasowy.firstChild, stary);
+    var nowy = document.getElementById('portfel');
+    var przodEl = nowy.querySelector('.karta.przod');
+    if (ruch) {
+      var lista = [];
+      ruchome().forEach(function (el) {
+        var dy = przed[klucz(el)] - el.getBoundingClientRect().top;
+        if (Math.abs(dy) > 0.5) { el.style.transition = 'none'; el.style.transform = 'translateY(' + dy + 'px)'; lista.push(el); }
+      });
+      void nowy.offsetHeight;
+      lista.forEach(function (el) {
+        el.style.transition = 'transform .45s cubic-bezier(.2, .75, .25, 1)';
+        el.style.transform = '';
+        el.addEventListener('transitionend', function koniec() { el.style.transition = ''; el.removeEventListener('transitionend', koniec); });
+      });
+      if (przodEl) przodEl.classList.add('wjezdza');
+    }
+    var btn = przodEl && przodEl.querySelector('.btn-pokaz');
+    if (btn) btn.focus({ preventScroll: true });
   }
   function kartaUwagi(o) {
     var u = o.uwaga;
@@ -238,19 +411,23 @@
   /* 2. Dopasuj do siebie — te same ustawienia co „Wygląd i dostępność” */
   function podglad() {
     var o = osoba();
-    var dowod = znajdz(o.dokumenty, 'dowod');
-    var przedDowodem = o.dokumenty[o.dokumenty.length - 2];
+    var docs = dokumentyOsoby(o);
+    var stos = '';
+    if (docs.length) {
+      var przod = znajdz(docs, idPrzodu(o, docs));
+      var reszta = docs.filter(function (d) { return d !== przod; });
+      stos = '<div class="portfel">' + (reszta.length ? kartaDokumentu(o, reszta[reszta.length - 1], 'tyl-podglad') : '') +
+        kartaDokumentu(o, przod, 'podglad') + '</div>';
+    }
     return '<div class="podglad" inert aria-hidden="true"><p class="podglad-etykieta">Podgląd</p>' +
       '<div class="tytul-strony"><span class="podglad-h">Dzień dobry, ' + o.wolacz + '</span>' +
-        '<span class="btn-czytaj tylko-czytanie">' + ikona('glosnik') + '<span>Przeczytaj</span></span></div>' +
-      '<div class="portfel"><div class="karta ' + przedDowodem.kolor + '"><div class="pasek-karty"><b>' + przedDowodem.nazwa + '</b>' + statusKarty(przedDowodem) + '</div></div>' +
-      kartaDowodu(o, dowod, 'podglad') + '</div></div>';
+        '<span class="btn-czytaj tylko-czytanie">' + ikona('glosnik') + '<span>Przeczytaj</span></span></div>' + stos + '</div>';
   }
-  function grupaOpcji(klucz, legenda, opcje) {
+  function grupaOpcji(klucz, legenda, opcje, wybrana) {
     return '<fieldset class="ustawienie"><legend>' + legenda + '</legend><div class="opcje">' + opcje.map(function (op) {
-      var wybrana = stan[klucz] === op[0];
-      return '<label class="opcja' + (wybrana ? ' wybrana' : '') + '"><input type="radio" name="' + klucz + '" value="' + op[0] + '"' + (wybrana ? ' checked' : '') + '>' +
-        '<span class="opcja-nazwa">' + op[1] + '</span>' + op[2] + '</label>';
+      var tak = (wybrana !== undefined ? wybrana : stan[klucz]) === op[0];
+      return '<label class="opcja' + (tak ? ' wybrana' : '') + '"><input type="radio" name="' + klucz + '" value="' + op[0] + '"' + (tak ? ' checked' : '') + '>' +
+        '<span class="opcja-nazwa">' + op[1] + '</span>' + (op[2] || '') + '</label>';
     }).join('') + '</div></fieldset>';
   }
   function przelacznik(klucz, nazwa, opis, wl, wyl) {
@@ -275,8 +452,8 @@
   }
   function ekranDopasuj() {
     return {
-      tytul: 'Dopasuj do siebie', uklad: 'wejscie', rodzic: '#/osoba',
-      html: '<section class="sekcja">' + tytul('Jak Ci wygodnie?', 'Ustaw wygląd aplikacji. Zmiany widać od razu.') + ustawieniaHtml() +
+      tytul: 'Dopasuj do siebie', h1: 'Jak Ci wygodnie?', uklad: 'wejscie', rodzic: '#/osoba',
+      html: '<section class="sekcja">' + wstep('Ustaw wygląd aplikacji. Zmiany widać od razu.') + ustawieniaHtml() +
         '<a class="btn glowny" href="#/poznaj">Dalej' + ikona('dalej') + '</a>' +
         '<p class="dopisek">Zmienisz to w każdej chwili w Więcej → Wygląd i dostępność.</p></section><div class="odstep-dol"></div>'
     };
@@ -287,7 +464,7 @@
     var sposoby = [['klik', 'Kliknij', 'Wybierz sprawę z listy usług.'], ['klawiatura', 'Napisz', 'Wpisz, co chcesz załatwić.'], ['mikrofon', 'Powiedz', 'Powiedz to własnymi słowami.']];
     return {
       tytul: 'Poznaj asystenta', uklad: 'wejscie', rodzic: '#/dopasuj',
-      html: '<section class="sekcja"><div class="ilustracja" aria-hidden="true">' + ikona('iskry') + '</div>' + tytul('Poznaj asystenta') +
+      html: '<section class="sekcja">' + wstep() + '<div class="ilustracja" aria-hidden="true">' + ikona('iskry') + '</div>' +
         '<div class="akapity"><p>Możesz kliknąć, napisać albo powiedzieć, co chcesz załatwić.</p>' +
         '<p>Asystent poprowadzi Cię krok po kroku i nic nie wyśle bez Twojej zgody.</p></div>' +
         '<ul class="sposoby">' + sposoby.map(function (s) {
@@ -303,45 +480,155 @@
     var o = osoba();
     return {
       tytul: 'Dokumenty', uklad: 'glowny', zakladka: 'dokumenty', pasekAsystenta: 'z-podpowiedziami',
-      html: '<section class="sekcja">' + tytul('Dzień dobry, ' + o.wolacz, null, 'tytul-powitanie') +
+      html: '<section class="sekcja"><div class="tytul-strony tytul-powitanie"><h1 tabindex="-1">Dzień dobry, ' + o.wolacz + '</h1>' +
+          '<div class="tytul-akcje">' + przyciskCzytaj() +
+          '<a class="btn-zarzadzaj" href="#/zarzadzaj" aria-label="Zarządzaj dokumentami">' + ikona('warstwy') + 'Zarządzaj</a></div></div>' +
         '<h2 class="ukryte">Twoje dokumenty</h2>' + portfel(o) + '</section>' +
-        '<section class="sekcja"><h2>Wymaga Twojej uwagi</h2>' + kartaUwagi(o) + '</section><div class="odstep-dol"></div>'
+        '<section class="sekcja" data-flip="uwaga"><h2>Wymaga Twojej uwagi</h2>' + kartaUwagi(o) + '</section><div class="odstep-dol"></div>'
     };
   }
 
-  /* 5. Szczegóły dokumentu */
+  /* 5. Szczegóły dokumentu (jak w mObywatelu): podgląd karty, Dane, ostatnia aktualizacja, akcje */
+  function wierszDanych(p) {
+    var w = p[2] === 'alarm' ? '<span class="status-pilne">' + ikona('uwaga') + '<span>' + p[1] + '</span></span>' : p[1];
+    return '<div><dt>' + p[0] + '</dt><dd>' + w + '</dd></div>';
+  }
+  function wierszAkcji(a) {
+    var srodek = '<span class="ikona-kolo">' + ikona(a.ikona) + '</span><span class="tekst"><span class="tytul-wiersza">' + a.tekst + '</span></span>' + ikona('dalej', 'chevron');
+    if (a.href) return '<li><a class="wiersz-listy" href="' + a.href + '">' + srodek + '</a></li>';
+    if (a.usun) return '<li><button type="button" class="wiersz-listy usun" data-akcja="usun" data-id="' + a.usun + '">' + srodek + '</button></li>';
+    return '<li><button type="button" class="wiersz-listy" data-akcja="niedostepne" data-nazwa="' + esc(a.niedostepne) + '">' + srodek + '</button></li>';
+  }
   function ekranDokument(id) {
     var o = osoba();
-    var d = znajdz(o.dokumenty, id);
-    if (!d) return ekranNieZnaleziono();
-    var gora = d.rodzaj === 'dowod' ? kartaDowodu(o, d, 'szczegoly') :
-      '<div class="karta pojedyncza ' + d.kolor + '"><div class="pasek-karty"><b>' + d.nazwa + '</b>' + statusKarty(d) + '</div></div>';
-    var srodek;
-    if (d.rodzaj === 'pojazdy') {
-      srodek = d.pojazdy.map(function (p) {
-        var oc = p.ocPilne ?
-          '<span class="status-pilne">' + ikona('uwaga') + 'Kończy się ' + p.oc + '</span>' :
-          '<span class="status-ok">' + ikona('ok') + 'Ważne do ' + p.oc + '</span>';
-        return '<div class="pojazd"><h2>' + p.marka + '</h2><dl class="dane">' +
-          '<div><dt>Numer rejestracyjny</dt><dd>' + p.numer + '</dd></div>' +
-          '<div><dt>Rok produkcji</dt><dd>' + p.rok + '</dd></div>' +
-          '<div><dt>OC</dt><dd>' + oc + '</dd></div>' +
-          '<div><dt>Badanie techniczne</dt><dd><span class="status-ok">' + ikona('ok') + 'Ważne do ' + p.badanie + '</span></dd></div>' +
-          '</dl></div>';
-      }).join('') +
-      '<div class="przyciski-pion"><a class="btn glowny" href="#/sprawa/samochod">' + ikona('auto') + 'OC i badanie techniczne</a></div>';
-    } else {
-      srodek = '<h2>Dane</h2><dl class="dane">' + d.dane.map(function (p) {
-        return '<div><dt>' + p[0] + '</dt><dd>' + p[1] + '</dd></div>';
-      }).join('') + '</dl>' +
-      '<div class="przyciski-pion">' +
-        '<button type="button" class="btn drugi" data-akcja="niedostepne" data-nazwa="Kod QR dokumentu">' + ikona('qr') + 'Pokaż kod QR</button>' +
-        '<a class="btn drugi" href="#/sprawa/zgubione?dokument=' + d.id + '">' + ikona('uwaga') + 'Zgłoś utratę tego dokumentu</a>' +
-      '</div>';
-    }
+    var d = znajdz(dokumentyOsoby(o), id);
+    if (!d) return ekranBrakDokumentu();
+    var a = D.akcje[d.rodzaj] || {};
+    var usun = { tekst: 'Usuń dokument', ikona: 'kosz', usun: d.id };
+    var akcje = (a.akcje || []).concat(a.skroty ? [] : [usun]);
     return {
       tytul: d.nazwa, uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/dokumenty',
-      html: '<section class="sekcja">' + tytul(d.nazwa) + gora + srodek + '</section><div class="odstep-dol"></div>'
+      html: '<section class="sekcja">' + wstep() + '<h2 class="ukryte">Podgląd dokumentu</h2>' + kartaDokumentu(o, d, 'szczegoly') +
+        '<h2>Dane</h2><dl class="dane">' + d.dane.map(wierszDanych).join('') +
+          (d.kod ? '<div><dt>Kod kreskowy</dt><dd><span class="kod-w-danych">' + kodKreskowy(d.kod) + '</span>' + d.kod + '</dd></div>' : '') + '</dl>' +
+        (d.dodatkowe ? '<details class="rozwijane"><summary><span>Twoje dodatkowe dane</span>' + ikona('dol', 'strzalka-rozwin') + '</summary>' +
+          '<dl class="dane">' + d.dodatkowe.map(wierszDanych).join('') + '</dl></details>' : '') +
+        '<p class="aktualizacja">' + ikona('zegarek') + '<span>Ostatnia aktualizacja: ' + d.aktualizacja + '</span></p>' +
+        (d.komunikat ? '<p class="komunikat-dokumentu">' + ikona('info') + '<span>' + d.komunikat + '</span></p>' : '') +
+        (akcje.length ? '<h2 class="ukryte">Akcje</h2><ul class="lista akcje-dokumentu">' + akcje.map(wierszAkcji).join('') + '</ul>' : '') +
+        (a.skroty ? '<h2>Pozostałe skróty</h2><ul class="lista">' + a.skroty.concat([usun]).map(wierszAkcji).join('') + '</ul>' : '') +
+        '</section><div class="odstep-dol"></div>'
+    };
+  }
+  function ekranBrakDokumentu() {
+    return {
+      tytul: 'Brak dokumentu', uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/dokumenty',
+      html: '<section class="sekcja">' + wstep() + '<p>Tego dokumentu nie ma w aplikacji. Mógł zostać usunięty.</p>' +
+        '<p>W prototypie wróci, gdy wybierzesz osobę jeszcze raz.</p>' +
+        '<div class="przyciski-pion"><a class="btn glowny" href="#/dokumenty">' + ikona('dokumenty') + 'Wróć do Dokumentów</a>' +
+        '<a class="btn drugi" href="#/osoba">' + ikona('rodzina') + 'Zmień osobę</a></div></section><div class="odstep-dol"></div>'
+    };
+  }
+
+  /* 5a. Zarządzaj (jak w mObywatelu) */
+  function ekranZarzadzaj() {
+    var o = osoba();
+    return {
+      tytul: 'Zarządzaj dokumentami', uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/dokumenty',
+      html: '<section class="sekcja">' + wstep() + '<ul class="lista">' +
+        wierszListy('#/zarzadzaj/kolejnosc', 'strzalki', 'Kolejność dokumentów', 'Ustaw, który dokument jest wyżej.') +
+        wierszListy('#/zarzadzaj/usun', 'kosz', 'Usuń dokument', 'Usuń dokument z aplikacji.') +
+        wierszListy('#/zarzadzaj/uklad', 'uslugi', 'Wybierz układ', 'Teraz: ' + NAZWY_UKLADOW[ukladOsoby(o)] + '.') +
+        wierszListy('#/zarzadzaj/dodaj', 'plus', 'Dodaj dokument', 'Zobacz dokumenty, które możesz dodać.') +
+        '</ul></section><div class="odstep-dol"></div>'
+    };
+  }
+  function listaKolejnosci(o) {
+    var docs = dokumentyOsoby(o);
+    var duze = ukladOsoby(o) === 'duze';
+    return docs.map(function (d, i) {
+      function przycisk(kier, ikonaNazwa, napis, wylaczony) {
+        return '<button type="button" class="btn drugi btn-przesun" data-akcja="przesun" data-id="' + d.id + '" data-kierunek="' + kier + '"' +
+          ' aria-label="' + napis + ': ' + d.nazwa + '"' + (wylaczony ? ' disabled' : '') + '>' + ikona(ikonaNazwa) + napis + '</button>';
+      }
+      return '<li class="kolejnosc-wiersz">' +
+        '<div class="kolejnosc-dokument"><span class="mini-karta k-' + d.kolor + '" aria-hidden="true"></span>' +
+          '<span class="tekst"><span class="tytul-wiersza">' + (i + 1) + '. ' + d.nazwa + '</span>' +
+          (duze && i === docs.length - 1 ? '<span class="opis">Leży z przodu portfela</span>' : '') + '</span></div>' +
+        '<div class="kolejnosc-przyciski">' + przycisk(-1, 'wGore', 'W górę', i === 0) + przycisk(1, 'wDol', 'W dół', i === docs.length - 1) + '</div></li>';
+    }).join('');
+  }
+  function ekranKolejnosc() {
+    var o = osoba();
+    var docs = dokumentyOsoby(o);
+    var opis = 'Taka kolejność jest na ekranie Dokumenty.' + (ukladOsoby(o) === 'duze' ? ' Ostatni dokument leży z przodu portfela.' : '');
+    return {
+      tytul: 'Kolejność dokumentów', uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/zarzadzaj',
+      html: '<section class="sekcja">' + wstep(docs.length ? opis : null) +
+        (docs.length ? '<p class="ogloszenie" id="ogloszenie" role="status"></p><ol class="lista-kolejnosci" id="lista-kolejnosci">' + listaKolejnosci(o) + '</ol>' +
+          '<div class="przyciski-pion"><button type="button" class="btn glowny" data-akcja="wstecz" data-rodzic="#/zarzadzaj">Gotowe</button></div>' : pustyPortfel()) +
+        '</section><div class="odstep-dol"></div>'
+    };
+  }
+  function przesunDokument(id, kier) {
+    var o = osoba();
+    var kol = dokumentyOsoby(o).map(function (d) { return d.id; });
+    var i = kol.indexOf(id), j = i + kier;
+    if (i < 0 || j < 0 || j >= kol.length) return;
+    kol[i] = kol[j];
+    kol[j] = id;
+    stan.kolejnosc[o.id] = kol;
+    delete przodPortfela[o.id];
+    zapisz();
+    var lista = document.getElementById('lista-kolejnosci');
+    if (!lista) return;
+    lista.innerHTML = listaKolejnosci(o);
+    var btn = lista.querySelector('[data-id="' + id + '"][data-kierunek="' + kier + '"]');
+    if (!btn || btn.disabled) btn = lista.querySelector('[data-id="' + id + '"][data-kierunek="' + (-kier) + '"]');
+    if (btn) btn.focus();
+    var ogl = document.getElementById('ogloszenie');
+    if (ogl) ogl.textContent = znajdz(o.dokumenty, id).nazwa + ' jest teraz na miejscu ' + (j + 1) + ' z ' + kol.length + '.';
+  }
+  function ekranUsun() {
+    var o = osoba();
+    var docs = dokumentyOsoby(o);
+    return {
+      tytul: 'Usuń dokument', uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/zarzadzaj',
+      html: '<section class="sekcja">' + wstep(docs.length ? 'Wybierz dokument, który chcesz usunąć z aplikacji.' : null) +
+        (docs.length ? '<ul class="lista">' + docs.map(function (d) {
+          return '<li><button type="button" class="wiersz-listy" data-akcja="usun" data-id="' + d.id + '">' +
+            '<span class="mini-karta k-' + d.kolor + '" aria-hidden="true"></span>' +
+            '<span class="tekst"><span class="tytul-wiersza">' + d.nazwa + '</span><span class="opis">' + statusWiersza(d) + '</span></span>' +
+            ikona('kosz', 'chevron ikona-usun') + '</button></li>';
+        }).join('') + '</ul>' : pustyPortfel()) +
+        '</section><div class="odstep-dol"></div>'
+    };
+  }
+  function ekranUklad() {
+    var o = osoba();
+    return {
+      tytul: 'Wybierz układ', uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/zarzadzaj',
+      html: '<section class="sekcja">' + wstep('Wybierz, jak dokumenty wyglądają na ekranie Dokumenty.') +
+        grupaOpcji('uklad', 'Układ dokumentów', [
+          ['duze', 'Duże karty<span class="opis">Karty jedna za drugą, jak w portfelu.</span>', ikona('kartyDuze', 'ikona-opcji')],
+          ['male', 'Małe karty<span class="opis">Wszystkie karty widać naraz.</span>', ikona('uslugi', 'ikona-opcji')],
+          ['lista', 'Lista<span class="opis">Nazwy i statusy dokumentów.</span>', ikona('lista', 'ikona-opcji')]], ukladOsoby(o)) +
+        '<button type="button" class="btn glowny" data-akcja="wstecz" data-rodzic="#/zarzadzaj">Gotowe</button></section><div class="odstep-dol"></div>'
+    };
+  }
+  function ekranDodaj() {
+    var o = osoba();
+    var rodzaje = dokumentyOsoby(o).map(function (d) { return d.rodzaj; });
+    return {
+      tytul: 'Dodaj dokument', uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/zarzadzaj',
+      html: '<section class="sekcja">' + wstep('Te dokumenty możesz dodać w mObywatelu.') +
+        D.doDodania.map(function (g) {
+          return '<h2>' + g.nazwa + '</h2><ul class="lista">' + g.dokumenty.map(function (x) {
+            var ma = x.rodzaj && rodzaje.indexOf(x.rodzaj) >= 0;
+            return wierszListy('data-akcja="niedostepne" data-nazwa="' + esc(x.nazwa) + '"', null, x.nazwa, null,
+              ma ? '<span class="etykieta-dziala">' + ikona('ok') + 'Masz w aplikacji</span>' : '');
+          }).join('') + '</ul>';
+        }).join('') + '</section><div class="odstep-dol"></div>'
     };
   }
 
@@ -380,7 +667,7 @@
     if (!k) return ekranNieZnaleziono();
     return {
       tytul: k.nazwa, uklad: 'pod', zakladka: 'uslugi', rodzic: '#/uslugi',
-      html: '<section class="sekcja">' + tytul(k.nazwa) + '<ul class="lista">' + k.uslugi.map(wierszUslugi).join('') + '</ul></section><div class="odstep-dol"></div>'
+      html: '<section class="sekcja">' + wstep() + '<ul class="lista">' + k.uslugi.map(wierszUslugi).join('') + '</ul></section><div class="odstep-dol"></div>'
     };
   }
   /* Wyszukiwarka: bez polskich znaków, po synonimach, z prostym „rdzeniem” słowa */
@@ -483,7 +770,7 @@
   function ekranWyglad() {
     return {
       tytul: 'Wygląd i dostępność', uklad: 'pod', zakladka: null, rodzic: '#/wiecej',
-      html: '<section class="sekcja">' + tytul('Wygląd i dostępność', 'Zmiany widać od razu w podglądzie i w całej aplikacji.') + ustawieniaHtml() +
+      html: '<section class="sekcja">' + wstep('Zmiany widać od razu w podglądzie i w całej aplikacji.') + ustawieniaHtml() +
         '<button type="button" class="btn glowny" data-akcja="wstecz" data-rodzic="#/wiecej">Gotowe</button></section><div class="odstep-dol"></div>'
     };
   }
@@ -494,7 +781,7 @@
     var n = liczbaNowych(o);
     return {
       tytul: 'Skrzynka', uklad: 'pod', zakladka: null, rodzic: '#/dokumenty',
-      html: '<section class="sekcja">' + tytul('Skrzynka', n ? 'Masz ' + n + ' ' + odmiana(n, 'nową wiadomość', 'nowe wiadomości', 'nowych wiadomości') + '.' : 'Nie masz nowych wiadomości.') +
+      html: '<section class="sekcja">' + wstep(n ? 'Masz ' + n + ' ' + odmiana(n, 'nową wiadomość', 'nowe wiadomości', 'nowych wiadomości') + '.' : 'Nie masz nowych wiadomości.') +
         '<ul class="lista">' + o.wiadomosci.map(function (w) {
           var nowa = czyNowa(o, w);
           return '<li><a class="wiersz-listy wiadomosc' + (nowa ? ' nowa' : '') + '" href="#/skrzynka/' + w.id + '">' +
@@ -522,7 +809,7 @@
     }
     return {
       tytul: w.tytul, uklad: 'pod', zakladka: null, rodzic: '#/skrzynka',
-      html: '<section class="sekcja">' + tytul(w.tytul) + '<p class="metryczka">' + w.nadawca + ' · ' + (w.data === D.dzis ? 'dziś' : w.data) + '</p>' +
+      html: '<section class="sekcja">' + wstep() + '<p class="metryczka">' + w.nadawca + ' · ' + (w.data === D.dzis ? 'dziś' : w.data) + '</p>' +
         '<div class="pismo">' + w.tresc.map(function (p) { return '<p>' + p + '</p>'; }).join('') + '</div>' +
         '<div class="przyciski-pion">' + akcja + '</div></section><div class="odstep-dol"></div>'
     };
@@ -532,8 +819,8 @@
   function ekranWBudowie(nazwa, dodatek, rodzic, zakladka) {
     return {
       tytul: nazwa, uklad: 'pod', zakladka: zakladka || null, rodzic: rodzic || '#/dokumenty',
-      html: '<section class="sekcja w-budowie"><div class="ilustracja" aria-hidden="true">' + ikona('klucz') + '</div>' +
-        tytul(nazwa) + '<p>Ta część jest w budowie. Powstanie w kolejnym etapie prototypu.</p>' + (dodatek || '') +
+      html: '<section class="sekcja w-budowie">' + wstep() + '<div class="ilustracja" aria-hidden="true">' + ikona('klucz') + '</div>' +
+        '<p>Ta część jest w budowie. Powstanie w kolejnym etapie prototypu.</p>' + (dodatek || '') +
         '<div class="przyciski-pion"><a class="btn glowny" href="#/dokumenty">' + ikona('dokumenty') + 'Wróć do Dokumentów</a>' +
         '<a class="btn drugi" href="#/uslugi">' + ikona('uslugi') + 'Zobacz wszystkie usługi</a></div></section><div class="odstep-dol"></div>'
     };
@@ -554,7 +841,7 @@
   function ekranNieZnaleziono() {
     return {
       tytul: 'Nie ma takiej strony', uklad: 'pod', rodzic: '#/dokumenty',
-      html: '<section class="sekcja">' + tytul('Nie ma takiej strony') + '<p>Ten adres nie prowadzi do żadnego ekranu.</p>' +
+      html: '<section class="sekcja">' + wstep() + '<p>Ten adres nie prowadzi do żadnego ekranu.</p>' +
         '<div class="przyciski-pion"><a class="btn glowny" href="#/dokumenty">Wróć do Dokumentów</a></div></section>'
     };
   }
@@ -566,6 +853,11 @@
     [/^\/poznaj$/, ekranPoznaj],
     [/^\/dokumenty$/, ekranDokumenty],
     [/^\/dokument\/([\w-]+)$/, ekranDokument],
+    [/^\/zarzadzaj$/, ekranZarzadzaj],
+    [/^\/zarzadzaj\/kolejnosc$/, ekranKolejnosc],
+    [/^\/zarzadzaj\/usun$/, ekranUsun],
+    [/^\/zarzadzaj\/uklad$/, ekranUklad],
+    [/^\/zarzadzaj\/dodaj$/, ekranDodaj],
     [/^\/uslugi$/, ekranUslugi],
     [/^\/uslugi\/([\w-]+)$/, ekranKategoria],
     [/^\/asystent$/, ekranAsystent],
@@ -584,7 +876,7 @@
   }
 
   /* Głębokość historii — „Wstecz” cofa w aplikacji, a na pierwszym ekranie idzie do ekranu nadrzędnego */
-  var glebokosc = 0, pierwszyEkran = true, otworzPodpowiedziPoWejsciu = false;
+  var glebokosc = 0, pierwszyEkran = true, otworzPodpowiedziPoWejsciu = false, komunikatPoPrzejsciu = null;
   function oznaczHistorie() {
     try {
       var s = history.state;
@@ -615,8 +907,12 @@
     if (!ekran) { location.replace('#/dokumenty'); return; }
     oznaczHistorie();
 
-    var naglowek = ekran.naglowek || (ekran.uklad === 'glowny' ? naglowekAplikacji() : naglowekWstecz(ekran.rodzic || '#/dokumenty'));
-    tresc.innerHTML = naglowek + '<main id="glowna">' + ekran.html + '</main>';
+    var naglowek = ekran.naglowek || (ekran.uklad === 'glowny' ? naglowekAplikacji() : naglowekWstecz(ekran.rodzic || '#/dokumenty', ekran.h1 || ekran.tytul));
+    var komunikat = komunikatPoPrzejsciu;
+    komunikatPoPrzejsciu = null;
+    tresc.innerHTML = naglowek + '<main id="glowna">' +
+      (komunikat ? '<p class="komunikat-ok" role="status" tabindex="-1">' + ikona('ok') + '<span>' + esc(komunikat) + '</span></p>' : '') +
+      ekran.html + '</main>';
     tresc.scrollTop = 0;
     window.scrollTo(0, 0);
     document.title = ekran.tytul + ' · mObywatel';
@@ -627,16 +923,24 @@
       else l.removeAttribute('aria-current');
     });
 
+    /* Przewijanie do elementu (np. po przejściu fokusu) zostawia miejsce na przyklejony pasek „Wstecz” */
+    var pasekGory = tresc.querySelector('.naglowek-pod');
+    if (obserwatorPaska) {
+      obserwatorPaska.disconnect();
+      if (pasekGory) obserwatorPaska.observe(pasekGory);
+    }
+    html.style.setProperty('--pasek-gora', (pasekGory ? Math.ceil(pasekGory.getBoundingClientRect().height) : 0) + 'px');
+
     pasek.hidden = !ekran.pasekAsystenta;
     pasek.setAttribute('data-tryb', ekran.pasekAsystenta || '');
     poleAsystenta.value = '';
     ustawPrzyciskMow();
     if (ekran.po) ekran.po();
 
-    /* Fokus na tytule ekranu — czytnik ekranu ogłasza nowy ekran */
+    /* Fokus na tytule ekranu (albo na komunikacie) — czytnik ekranu ogłasza nowy ekran */
     if (!pierwszeRysowanie) {
-      var h1 = tresc.querySelector('h1');
-      if (h1) h1.focus({ preventScroll: true });
+      var cel = tresc.querySelector('.komunikat-ok') || tresc.querySelector('h1');
+      if (cel) cel.focus({ preventScroll: true });
     }
     pierwszeRysowanie = false;
 
@@ -645,6 +949,9 @@
     otworzPodpowiedziPoWejsciu = false;
   }
   var pierwszeRysowanie = true;
+  var obserwatorPaska = window.ResizeObserver ? new window.ResizeObserver(function (wpisy) {
+    html.style.setProperty('--pasek-gora', Math.ceil(wpisy[0].target.getBoundingClientRect().height) + 'px');
+  }) : null;
 
   /* ======================= POLE ASYSTENTA ======================= */
   function ustawPrzyciskMow() {
@@ -699,6 +1006,28 @@
     otworzOkno('<span class="ikona-kolo" aria-hidden="true">' + ikona('info') + '</span><h2 id="okno-tytul">' + tytulOkna + '</h2><p>' + tekst + '</p>' +
       '<div class="przyciski-pion"><button type="button" class="btn glowny" data-akcja="zamknij-okno">Zamknij</button></div>');
   }
+  /* Usuń dokument — zawsze z potwierdzeniem */
+  function oknoUsun(id) {
+    var d = znajdz(osoba().dokumenty, id);
+    if (!d) return;
+    otworzOkno('<span class="ikona-kolo ikona-usun" aria-hidden="true">' + ikona('kosz') + '</span>' +
+      '<h2 id="okno-tytul">Usunąć dokument „' + d.nazwa + '”?</h2>' +
+      '<p>Dokument zniknie z aplikacji. W prototypie wróci, gdy wybierzesz osobę jeszcze raz.</p>' +
+      '<div class="przyciski-pion"><button type="button" class="btn usun" data-akcja="usun-potwierdz" data-id="' + d.id + '">' + ikona('kosz') + 'Usuń dokument</button>' +
+      '<button type="button" class="btn drugi" data-akcja="zamknij-okno">Anuluj</button></div>');
+  }
+  function usunDokument(id) {
+    var o = osoba();
+    var d = znajdz(o.dokumenty, id);
+    if (!d) return;
+    stan.kolejnosc[o.id] = dokumentyOsoby(o).map(function (x) { return x.id; }).filter(function (x) { return x !== id; });
+    if (przodPortfela[o.id] === id) delete przodPortfela[o.id];
+    zapisz();
+    zamknijOkno();
+    komunikatPoPrzejsciu = 'Usunięto dokument „' + d.nazwa + '”.';
+    if (/^\/dokument\//.test(biezacyAdres().sciezka)) wstecz('#/dokumenty');
+    else pokaz();
+  }
   /* Kliknięcie w przyciemnione tło (poza oknem) zamyka okno */
   okno.addEventListener('click', function (e) {
     if (e.target !== okno) return;
@@ -718,12 +1047,13 @@
   function tekstEkranu() {
     var glowna = document.getElementById('glowna');
     if (!glowna) return '';
+    var tytulPaska = tresc.querySelector('.tytul-paska');
     var kopia = glowna.cloneNode(true);
     kopia.removeAttribute('id');
-    Array.prototype.forEach.call(kopia.querySelectorAll('button, svg, input, .tylko-czytanie, .podglad, [aria-hidden="true"]'), function (el) { el.parentNode.removeChild(el); });
+    Array.prototype.forEach.call(kopia.querySelectorAll('button, svg, input, .tylko-czytanie, .podglad, .ukryte, [aria-hidden="true"]'), function (el) { el.parentNode.removeChild(el); });
     kopia.style.cssText = 'position:absolute;left:-10000px;top:0;width:360px';
     document.body.appendChild(kopia);
-    var t = kopia.innerText;
+    var t = (tytulPaska ? tytulPaska.textContent + '\n' : '') + kopia.innerText;
     document.body.removeChild(kopia);
     return t.split('\n').map(function (l) { return l.trim(); }).filter(Boolean)
       .map(function (l) { return /[.!?:…”]$/.test(l) ? l : l + '.'; }).join(' ');
@@ -749,7 +1079,7 @@
   /* ======================= KLIKNIĘCIA ======================= */
   document.addEventListener('click', function (e) {
     var el = e.target.closest('[data-akcja]');
-    if (!el) return;
+    if (!el || el.disabled) return;
     var akcja = el.getAttribute('data-akcja');
     switch (akcja) {
       case 'wstecz': wstecz(el.getAttribute('data-rodzic')); break;
@@ -762,6 +1092,10 @@
         location.hash = '#/dokumenty';
         break;
       case 'pomin': location.hash = '#/dokumenty'; break;
+      case 'na-przod': naPrzod(el.getAttribute('data-id')); break;
+      case 'przesun': przesunDokument(el.getAttribute('data-id'), +el.getAttribute('data-kierunek')); break;
+      case 'usun': oknoUsun(el.getAttribute('data-id')); break;
+      case 'usun-potwierdz': usunDokument(el.getAttribute('data-id')); break;
       case 'niedostepne': oknoNiedostepne(el.getAttribute('data-nazwa')); break;
       case 'zamknij-okno': zamknijOkno(); break;
       case 'zapytaj': zapytaj(el.getAttribute('data-pytanie')); break;
@@ -780,11 +1114,12 @@
         break;
     }
   });
-  /* Ustawienia: rozmiar tekstu i motyw zmieniają się od razu (bez przerysowania ekranu) */
+  /* Ustawienia i układ zmieniają się od razu (bez przerysowania ekranu) */
   document.addEventListener('change', function (e) {
     var el = e.target;
-    if (el.type !== 'radio' || (el.name !== 'tekst' && el.name !== 'motyw')) return;
-    stan[el.name] = el.value;
+    if (el.type !== 'radio' || ['tekst', 'motyw', 'uklad'].indexOf(el.name) < 0) return;
+    if (el.name === 'uklad') stan.uklady[osoba().id] = el.value;
+    else stan[el.name] = el.value;
     zapisz();
     zastosujUstawienia();
     Array.prototype.forEach.call(document.querySelectorAll('input[name="' + el.name + '"]'), function (r) {
@@ -803,6 +1138,7 @@
 
   /* ======================= START ======================= */
   (function start() {
+    ustawGilosz();
     var parametry;
     try { parametry = new URLSearchParams(location.search); } catch (e) { parametry = null; }
     var zmieniono = false;

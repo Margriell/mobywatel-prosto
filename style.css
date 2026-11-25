@@ -28,6 +28,7 @@
   --pojazdy: #9A4508;
   --kdr: #5A3E9E;
   --legitymacja: #0E6B62;
+  --emeryt: #22663F;
   --tlo-strony: #D9DCE3;
   --cien-okna: rgba(10, 15, 30, .55);
   --fs: 18px;
@@ -122,12 +123,15 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
   .naglowek { padding-top: 2px; }
 }
 .tresc { flex: 1; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; }
+/* Element z fokusem nigdy nie chowa się pod przyklejonym paskiem „Wstecz” (wysokość paska liczy app.js) */
+html, .tresc { scroll-padding-top: calc(var(--pasek-gora, 0px) + 8px); }
 .tresc::-webkit-scrollbar { display: none; }
 /* Niski ekran (np. powiększenie 200%): przewija się cała strona, dolny pasek zostaje na dole */
 @media (max-height: 30em) {
   .ekran { height: auto; min-height: 100vh; overflow: visible; }
   .tresc { overflow: visible; flex: 1 0 auto; }
   .dolny-pasek { position: sticky; bottom: 0; z-index: 2; }
+  html { scroll-padding-bottom: 96px; }
 }
 
 /* ---------- Nagłówek (makieta) ---------- */
@@ -162,8 +166,13 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
   .naglowek-akcje { gap: 0; }
   .ikona-btn { padding: 2px 3px; min-width: 56px; }
 }
-/* Podekrany: „Wstecz” z napisem */
-.naglowek-pod { padding-top: 6px; padding-bottom: 6px; justify-content: flex-start; }
+/* Podekrany: górny pasek z „Wstecz” (z napisem) i tytułem — przyklejony u góry, nie znika przy przewijaniu */
+.naglowek-pod {
+  position: sticky; top: 0; z-index: 4; min-height: 60px;
+  padding: 6px 16px 6px 8px; justify-content: flex-start; gap: 0 4px;
+}
+.tytul-paska { flex: 1 1 0%; font-size: 1.05rem; line-height: 1.3; padding: 6px 0; overflow-wrap: break-word; }
+.tytul-paska:focus { outline: none; }
 .wstecz {
   min-height: 48px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px 0 4px;
   border: 0; background: none; color: var(--akcent); font-weight: 700; font-size: 1rem; border-radius: 12px;
@@ -182,6 +191,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .tytul-strony h1 { font-size: 1.3rem; line-height: 1.3; }
 .tytul-powitanie h1 { font-size: 1.1rem; } /* jak w makiecie */
 .podtytul { color: var(--tekst-2); margin: -4px 0 14px; }
+.czytaj-wiersz + .podtytul { margin-top: 0; }
+.czytaj-wiersz .btn-czytaj { margin-bottom: 10px; }
 .odstep-dol { height: 16px; }
 h1:focus { outline: none; }
 
@@ -194,53 +205,106 @@ h1:focus { outline: none; }
 }
 .btn-czytaj svg { width: 22px; height: 22px; }
 
-/* ---------- Portfel dokumentów (makieta) ---------- */
+/* ---------- Karty dokumentów: jeden szablon, każda w swoim kolorze, z wzorem giloszowym ---------- */
+.k-dowod { --karta: var(--dowod); }
+.k-prawko { --karta: var(--prawko); }
+.k-pojazdy { --karta: var(--pojazdy); }
+.k-kdr { --karta: var(--kdr); }
+.k-legitymacja { --karta: var(--legitymacja); }
+.k-emeryt { --karta: var(--emeryt); }
 .portfel { position: relative; }
 .karta {
-  border-radius: 18px; color: #fff; position: relative; overflow: hidden;
+  display: block; position: relative; border-radius: 18px; color: #fff; overflow: hidden;
+  padding: 14px 16px 16px; line-height: 1.25; text-decoration: none;
+  background-color: var(--karta);
+  /* Wzór giloszowy (rozeta i fale z cienkich linii) + lekkie przyciemnienie ku dołowi */
+  background-image: var(--gilosz-rozeta), var(--gilosz-fale), linear-gradient(160deg, rgba(255, 255, 255, 0) 35%, rgba(0, 0, 0, .16));
+  background-repeat: no-repeat;
+  background-size: 340px 340px, 100% 72px, 100% 100%;
+  background-position: right -120px top -150px, 0 104px, 0 0;
   box-shadow: 0 -4px 10px rgba(0, 0, 0, .18);
 }
-.karta + .karta { margin-top: -32px; }
-.karta::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, .05) 0 2px, transparent 2px 14px);
+.karta.k-dowod { background-image: var(--gilosz-rozeta), var(--gilosz-fale), linear-gradient(160deg, var(--dowod-jasny), var(--dowod)); }
+/* Pasek karty: nazwa i status — widoczny także na kartach z tyłu */
+.karta-gora { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px; }
+.karta-nazwa { font-weight: 700; font-size: 1.05rem; line-height: 1.3; }
+.karta-status {
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px 2px 7px; border-radius: 14px;
+  background: rgba(0, 0, 0, .24); font-size: 16px; font-weight: 700; line-height: 1.3;
 }
-.pasek-karty {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px;
-  padding: 12px 18px 44px; min-height: 92px; color: #fff; text-decoration: none; line-height: 1.3;
+.karta-status svg { width: 18px; height: 18px; }
+.karta-status.alarm { background: #fff; color: #B3261E; }
+/* Portfel: karty z tyłu to przyciski „Pokaż … na przodzie”; widać ich pasek (min. 48 px) */
+.portfel .karta + .karta { margin-top: -30px; }
+.karta.tyl { padding: 0; }
+.karta.tyl > .karta-gora {
+  width: 100%; padding: 12px 16px 42px; border: 0; background: none; color: inherit; text-align: left; line-height: 1.25;
 }
-a.pasek-karty:hover b { text-decoration: underline; text-underline-offset: 3px; }
-.pasek-karty b { font-size: 1.05rem; }
-.status-karty { font-size: 16px; display: flex; align-items: center; gap: 6px; opacity: .95; }
-.pasek-karty svg { width: 20px; height: 20px; }
-.karta :focus-visible { outline: 3px solid #fff; outline-offset: -6px; border-radius: 16px; }
-.karta.pojazdy { background: var(--pojazdy); }
-.karta.prawko { background: var(--prawko); }
-.karta.kdr { background: var(--kdr); }
-.karta.legitymacja { background: var(--legitymacja); }
-.karta.dowod { background: var(--dowod); background: linear-gradient(160deg, var(--dowod-jasny), var(--dowod)); padding: 16px 18px 18px; }
-/* Pojedyncza karta (szczegóły dokumentu) — bez nakładania */
-.karta.pojedyncza { margin-bottom: 16px; }
-.karta.pojedyncza .pasek-karty { padding-bottom: 14px; min-height: 64px; }
-.dowod-gora { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.dowod-gora b { font-size: 1.2rem; }
-.chip { width: 34px; height: 26px; border-radius: 6px; background: linear-gradient(135deg, #F3D27A, #D9A93F); flex: none; }
-.dowod-srodek { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 12px; align-items: center; line-height: 1.3; }
-.zdjecie {
-  width: 64px; height: 76px; border-radius: 10px; background: #E6ECF7; color: var(--dowod); flex: none;
-  display: grid; place-items: center; font-weight: 800; font-size: 24px;
+button.karta-gora:hover .karta-nazwa { text-decoration: underline; text-underline-offset: 3px; }
+.karta.tyl > button.karta-gora:focus-visible { outline: none; }
+.karta.tyl > button.karta-gora:focus-visible .karta-nazwa { outline: 3px solid #fff; outline-offset: 3px; border-radius: 4px; }
+/* Przód karty: zdjęcie i dane jak na dokumencie */
+.karta-cialo { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 14px; margin-top: 12px; }
+.karta-zdjecie {
+  flex: none; width: 60px; height: 76px; border-radius: 10px; background: rgba(255, 255, 255, .92); color: var(--karta);
+  display: grid; place-items: center; font-weight: 800; font-size: 22px; line-height: 1;
 }
-.dowod-srodek .imie { font-size: 1.1rem; font-weight: 700; }
-.dowod-srodek .waznosc { font-size: 16px; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-.dowod-srodek svg { width: 20px; height: 20px; }
-.dowod-dane { min-width: 0; flex: 1 1 8em; }
+.karta-zdjecie.auto { width: 84px; height: 60px; }
+.sylwetka { width: 68px; height: 43px; fill: currentColor; stroke: none; }
+.sylwetka .jasne { fill: rgba(255, 255, 255, .92); }
+.karta-pola { flex: 1 1 13em; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 0; }
+.karta-pole { flex: 1 1 6.4em; }
+.karta-pole.dlugie { flex-basis: 100%; }
+.karta-pole dt { font-size: 16px; line-height: 1.25; }
+.karta-pole dd { margin: 0; font-weight: 700; font-size: 1rem; line-height: 1.25; }
+.pole-alarm {
+  display: inline-flex; align-items: flex-start; gap: 6px; margin-top: 2px; padding: 2px 8px 2px 6px;
+  border-radius: 8px; background: #fff; color: #B3261E;
+}
+.pole-alarm svg { width: 18px; height: 18px; margin-top: .12em; }
+.karta-kod {
+  margin-top: 12px; padding: 8px 12px 6px; border-radius: 10px; background: #fff; color: #1A1D26;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.karta-kod > span { font-size: 16px; font-weight: 700; letter-spacing: .12em; line-height: 1.3; }
+.kod-paski { display: block; width: 100%; max-width: 260px; height: 40px; fill: currentColor; stroke: none; }
 .btn-pokaz {
-  width: 100%; min-height: 52px; border: 0; border-radius: 12px; background: #fff; color: var(--dowod);
+  width: 100%; min-height: 48px; margin-top: 14px; border: 0; border-radius: 12px; background: #fff; color: var(--karta);
   font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
-  position: relative; z-index: 1; padding: 6px 12px; text-align: center;
+  position: relative; z-index: 1; padding: 6px 12px; text-align: center; line-height: 1.3;
 }
 .btn-pokaz svg { width: 22px; height: 22px; }
-.karta .btn-pokaz:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.karta :focus-visible { outline: 3px solid #fff; outline-offset: -6px; border-radius: 16px; }
+.karta .btn-pokaz:focus-visible { outline: 3px solid #fff; outline-offset: 3px; border-radius: 12px; }
+/* Karta, która właśnie przyszła na przód: jej dane pojawiają się łagodnie */
+@media (prefers-reduced-motion: no-preference) {
+  .karta.wjezdza .karta-cialo, .karta.wjezdza .karta-kod, .karta.wjezdza .btn-pokaz { animation: wjazd .4s ease-out both; }
+  @keyframes wjazd { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+}
+/* Szczegóły dokumentu: cała karta na górze */
+.karta.szczegoly { margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0, 0, 0, .14); }
+/* Układ „Małe karty”: wszystkie karty widać naraz */
+.male-karty { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.6em), 1fr)); gap: 10px; }
+.karta.mala {
+  min-height: 112px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 10px;
+  padding: 14px; background-size: 220px 220px, 100% 50px, 100% 100%; background-position: right -90px top -100px, 0 64px, 0 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .14);
+}
+a.karta.mala:hover .karta-nazwa { text-decoration: underline; text-underline-offset: 3px; }
+/* Mała karta w listach (układ „Lista”, Zarządzaj) */
+.mini-karta {
+  flex: none; width: 46px; height: 32px; border-radius: 6px; background-color: var(--karta);
+  background-image: var(--gilosz-rozeta); background-size: 120px 120px; background-position: right -50px top -50px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12);
+}
+/* Nad portfelem: „Zarządzaj” */
+.tytul-akcje { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.btn-zarzadzaj {
+  min-height: 48px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px 0 12px; border-radius: 24px;
+  background: var(--akcent-jasny); color: var(--akcent); font-weight: 700; font-size: 16px; line-height: 1.2; text-decoration: none;
+}
+.btn-zarzadzaj svg { width: 22px; height: 22px; }
+.btn-zarzadzaj:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- Wymaga Twojej uwagi (makieta) ---------- */
 .uwaga {
@@ -391,8 +455,52 @@ a.uwaga:hover { border-color: var(--akcent); }
 .status-ok { color: var(--sukces); }
 .status-pilne { color: var(--pilne); }
 .status-ok svg, .status-pilne svg { width: 20px; height: 20px; }
-.pojazd + .pojazd { margin-top: 16px; }
-.pojazd h2 { margin-bottom: 6px; }
+.rozwijane { margin-top: 10px; background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; overflow: hidden; }
+.rozwijane summary {
+  list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 56px;
+  padding: 10px 16px; font-weight: 700; color: var(--akcent); cursor: pointer; line-height: 1.3;
+}
+.rozwijane summary::-webkit-details-marker { display: none; }
+.rozwijane summary:hover { background: var(--akcent-jasny); }
+.rozwijane summary:focus-visible { outline-offset: -3px; }
+.strzalka-rozwin { width: 24px; height: 24px; flex: none; transition: transform .2s; }
+.rozwijane[open] .strzalka-rozwin { transform: rotate(180deg); }
+.rozwijane .dane { border: 0; border-top: 1px solid var(--linia); border-radius: 0; }
+.kod-w-danych { display: block; max-width: 280px; margin: 6px 0 4px; padding: 8px 10px; border-radius: 8px; background: #fff; color: #1A1D26; }
+.aktualizacja { display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; color: var(--tekst-2); font-size: max(16px, .9rem); line-height: 1.4; }
+.aktualizacja svg { width: 20px; height: 20px; margin-top: .1em; }
+.komunikat-dokumentu {
+  display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; padding: 12px 14px; line-height: 1.4;
+  border: 1px solid var(--akcent); border-radius: 12px; background: var(--akcent-jasny); color: var(--tekst); font-weight: 700;
+}
+.komunikat-dokumentu svg { width: 22px; height: 22px; color: var(--akcent); margin-top: .1em; }
+.sekcja .lista.akcje-dokumentu { margin-top: 18px; }
+.wiersz-listy.usun .tytul-wiersza { color: var(--pilne); }
+.wiersz-listy.usun .ikona-kolo, .ikona-kolo.ikona-usun { background: var(--pilne-jasne); color: var(--pilne); }
+.ikona-usun { color: var(--pilne); }
+
+/* ---------- Komunikaty (bez znikania) ---------- */
+.komunikat-ok, .ogloszenie:not(:empty) {
+  display: flex; align-items: flex-start; gap: 8px; padding: 12px 14px; line-height: 1.4;
+  border: 1px solid var(--sukces); border-radius: 12px; background: var(--sukces-jasny); color: var(--tekst); font-weight: 700;
+}
+.komunikat-ok { margin: 12px 16px 0; }
+.komunikat-ok svg { width: 22px; height: 22px; color: var(--sukces); margin-top: .1em; }
+.komunikat-ok:focus { outline: none; }
+.ogloszenie:not(:empty) { margin-bottom: 12px; }
+
+/* ---------- Zarządzaj: kolejność, usuń, układ, dodaj ---------- */
+.lista-kolejnosci { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.kolejnosc-wiersz { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 12px 14px; }
+.kolejnosc-dokument { display: flex; align-items: center; gap: 12px; line-height: 1.35; }
+.kolejnosc-dokument .tekst { display: flex; flex-direction: column; min-width: 0; }
+.kolejnosc-przyciski { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.btn-przesun { flex: 1 1 7em; width: auto; min-height: 48px; padding: 6px 12px; }
+.btn:disabled { border-style: dashed; border-color: var(--pole-ramka); background: none; color: var(--tekst-2); cursor: default; filter: none; }
+.btn.usun { background: var(--pilne); border-color: var(--pilne); color: var(--powierzchnia); }
+.opcja-nazwa .opis { display: block; font-weight: 400; }
+.ikona-opcji { width: 28px; height: 28px; color: var(--akcent); flex: none; }
+.ustawienie + .btn { margin-top: 4px; }
 
 /* ---------- Wybór osoby ---------- */
 .lista-osob { display: flex; flex-direction: column; gap: 10px; }
@@ -537,10 +645,16 @@ a.uwaga:hover { border-color: var(--akcent); }
 [data-prosty="tak"] .karta-osoby, [data-prosty="tak"] .kafel { padding-top: 18px; padding-bottom: 18px; }
 
 /* ---------- Wysoki kontrast: obramowania zamiast tła ---------- */
-[data-motyw="kontrast"] .karta { background: #000; border: 3px solid #fff; box-shadow: none; }
-[data-motyw="kontrast"] .karta::after, [data-motyw="kontrast"] .chip { display: none; }
-[data-motyw="kontrast"] .zdjecie { background: #000; color: #fff; border: 2px solid #fff; }
+[data-motyw="kontrast"] .karta, [data-motyw="kontrast"] .mini-karta { background: #000; border: 3px solid #fff; box-shadow: none; }
+[data-motyw="kontrast"] .mini-karta { border-width: 2px; }
+[data-motyw="kontrast"] .karta-status { background: #000; border: 2px solid #fff; }
+[data-motyw="kontrast"] .karta-status.alarm, [data-motyw="kontrast"] .pole-alarm { background: #000; color: #FF9C92; border: 2px solid #FF9C92; }
+[data-motyw="kontrast"] .karta-zdjecie { background: #000; color: #fff; border: 2px solid #fff; }
+[data-motyw="kontrast"] .sylwetka .jasne { fill: #000; }
 [data-motyw="kontrast"] .btn-pokaz { background: #FFE500; color: #000; }
+[data-motyw="kontrast"] .btn-zarzadzaj, [data-motyw="kontrast"] .rozwijane, [data-motyw="kontrast"] .kolejnosc-wiersz,
+[data-motyw="kontrast"] .komunikat-ok, [data-motyw="kontrast"] .ogloszenie:not(:empty), [data-motyw="kontrast"] .komunikat-dokumentu { border: 2px solid #fff; }
+[data-motyw="kontrast"] .btn:disabled { border-color: #fff; color: #fff; }
 [data-motyw="kontrast"] .karta :focus-visible, [data-motyw="kontrast"] .karta .btn-pokaz:focus-visible { outline-color: #FFE500; }
 [data-motyw="kontrast"] .podpowiedz, [data-motyw="kontrast"] .btn-czytaj, [data-motyw="kontrast"] .etykieta-dziala,
 [data-motyw="kontrast"] .ikona-kolo, [data-motyw="kontrast"] .awatar, [data-motyw="kontrast"] .ilustracja { border: 2px solid #fff; }

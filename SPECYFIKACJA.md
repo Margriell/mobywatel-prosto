@@ -1,6 +1,6 @@
 # Specyfikacja prototypu „mObywatel dla każdego”
 
-Wersja 2.1 · 25.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty)
+Wersja 2.2 · 25.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu)
 
 Klikalny prototyp aplikacji mObywatel na konkurs mObywatel Challenge (termin zgłoszenia: 26.11 wieczorem). Konkurs ma pierwszeństwo: prototyp ma być lepszy od prototypu referencyjnego Janusza Cieszyńskiego (mobywatel.ai), mieć na to dowody i wyróżniać się.
 
@@ -20,7 +20,7 @@ Ten plik jest jedynym źródłem prawdy. Nie zmieniaj go bez zgody autorki.
 
 | | Oficjalny mObywatel | Prototyp Cieszyńskiego | Nasz prototyp |
 | --- | --- | --- | --- |
-| Co widać na starcie | Dokumenty | Dokumenty (nachodzące karty) | Dokumenty jako portfel kart: każda karta ma czytelny pasek z nazwą i statusem, mDowód z przodu w całości |
+| Co widać na starcie | Dokumenty | Dokumenty (nachodzące karty) | Dokumenty jako portfel kart: każda karta wygląda jak prawdziwy dokument i ma czytelny pasek z nazwą i statusem, mDowód z przodu w całości; dotknięcie karty z tyłu przesuwa ją na przód |
 | Jak załatwić sprawę | Ręcznie, przez Usługi | Tylko rozmowa z AI | Ręcznie przez Usługi **albo** z asystentem — obie drogi prowadzą do tych samych kroków |
 | Czy widać, co można zrobić | Tak | Nie — trzeba wiedzieć, o co zapytać; aplikacja wydaje się pusta | Tak — pełna lista usług z opisami + podpowiedzi asystenta |
 | Asystent | Tylko odpowiada na pytania | Załatwia sprawy w czacie | Załatwia sprawy i prowadzi widocznymi krokami |
@@ -63,31 +63,32 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 | Element | Wymaganie |
 | --- | --- |
 | Tekst | Podstawowy 18 px, nagłówki 22–28 px, nic poniżej 16 px. Interlinia 1,5. Rozmiary: Standardowy (18), Duży (22), Bardzo duży (26), skalowane jedną zmienną. Podpisy dolnego paska stałe 16 px, pasek zawsze w jednym rzędzie |
-| Czcionka | Atkinson Hyperlegible (Google Fonts) albo systemowa |
+| Czcionka | Atkinson Hyperlegible wczytywana z Google Fonts; zapasowo czcionka systemowa — bez internetu aplikacja działa dalej |
 | Motywy | Jasny (jak makieta: jasnoszare tło, białe powierzchnie, granatowy akcent), Ciemny, Wysoki kontrast. Wszystkie kolory jako zmienne CSS. W każdym motywie tekst min. 4,5:1, ikony i obramowania min. 3:1 |
 | Kolory | Kolor mają tylko karty dokumentów. Reszta interfejsu jest spokojna: białe powierzchnie, jeden akcent (granat) — akcje. Czerwień — wyłącznie sprawy z terminem lub ryzykiem i błędy. Zieleń — sukces. Zawsze z ikoną i słowem |
 | Przyciski | Min. 48 × 48 px, odstęp min. 8 px. Główny przycisk na całą szerokość, 56 px |
 | Ikony | Zawsze z podpisem |
 | Język | Zdania do 15 słów, na „Ty”, bez żargonu, formy neutralne płciowo |
 | Układ | Jedna kolumna, naturalny przepływ, nic się nie nakłada, jednostki rem. Działa przy 320 px i powiększeniu 200%. Jedyny wyjątek: portfel kart dokumentów — karty leżą jedna za drugą, ale pasek każdej karty (nazwa i status) jest w całości widoczny i ma min. 48 px wysokości |
-| Nawigacja | Dolny pasek widoczny poza krokami sprawy. Na podekranach „Wstecz” z napisem. W sprawach „Krok 2 z 4” |
+| Nawigacja | Dolny pasek widoczny poza krokami sprawy. Na każdym podekranie górny pasek z „Wstecz” (z napisem) i tytułem ekranu, przyklejony u góry — nie znika przy przewijaniu. W sprawach „Krok 2 z 4” |
 | Czas i ruch | Brak limitów czasu i znikających komunikatów. Animacje subtelne, wyłączone przy „ogranicz ruch” |
 | Czytniki ekranu | `lang="pl"`, nagłówki, etykiety pól, `aria-live` dla asystenta, pola wyboru ogłaszające zaznaczenie, widoczny fokus |
 | Oznaczenia | Nazwa „mObywatel”. Ikona: czerwony kwadrat z zaokrąglonymi rogami i prostym białym znakiem własnego projektu — bez godła i oficjalnego logo. Informacja „Prototyp konkursowy, dane fikcyjne” tylko na ekranie wyboru osoby i w „Więcej”. Awatary z inicjałów |
 
 ## Osoby (pokazują, że aplikacja jest dla młodych i starszych)
 
-| Osoba | Ustawienia startowe | Karta „Wymaga Twojej uwagi” |
-| --- | --- | --- |
-| Halina, 71 lat, emerytka, pierwszy raz w aplikacji | Duży tekst, tryb prosty, jasny motyw | Nowe pismo z Urzędu Miasta o podatku od nieruchomości (kolor akcentu, etykieta „Nowe”, bez czerwieni) → Skrzynka |
-| Tomasz, 38 lat, kierowca | Standardowy tekst, jasny motyw | OC kończy się za 12 dni (czerwień; data = dziś + 12 dni) → sprawa B |
-| Ola, 24 lata, studentka | Standardowy tekst, ciemny motyw | Brak pilnych spraw („Wszystko w porządku”) |
+| Osoba | Ustawienia startowe | Dokumenty (dane fikcyjne) | Karta „Wymaga Twojej uwagi” |
+| --- | --- | --- | --- |
+| Halina, 71 lat, emerytka, pierwszy raz w aplikacji | Duży tekst, tryb prosty, jasny motyw | mDowód, mLegitymacja emeryta-rencisty (ZUS), Karta Dużej Rodziny (rodzic, ważna bezterminowo). Nie ma prawa jazdy ani pojazdów | Nowe pismo z Urzędu Miasta o podatku od nieruchomości (kolor akcentu, etykieta „Nowe”, bez czerwieni) → Skrzynka |
+| Tomasz, 38 lat, kierowca | Standardowy tekst, jasny motyw | mDowód, mPrawo jazdy, Moje pojazdy | OC kończy się za 12 dni (czerwień; data = dziś + 12 dni) → sprawa B |
+| Ola, 24 lata, studentka | Standardowy tekst, ciemny motyw | mDowód, mLegitymacja studencka | Brak pilnych spraw („Wszystko w porządku”) |
 
 ## Mapa aplikacji
 
 - **Wejście** (pierwsze uruchomienie): Wybór osoby → Dopasuj do siebie → Poznaj asystenta (jeden ekran, można pominąć) → Dokumenty.
 - **Pasek telefonu:** na górze ekranu godzina i bateria, żeby prototyp wyglądał jak prawdziwa aplikacja.
 - **Nagłówek:** ikona + „mObywatel”, po prawej „Dostosuj” (ikona suwaków z podpisem; otwiera panel „Wygląd i dostępność”, ten sam co w Więcej) i „Skrzynka” (ikona z podpisem i licznikiem).
+- **Podekrany:** górny pasek z „Wstecz” i tytułem, przyklejony u góry ekranu.
 - **Pole asystenta** przypięte nad dolnym paskiem: pole „Co chcesz załatwić?” + przycisk „Powiedz” (jak u Cieszyńskiego). Po dotknięciu pola pokazują się 3 gotowe pytania.
 - **Dolny pasek:** Dokumenty (ekran startowy) · Usługi · Asystent · Kod QR · Więcej.
 - **Do każdej sprawy prowadzą trzy drogi:** Usługi, asystent (pole przypięte na ekranie Dokumenty i zakładka), szczegóły dokumentu.
@@ -109,12 +110,31 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 
 **4. Dokumenty (ekran startowy).** Wzór: `warianty/makieta-dokumenty.html`. Od góry:
 1. Pasek telefonu (godzina, bateria), nagłówek (znak + „mObywatel”, „Dostosuj”, „Skrzynka” z licznikiem), powitanie „Dzień dobry, Halino”.
-2. Portfel kart ułożonych jedna za drugą, jak w oryginałach: Moje pojazdy, mPrawo jazdy, Karta Dużej Rodziny — każda z czytelnym paskiem z nazwą i statusem; mDowód z przodu w całości (inicjały zamiast zdjęcia, imię, ważność, „Pokaż dane”). Dotknięcie paska karty otwiera szczegóły tego dokumentu.
-3. „Wymaga Twojej uwagi” — karta zależna od osoby.
-4. Pole asystenta przypięte nad dolnym paskiem („Co chcesz załatwić?” + „Powiedz”); po dotknięciu pola 3 gotowe pytania. Wcześniejszy blok asystenta pod kartą sprawy usunięty.
+2. Nad portfelem przycisk „Zarządzaj” (ikona z podpisem) — ekran 5a.
+3. Portfel kart ułożonych jedna za drugą (układ „Duże karty”): karty z tyłu pokazują czytelny pasek z nazwą i statusem, mDowód jest z przodu w całości. Dotknięcie karty z tyłu przesuwa ją na przód (płynna animacja, wyłączona przy „ogranicz ruch”). Szczegóły otwiera dopiero przycisk na przedniej karcie. Dla czytnika ekranu każda karta z tyłu to przycisk „Pokaż [nazwa] na przodzie”. Wygląd kart — sekcja „Karty dokumentów”.
+4. „Wymaga Twojej uwagi” — karta zależna od osoby.
+5. Pole asystenta przypięte nad dolnym paskiem („Co chcesz załatwić?” + „Powiedz”); po dotknięciu pola 3 gotowe pytania. Wcześniejszy blok asystenta pod kartą sprawy usunięty.
 Przy tekście Standardowym na 390 × 844 bez przewijania widać mDowód, kartę sprawy i pole asystenta. Jeśli się nie mieści — zapytaj autorkę, zanim coś ukryjesz.
 
-**5. Szczegóły dokumentu.** Dane jako lista „etykieta — wartość”. Przyciski: „Pokaż kod QR” (niedostępne w prototypie), „Zgłoś utratę tego dokumentu” → sprawa A z zaznaczonym dokumentem.
+**Karty dokumentów.** Każda karta wygląda jak prawdziwy dokument: jeden wspólny szablon, każda w swoim kolorze, z delikatnym wzorem giloszowym jak na prawdziwych dokumentach. Tekst pozostaje w pełni czytelny (kontrast min. 4,5:1). Na górze karty pasek z nazwą i statusem. Pola na kartach:
+- mDowód: zdjęcie (inicjały), imię, nazwisko, data urodzenia, PESEL.
+- mPrawo jazdy: zdjęcie, imię, nazwisko, kategorie, ważne do.
+- mLegitymacja studencka: zdjęcie, imię, nazwisko, data urodzenia, PESEL, nazwa uczelni, numer albumu, data wydania, kod kreskowy.
+- mLegitymacja emeryta-rencisty: zdjęcie, imię, nazwisko, PESEL, organ wydający (ZUS), ważność.
+- Karta Dużej Rodziny: zdjęcie, imię, nazwisko, numer karty, ważna bezterminowo.
+- Moje pojazdy: sylwetka auta zamiast zdjęcia, marka i model, numer rejestracyjny, OC ważne do, badanie techniczne do (u Tomasza ostrzeżenie o OC).
+
+**5. Szczegóły dokumentu** (jak w mObywatelu). Na górze podgląd karty, pod nim sekcja „Dane”, ostatnia aktualizacja, a potem akcje. Akcje spoza prototypu otwierają okno „Niedostępne w prototypie”.
+- mDowód — Dane: seria i numer dowodu, termin ważności, data wydania, imię ojca, imię matki, rozwijane „Twoje dodatkowe dane”, ostatnia aktualizacja. Akcje: „Potwierdź swoje dane osobiste”, „Dane dowodu osobistego”. „Pozostałe skróty”: Zastrzeż PESEL, Zgłoś utratę dowodu (→ sprawa A), Mandaty, Wybory, Usuń dokument.
+- mLegitymacja studencka — dane z karty, numer albumu, kod kreskowy, ostatnia aktualizacja, przykładowy komunikat („Dokument wymaga potwierdzenia danych”). Akcje: „Bezpieczny autobus”, „Usuń dokument”.
+- Pozostałe dokumenty analogicznie, tylko z danymi z karty (sekcja „Karty dokumentów”).
+
+**5a. Zarządzaj** (jak w mObywatelu; otwiera go przycisk nad portfelem).
+- Kolejność dokumentów: przyciski „W górę” / „W dół” przy każdym dokumencie (bez przeciągania — łatwiej dla seniorów).
+- Usuń dokument (z potwierdzeniem).
+- Wybierz układ: Duże karty (portfel), Małe karty, Lista. Każdy układ spełnia zasady projektowe (tekst min. 16 px, przyciski min. 48 px).
+- Dodaj dokument: lista dokumentów dostępnych w mObywatelu, m.in. mLegitymacja szkolna, studencka, doktoranta, emeryta-rencisty, osoby niepełnosprawnej, Karta Dużej Rodziny, legitymacja ulgowych usług transportowych, legitymacje zawodowe (adwokacka, radcy prawnego, PWZ lekarza, pielęgniarki i położnej, farmaceuty, fizjoterapeuty, nauczyciela i inne). Wybór otwiera okno „Niedostępne w prototypie”.
+- Kolejność i układ zapamiętują się.
 
 **6. Usługi.** Wyszukiwarka u góry („Szukaj usługi, np. PESEL”; działa bez polskich znaków i po synonimach). Potem „Najczęstsze” (3–4 usługi), potem wszystkie usługi według sytuacji życiowych: Dokumenty i tożsamość, Samochód, Mieszkanie, Rodzina, Zdrowie, Podatki, Bezpieczeństwo — w każdej 3–5 usług z jednozdaniowym opisem, np. „Zastrzeż PESEL — nikt nie weźmie kredytu na Twoje dane”. Usługi działające w prototypie mają etykietę „Działa w prototypie”. W trybie prostym: tylko kategorie jako duże przyciski, usługi po wejściu w kategorię.
 

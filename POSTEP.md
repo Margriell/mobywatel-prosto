@@ -4,8 +4,8 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 
 ## Stan
 
-- Obowiązuje SPECYFIKACJA.md w wersji 2.1 (wzór wyglądu: `warianty/makieta-dokumenty.html`).
-- Ukończony etap: 2 — szkielet całej aplikacji (`index.html`, `style.css`, `app.js`, `dane.js`).
+- Obowiązuje SPECYFIKACJA.md w wersji 2.2 (wzór wyglądu: `warianty/makieta-dokumenty.html`; dokumenty jak w prawdziwym mObywatelu).
+- Ukończony etap: 2 — szkielet całej aplikacji (`index.html`, `style.css`, `app.js`, `dane.js`), z poprawkami dokumentów.
 - Następny etap: 3 — sprawa A „Zgubione dokumenty” z asystentem (wtedy powstanie `asystent.js`).
 
 ## Decyzje autorki
@@ -21,7 +21,43 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 - 25.11.2026: wzorem wyglądu i układu jest `warianty/makieta-dokumenty.html` (zatwierdzona przez autorkę). Warianty Dokumenty 1–3 przeniesione do `warianty/archiwum/`.
 - 25.11.2026: decyzje z makiety wpisane do SPECYFIKACJA.md (wersja 2.1): (1) dokumenty jako portfel kart jedna za drugą, każda z czytelnym paskiem, mDowód z przodu w całości, dotknięcie paska otwiera szczegóły; (2) kolor mają tylko karty dokumentów, reszta spokojna — białe powierzchnie i granat, czerwień tylko dla spraw z terminem; (3) w nagłówku „Dostosuj” (suwaki z podpisem) i „Skrzynka” z licznikiem; (4) pole asystenta przypięte nad dolnym paskiem, po dotknięciu 3 gotowe pytania, blok asystenta pod kartą sprawy usunięty; (5) pasek telefonu z godziną i baterią.
 
+- 25.11.2026: poprawki do etapu 2 — dokumenty mają odpowiadać prawdziwemu mObywatelowi (opis z aplikacji autorki), wpisane do SPECYFIKACJA.md (wersja 2.2): (1) dokumenty osób — Halina: mDowód, mLegitymacja emeryta-rencisty, Karta Dużej Rodziny; Tomasz: mDowód, mPrawo jazdy, Moje pojazdy; Ola: mDowód, mLegitymacja studencka; (2) dotknięcie karty z tyłu przesuwa ją na przód, szczegóły otwiera przycisk na przedniej karcie; (3) każda karta wygląda jak prawdziwy dokument — wspólny szablon, własny kolor, wzór giloszowy; (4) szczegóły dokumentu jak w mObywatelu; (5) „Zarządzaj”: kolejność, usuń, układ, dodaj; (6) „Wstecz” z tytułem przyklejone u góry podekranów; (7) czcionka Atkinson Hyperlegible z Google Fonts, zapasowo systemowa.
+
 ## Dziennik
+
+### 25.11.2026 Etap 2, poprawki — dokumenty jak w mObywatelu
+- Zrobione:
+  - **Dokumenty osób** według opisu autorki: Halina — mDowód, mLegitymacja emeryta-rencisty (ZUS), Karta Dużej Rodziny (rodzic, bezterminowo), bez prawa jazdy i pojazdów; Tomasz — mDowód, mPrawo jazdy, Moje pojazdy; Ola — mDowód, mLegitymacja studencka.
+  - **Karty jak prawdziwe dokumenty:** jeden wspólny szablon — na górze pasek z nazwą i statusem, pod nim zdjęcie (inicjały) i dane jak na dokumencie. Każda karta w swoim kolorze (nowy: zielony dla legitymacji emeryta-rencisty). Wzór giloszowy jak na banknotach i dowodach: jasna rozeta z przeplatanych krzywych w prawym górnym rogu i ciemne fale przez środek karty. Moje pojazdy: sylwetka auta zamiast zdjęcia, u Tomasza białe pole z czerwonym ostrzeżeniem „[data] — zostało 12 dni”. mLegitymacja studencka: kod kreskowy z numerem albumu.
+  - **Portfel:** dotknięcie karty z tyłu przesuwa ją na przód — karty płynnie zamieniają się miejscami, a dane nowej karty łagodnie się pojawiają (bez animacji przy „ogranicz ruch”). Szczegóły otwiera dopiero przycisk „Pokaż szczegóły” na przedniej karcie. Czytnik ekranu czyta każdą kartę z tyłu jako przycisk „Pokaż [nazwa] na przodzie” (ze statusem). Po przesunięciu fokus trafia na „Pokaż szczegóły”.
+  - **Szczegóły dokumentu** jak w mObywatelu: podgląd karty, „Dane”, ostatnia aktualizacja, akcje. mDowód: seria i numer, termin ważności, data wydania, imię ojca i matki, rozwijane „Twoje dodatkowe dane”; „Potwierdź swoje dane osobiste”, „Dane dowodu osobistego”; „Pozostałe skróty”: Zastrzeż PESEL, Zgłoś utratę dowodu (sprawa A), Mandaty, Wybory, Usuń dokument. mLegitymacja studencka: dane z karty, numer albumu, kod kreskowy, komunikat „Dokument wymaga potwierdzenia danych”, „Bezpieczny autobus”, „Usuń dokument”. Pozostałe: dane z karty i „Usuń dokument”; Moje pojazdy dodatkowo „OC i badanie techniczne” (sprawa B). Akcje spoza prototypu otwierają okno „Niedostępne w prototypie”.
+  - **Zarządzaj** (przycisk z ikoną nad portfelem): Kolejność dokumentów (przyciski „W górę” / „W dół”, po każdym przesunięciu zdanie „mDowód jest teraz na miejscu 2 z 3”), Usuń dokument (okno z potwierdzeniem, potem zielony komunikat „Usunięto dokument…”), Wybierz układ (Duże karty, Małe karty, Lista — zmiana od razu), Dodaj dokument (lista z opisu autorki, z oznaczeniem „Masz w aplikacji”; wybór otwiera okno „Niedostępne w prototypie”). Kolejność i układ zapamiętują się w przeglądarce.
+  - **„Wstecz” zawsze widoczne:** na każdym podekranie górny pasek z „Wstecz” i tytułem ekranu jest przyklejony u góry i nie znika przy przewijaniu.
+  - **Czcionka:** Atkinson Hyperlegible wczytywana z Google Fonts; bez internetu aplikacja działa z czcionką systemową.
+  - SPECYFIKACJA.md: wersja 2.2 (dokumenty osób w tabeli „Osoby”, sekcje „Karty dokumentów”, „5. Szczegóły dokumentu”, „5a. Zarządzaj”, zasady „Czcionka” i „Nawigacja”).
+- Pliki: `index.html` (czcionka), `style.css`, `app.js`, `dane.js`, `SPECYFIKACJA.md`, `POSTEP.md`.
+- Jak sprawdzić: dwuklik na `index.html`. Dotknij paska karty z tyłu portfela — przesunie się na przód; „Pokaż szczegóły” otwiera szczegóły. „Zarządzaj” nad portfelem. Szybkie wejście: `?osoba=tomasz` (albo `halina`, `ola`) — każdy wybór osoby przywraca jej wszystkie dokumenty, kolejność i układ „Duże karty”.
+- Kontrola (według sekcji „Kontrola” specyfikacji; automatycznie, w przeglądarce opartej na Chrome, z włączonym czytaniem na głos):
+  - 119 ekranów na zestaw: wszystkie ekrany trzech osób, w tym szczegóły każdego dokumentu, rozwinięte „Twoje dodatkowe dane”, każda karta z tyłu przesunięta na przód, wszystkie ekrany „Zarządzaj”, układy „Małe karty” i „Lista”, przesunięcie w kolejności, okno usuwania, ekran po usunięciu i „Brak dokumentu”, wyszukiwarka, okno „Niedostępne w prototypie”.
+  - Szerokość 390 px (ramka telefonu): 3 rozmiary tekstu × 3 motywy + 3 zestawy z trybem prostym. Szerokość 320 px: 6 zestawów. Powiększenie 200% (640 × 360 px): 3 zestawy. Razem 21 zestawów, 2499 ekranów — 0 błędów. Dodatkowo 2 zestawy kontrolne na ostatecznej wersji kodu — 0 błędów.
+  - Najmniejszy tekst: 16 px. Najsłabszy kontrast: 4,65:1 — liczony w najgorszym miejscu, czyli tam, gdzie na zielonej karcie mLegitymacji studenckiej krzyżują się dwie jasne linie wzoru; bez wzoru 6,4:1.
+  - Wszystkie elementy klikalne mają co najmniej 48 × 48 px (widoczny pasek karty z tyłu: 51 px), odstępy co najmniej 8 px. Nic nie wychodzi poza ekran i nic się nie nakłada. Każdy przycisk coś robi, każdy adres prowadzi do ekranu.
+  - Bez przewijania (390 × 844, tekst Standardowy): widać mDowód, kartę „Wymaga Twojej uwagi” i pole asystenta u wszystkich — zapas: Halina 8 px, Tomasz 35 px, Ola 109 px.
+  - Działa po otwarciu z pliku (bez serwera) w Edge i Chrome. Bez internetu (zablokowana sieć) działa z czcionką systemową.
+  - Poprawione w trakcie: wzór giloszowy był prawie niewidoczny (wzmocniony; fale są ciemne, więc nie osłabiają kontrastu); za mały odstęp nad akcjami w szczegółach; przy powiększeniu 200% przycisk „W górę”/„W dół” z fokusem chował się pod przyklejonym paskiem „Wstecz” (teraz przewijanie zawsze zostawia miejsce na pasek); jawne etykiety dla czytnika ekranu przy kartach i „Zarządzaj”.
+- Rozwiązane z poprzedniego wpisu: Halina mieści się teraz bez przewijania (ma 3 dokumenty zamiast 4); czcionka Atkinson Hyperlegible jest wczytywana.
+- Znane problemy / do decyzji:
+  - **„Twoje dodatkowe dane”** (mDowód): opis nie mówił, co zawierają. Wpisałem nazwisko rodowe, miejsce urodzenia i obywatelstwo — do potwierdzenia.
+  - **Zastrzeż PESEL** w „Pozostałych skrótach” prowadzi do sprawy A (tak jak w Usługach — PESEL zastrzega się w kroku 2 tej sprawy).
+  - **Akcje pozostałych dokumentów:** mPrawo jazdy, Karta Dużej Rodziny i mLegitymacja emeryta-rencisty mają tylko „Usuń dokument”. Moje pojazdy mają też „OC i badanie techniczne” (sprawa B), bo specyfikacja wymaga drogi do sprawy ze szczegółów dokumentu.
+  - **Karta Dużej Rodziny:** „Rodzaj karty: Rodzic” jest w danych w szczegółach (z opisu „rodzic”), na samej karcie nie.
+  - **Usunięty dokument** wraca po ponownym wyborze osoby; „Dodaj dokument” w prototypie otwiera okno „Niedostępne w prototypie”.
+  - **Karta z przodu:** zostaje z przodu do końca wizyty (np. po powrocie ze szczegółów). Po odświeżeniu z przodu jest ostatni dokument z kolejności — domyślnie mDowód.
+  - **Ola:** w szczegółach mLegitymacji jest przykładowy komunikat „Dokument wymaga potwierdzenia danych”, a karta na ekranie Dokumenty nadal mówi „Wszystko w porządku” (zgodnie ze specyfikacją).
+  - **Czcionka z Google Fonts:** przy otwarciu aplikacji przeglądarka łączy się z serwerami Google, żeby pobrać czcionkę.
+  - **Kod kreskowy** to ilustracja (paski ułożone z cyfr numeru albumu), nie prawdziwy kod do skanowania.
+  - **Małe karty:** przy tekście Standardowym 2 kolumny, przy większym tekście lub 320 px — 1 kolumna.
+  - **Dane wymyślone:** serie i numery dowodów (XYZ …), imiona rodziców, nazwiska rodowe, numer Karty Dużej Rodziny, numer albumu, daty wydania, daty ostatniej aktualizacji. Nowy kolor karty: zielony dla mLegitymacji emeryta-rencisty.
 
 ### 25.11.2026 Etap 2 — szkielet całej aplikacji
 - Zrobione:

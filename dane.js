@@ -27,26 +27,32 @@
     };
   }
 
+  /* Ostatnia aktualizacja dokumentu (np. „23.11.2026, 08:12”) */
+  function aktualizacja(dni, godzina) { return formatuj(dataZaDni(-dni)) + ', ' + godzina; }
+
+  /* Dokumenty: kolejność = kolejność w portfelu od góry; ostatni leży z przodu.
+     pola = dane na karcie (jak na prawdziwym dokumencie); dane = sekcja „Dane” w szczegółach.
+     Trzeci element: 'dlugie' (cała szerokość karty), 'alarm' (ostrzeżenie: ikona + słowa). */
   var OSOBY = {
     halina: {
       id: 'halina', imie: 'Halina', wolacz: 'Halino', nazwisko: 'Wiśniewska', inicjaly: 'HW', wiek: '71 lat',
       opis: 'Emerytka, pierwszy raz korzysta z aplikacji.',
       ustawienia: { tekst: 'duzy', motyw: 'jasny', prosty: true, czytanie: false },
       ustawieniaOpis: 'Duży tekst, tryb prosty',
-      /* Kolejność = kolejność w portfelu; ostatnia karta leży z przodu */
       dokumenty: [
-        { id: 'pojazdy', rodzaj: 'pojazdy', nazwa: 'Moje pojazdy', kolor: 'pojazdy', status: '1 pojazd',
-          pojazdy: [{ marka: 'Toyota Yaris', numer: 'KR 7731C', rok: '2015', oc: '30.06.2027', ocPilne: false, badanie: '14.05.2027' }] },
-        { id: 'prawko', rodzaj: 'prawko', nazwa: 'mPrawo jazdy', kolor: 'prawko', status: 'Ważne', ikonaStatusu: 'ok',
-          dane: [['Imię i nazwisko', 'Halina Wiśniewska'], ['Kategorie', 'B'], ['Ważne do', '04.09.2033'],
-            ['Numer prawa jazdy', '00412/03/1261'], ['Wydane przez', 'Prezydent Miasta Krakowa']] },
         { id: 'kdr', rodzaj: 'kdr', nazwa: 'Karta Dużej Rodziny', kolor: 'kdr', status: 'Ważna', ikonaStatusu: 'ok',
-          dane: [['Imię i nazwisko', 'Halina Wiśniewska'], ['Numer karty', '12/2014/000184'], ['Ważna do', 'bezterminowo'],
-            ['Wydana przez', 'Urząd Miasta Krakowa']] },
-        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny do 12.03.2031',
-          dane: [['Imię i nazwisko', 'Halina Wiśniewska'], ['Data urodzenia', '14.03.1955'], ['Miejsce urodzenia', 'Kraków'],
-            ['PESEL', '55031412345'], ['Obywatelstwo', 'polskie'], ['Seria i numer', 'XYZ 104233'],
-            ['Ważny do', '12.03.2031'], ['Wydany przez', 'Prezydent Miasta Krakowa']] }
+          pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Numer karty', '12/2014/000184'], ['Ważność', 'bezterminowo']],
+          dane: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Numer karty', '12/2014/000184'], ['Rodzaj karty', 'Rodzic'], ['Ważność', 'bezterminowo']],
+          aktualizacja: aktualizacja(6, '10:24') },
+        { id: 'emeryt', rodzaj: 'emeryt', nazwa: 'mLegitymacja emeryta-rencisty', kolor: 'emeryt', status: 'Ważna', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['PESEL', '55031412345'], ['Ważność', 'bezterminowo'], ['Organ wydający', 'ZUS', 'dlugie']],
+          dane: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['PESEL', '55031412345'], ['Organ wydający', 'Zakład Ubezpieczeń Społecznych (ZUS)'], ['Ważność', 'bezterminowo']],
+          aktualizacja: aktualizacja(3, '09:05') },
+        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Data urodzenia', '14.03.1955'], ['PESEL', '55031412345']],
+          dane: [['Seria i numer dowodu', 'XYZ 104233'], ['Termin ważności', '12.03.2031'], ['Data wydania', '12.03.2021'], ['Imię ojca', 'Stanisław'], ['Imię matki', 'Zofia']],
+          dodatkowe: [['Nazwisko rodowe', 'Nowicka'], ['Miejsce urodzenia', 'Kraków'], ['Obywatelstwo', 'polskie']],
+          aktualizacja: aktualizacja(2, '08:12') }
       ],
       uwaga: { styl: 'nowe', ikona: 'list', etykieta: 'Nowe pismo', opis: 'Urząd Miasta: podatek od nieruchomości', href: '#/skrzynka/podatek' },
       wiadomosci: [
@@ -63,15 +69,21 @@
       ustawienia: { tekst: 'standardowy', motyw: 'jasny', prosty: false, czytanie: false },
       ustawieniaOpis: 'Standardowy tekst, jasny motyw',
       dokumenty: [
-        { id: 'pojazdy', rodzaj: 'pojazdy', nazwa: 'Moje pojazdy', kolor: 'pojazdy', status: 'OC: 12 dni', ikonaStatusu: 'uwaga',
-          pojazdy: [{ marka: 'Skoda Octavia', numer: 'WX 4821K', rok: '2019', oc: KONIEC_OC_TOMASZA, ocPilne: true, badanie: '14.05.2027' }] },
+        { id: 'pojazdy', rodzaj: 'pojazdy', nazwa: 'Moje pojazdy', kolor: 'pojazdy', status: 'OC: 12 dni', ikonaStatusu: 'uwaga', alarm: true,
+          pola: [['Marka i model', 'Skoda Octavia'], ['Numer rejestracyjny', 'WX 4821K'],
+            ['OC ważne do', KONIEC_OC_TOMASZA + ' — zostało 12 dni', 'alarm dlugie'], ['Badanie techniczne do', '14.05.2027', 'dlugie']],
+          dane: [['Marka i model', 'Skoda Octavia'], ['Numer rejestracyjny', 'WX 4821K'],
+            ['OC ważne do', KONIEC_OC_TOMASZA + ' — zostało 12 dni', 'alarm'], ['Badanie techniczne do', '14.05.2027']],
+          aktualizacja: aktualizacja(1, '07:40') },
         { id: 'prawko', rodzaj: 'prawko', nazwa: 'mPrawo jazdy', kolor: 'prawko', status: 'Ważne', ikonaStatusu: 'ok',
-          dane: [['Imię i nazwisko', 'Tomasz Kowalski'], ['Kategorie', 'B, C, C+E'], ['Ważne do', '22.06.2031'],
-            ['Numer prawa jazdy', '01877/06/1465'], ['Wydane przez', 'Prezydent m.st. Warszawy']] },
-        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny do 03.10.2030',
-          dane: [['Imię i nazwisko', 'Tomasz Kowalski'], ['Data urodzenia', '22.06.1988'], ['Miejsce urodzenia', 'Warszawa'],
-            ['PESEL', '88062254310'], ['Obywatelstwo', 'polskie'], ['Seria i numer', 'XYZ 552910'],
-            ['Ważny do', '03.10.2030'], ['Wydany przez', 'Prezydent m.st. Warszawy']] }
+          pola: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Kategorie', 'B, C, C+E'], ['Ważne do', '22.06.2031']],
+          dane: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Kategorie', 'B, C, C+E'], ['Ważne do', '22.06.2031']],
+          aktualizacja: aktualizacja(4, '18:31') },
+        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Data urodzenia', '22.06.1988'], ['PESEL', '88062254310']],
+          dane: [['Seria i numer dowodu', 'XYZ 552910'], ['Termin ważności', '03.10.2030'], ['Data wydania', '03.10.2020'], ['Imię ojca', 'Andrzej'], ['Imię matki', 'Ewa']],
+          dodatkowe: [['Nazwisko rodowe', 'Kowalski'], ['Miejsce urodzenia', 'Warszawa'], ['Obywatelstwo', 'polskie']],
+          aktualizacja: aktualizacja(2, '08:12') }
       ],
       uwaga: { styl: 'pilne', ikona: 'uwaga', etykieta: 'Kończy się OC', opis: 'OC samochodu kończy się za 12 dni (' + KONIEC_OC_TOMASZA + ')', href: '#/sprawa/samochod' },
       wiadomosci: [
@@ -89,14 +101,18 @@
       ustawieniaOpis: 'Standardowy tekst, ciemny motyw',
       dokumenty: [
         { id: 'legitymacja', rodzaj: 'legitymacja', nazwa: 'mLegitymacja studencka', kolor: 'legitymacja', status: 'Ważna', ikonaStatusu: 'ok',
-          dane: [['Imię i nazwisko', 'Aleksandra Nowak'], ['Uczelnia', 'Uniwersytet Gdański'], ['Numer albumu', '412377'], ['Ważna do', '31.03.2027']] },
-        { id: 'prawko', rodzaj: 'prawko', nazwa: 'mPrawo jazdy', kolor: 'prawko', status: 'Ważne', ikonaStatusu: 'ok',
-          dane: [['Imię i nazwisko', 'Aleksandra Nowak'], ['Kategorie', 'B'], ['Ważne do', '18.07.2035'],
-            ['Numer prawa jazdy', '02931/20/2261'], ['Wydane przez', 'Prezydent Miasta Gdańska']] },
-        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny do 09.02.2032',
-          dane: [['Imię i nazwisko', 'Aleksandra Nowak'], ['Data urodzenia', '09.02.2002'], ['Miejsce urodzenia', 'Gdańsk'],
-            ['PESEL', '02220912346'], ['Obywatelstwo', 'polskie'], ['Seria i numer', 'XYZ 731045'],
-            ['Ważny do', '09.02.2032'], ['Wydany przez', 'Prezydent Miasta Gdańska']] }
+          pola: [['Imię', 'Aleksandra'], ['Nazwisko', 'Nowak'], ['Data urodzenia', '09.02.2002'], ['PESEL', '02220912346'],
+            ['Nazwa uczelni', 'Uniwersytet Gdański', 'dlugie'], ['Numer albumu', '412377'], ['Data wydania', '04.10.2021']],
+          dane: [['Imię', 'Aleksandra'], ['Nazwisko', 'Nowak'], ['Data urodzenia', '09.02.2002'], ['PESEL', '02220912346'],
+            ['Nazwa uczelni', 'Uniwersytet Gdański'], ['Numer albumu', '412377'], ['Data wydania', '04.10.2021']],
+          kod: '412377',
+          komunikat: 'Dokument wymaga potwierdzenia danych',
+          aktualizacja: aktualizacja(3, '12:47') },
+        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Aleksandra'], ['Nazwisko', 'Nowak'], ['Data urodzenia', '09.02.2002'], ['PESEL', '02220912346']],
+          dane: [['Seria i numer dowodu', 'XYZ 731045'], ['Termin ważności', '09.02.2032'], ['Data wydania', '09.02.2022'], ['Imię ojca', 'Piotr'], ['Imię matki', 'Anna']],
+          dodatkowe: [['Nazwisko rodowe', 'Nowak'], ['Miejsce urodzenia', 'Gdańsk'], ['Obywatelstwo', 'polskie']],
+          aktualizacja: aktualizacja(2, '08:12') }
       ],
       uwaga: { styl: 'ok', ikona: 'ok', etykieta: 'Wszystko w porządku', opis: 'Nie masz spraw, które czekają.' },
       wiadomosci: [
@@ -107,6 +123,47 @@
       ]
     }
   };
+
+  /* Akcje w szczegółach dokumentu (jak w mObywatelu). „Usuń dokument” dokłada aplikacja.
+     href = działa w prototypie; niedostepne = okno „Niedostępne w prototypie”. */
+  var AKCJE = {
+    dowod: {
+      akcje: [
+        { tekst: 'Potwierdź swoje dane osobiste', ikona: 'osobaOk', niedostepne: 'Potwierdź swoje dane osobiste' },
+        { tekst: 'Dane dowodu osobistego', ikona: 'dowod', niedostepne: 'Dane dowodu osobistego' }
+      ],
+      skroty: [
+        { tekst: 'Zastrzeż PESEL', ikona: 'tarcza', href: '#/sprawa/zgubione' },
+        { tekst: 'Zgłoś utratę dowodu', ikona: 'uwaga', href: '#/sprawa/zgubione?dokument=dowod' },
+        { tekst: 'Mandaty', ikona: 'paragon', niedostepne: 'Mandaty' },
+        { tekst: 'Wybory', ikona: 'wybory', niedostepne: 'Wybory' }
+      ]
+    },
+    legitymacja: { akcje: [{ tekst: 'Bezpieczny autobus', ikona: 'autobus', niedostepne: 'Bezpieczny autobus' }] },
+    pojazdy: { akcje: [{ tekst: 'OC i badanie techniczne', ikona: 'auto', href: '#/sprawa/samochod' }] }
+  };
+
+  /* Zarządzaj → Dodaj dokument: dokumenty dostępne w mObywatelu (rodzaj = osoba może już go mieć) */
+  var DO_DODANIA = [
+    { nazwa: 'Legitymacje i karty', dokumenty: [
+      { nazwa: 'mLegitymacja szkolna' },
+      { nazwa: 'mLegitymacja studencka', rodzaj: 'legitymacja' },
+      { nazwa: 'mLegitymacja doktoranta' },
+      { nazwa: 'mLegitymacja emeryta-rencisty', rodzaj: 'emeryt' },
+      { nazwa: 'mLegitymacja osoby niepełnosprawnej' },
+      { nazwa: 'Karta Dużej Rodziny', rodzaj: 'kdr' },
+      { nazwa: 'Legitymacja ulgowych usług transportowych' }
+    ] },
+    { nazwa: 'Legitymacje zawodowe', dokumenty: [
+      { nazwa: 'Legitymacja adwokacka' },
+      { nazwa: 'Legitymacja radcy prawnego' },
+      { nazwa: 'Prawo wykonywania zawodu lekarza (PWZ)' },
+      { nazwa: 'Legitymacja pielęgniarki i położnej' },
+      { nazwa: 'Legitymacja farmaceuty' },
+      { nazwa: 'Legitymacja fizjoterapeuty' },
+      { nazwa: 'Legitymacja nauczyciela' }
+    ] }
+  ];
 
   /* Sprawy, które działają w prototypie (pokazywane w oknie „Niedostępne w prototypie”) */
   var DZIALAJACE = [
@@ -165,10 +222,12 @@
     kategorie: KATEGORIE,
     najczestsze: ['utrata', 'oc-badanie', 'pit', 'recepty'],
     dzialajace: DZIALAJACE,
+    akcje: AKCJE,
+    doDodania: DO_DODANIA,
     /* Gotowe pytania: 3 pod polem asystenta, 4 na pustym ekranie Asystenta */
     pytania: ['Zginął mi portfel', 'Do kiedy mam OC?', 'Jak zastrzec PESEL?'],
     podpowiedziAsystenta: ['Zginął mi portfel', 'Do kiedy mam OC?', 'Jak zastrzec PESEL?', 'Co umiesz?'],
-    nazwyDokumentow: { dowod: 'Dowód osobisty', prawko: 'Prawo jazdy', kdr: 'Karta Dużej Rodziny', legitymacja: 'Legitymacja studencka' },
+    nazwyDokumentow: { dowod: 'Dowód osobisty', prawko: 'Prawo jazdy', kdr: 'Karta Dużej Rodziny', legitymacja: 'Legitymacja studencka', emeryt: 'Legitymacja emeryta-rencisty' },
     dzis: DZIS
   };
 })();
