@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Start, wariant B1: Granatowa góra · mObywatel</title>
+<title>Dokumenty, wygląd 3: Czysty, bliski oficjalnemu · mObywatel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
-  html { font-size: var(--tekst, 137.5%); }
+  html { font-size: var(--tekst, 112.5%); }
   body { margin: 0; font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     font-size: 16px; line-height: 1.5; color: #1A1F27; background: #fff; }
   :focus-visible { outline: 3px solid #1A1A1A; outline-offset: 3px; }
   .narzedzia { display: none; }
-  /* Na komputerze: ramka telefonu 390 × 844 px (z obramowaniem 410 × 864) */
+  /* Na komputerze: ramka telefonu, wnętrze 390 × 844 px */
   @media (min-width: 31em) and (min-height: 46em) {
-    body { background: #E6E1D8; display: flex; flex-direction: column; align-items: center; padding: 12px; gap: 12px; }
-    .narzedzia { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 20px; }
-    .ekran { --wysokosc-ekranu: 100%; width: 410px; height: min(864px, calc(100dvh - 96px)); overflow-y: auto;
+    body { background: #E3E6EC; display: flex; flex-direction: column; align-items: center; padding: 12px; gap: 12px; }
+    .narzedzia { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 20px; max-width: 900px; }
+    .ekran { --wysokosc-ekranu: 100%; width: 410px; height: min(864px, calc(100dvh - 140px)); overflow-y: auto;
       border: 10px solid #1A1F27; border-radius: 40px; box-shadow: 0 10px 40px rgba(0,0,0,.25); background: #fff;
-      scrollbar-width: none; } /* jak w telefonie: bez paska przewijania, wnętrze ma pełne 390 px */
+      scrollbar-width: none; } /* jak w telefonie: bez paska przewijania */
     .ekran::-webkit-scrollbar { display: none; }
   }
   .narzedzia p { margin: 0; font-weight: 700; }
@@ -33,24 +33,29 @@
 </head>
 <body>
   <div class="narzedzia">
-    <p>Wariant B1: Granatowa góra</p>
+    <p>Dokumenty — wygląd 3: Czysty, bliski oficjalnemu</p>
     <fieldset>
       <legend>Rozmiar tekstu:</legend>
       <label><input type="radio" name="rozmiar" value="standardowy"> Standardowy</label>
       <label><input type="radio" name="rozmiar" value="duzy"> Duży</label>
       <label><input type="radio" name="rozmiar" value="bardzo-duzy"> Bardzo duży</label>
     </fieldset>
+    <fieldset>
+      <legend>Motyw:</legend>
+      <label><input type="radio" name="motyw" value="jasny"> Jasny</label>
+      <label><input type="radio" name="motyw" value="ciemny"> Ciemny</label>
+      <label><input type="radio" name="motyw" value="kontrast"> Wysoki kontrast</label>
+    </fieldset>
     <a href="porownanie.html">Porównanie wariantów</a>
   </div>
-  <div class="ekran" id="ekran"></div>
+  <div class="ekran" id="ekran" role="region" aria-label="Podgląd ekranu Dokumenty"></div>
   <noscript><p>Ten podgląd potrzebuje włączonego JavaScriptu.</p></noscript>
 
-  <script src="wspolne.js"></script>
-  <script src="b1.js"></script>
+  <script src="dokumenty-wspolne.js"></script>
+  <script src="wyglad-3.js"></script>
   <script>
-    Prototyp.ustawRozmiar(Prototyp.rozmiarZAdresu());
-    Prototyp.podlaczPrzelacznik();
-    Prototyp.zamontuj(document.getElementById('ekran'), 'b1');
+    Dokumenty.zamontuj(document.getElementById('ekran'), '3');
+    Dokumenty.podlaczPrzelaczniki();
   </script>
 </body>
 </html>

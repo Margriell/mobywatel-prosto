@@ -3,32 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Porównanie wariantów ekranu Start (B1, B2, B3) · mObywatel</title>
+<title>Porównanie wyglądów ekranu Dokumenty · mObywatel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
-  /* Rozmiar tekstu ekranów w telefonach: JEDNA zmienna --tekst. Tekst tej strony ma stałe 18 px. */
-  html { font-size: var(--tekst, 137.5%); }
+  /* Rozmiar tekstu w telefonach: JEDNA zmienna --tekst. Tekst tej strony ma stałe 18 px. */
+  html { font-size: var(--tekst, 112.5%); }
   *, *::before, *::after { box-sizing: border-box; }
   body { margin: 0; padding: 24px 16px 48px; background: #EEF1F4; color: #1A1F27;
     font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 18px; line-height: 1.5; }
+  html[data-motyw="ciemny"] body, html[data-motyw="kontrast"] body { background: #2A2E35; color: #F3F4F6; }
+  html[data-motyw="ciemny"] h1, html[data-motyw="ciemny"] h2, html[data-motyw="ciemny"] a,
+  html[data-motyw="kontrast"] h1, html[data-motyw="kontrast"] h2, html[data-motyw="kontrast"] a { color: #DCE6FF; }
   h1, h2, p { margin: 0; }
-  :focus-visible { outline: 3px solid #1A1A1A; outline-offset: 3px; }
+  :focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
   .wstep { max-width: 1290px; margin: 0 auto 24px; display: grid; gap: 12px; }
   h1 { font-size: 28px; line-height: 1.25; color: #123A6B; }
+  .przelaczniki { display: flex; flex-wrap: wrap; gap: 12px 32px; }
   fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
   legend { float: left; margin-right: 8px; font-weight: 700; }
   fieldset label { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 12px;
-    background: #fff; border: 2px solid #6B7A8C; border-radius: 999px; cursor: pointer; }
+    background: #fff; color: #1A1F27; border: 2px solid #6B7A8C; border-radius: 999px; cursor: pointer; }
   fieldset input { width: 20px; height: 20px; accent-color: #123A6B; }
   .warianty { list-style: none; margin: 0 auto; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; }
   .wariant { width: 410px; max-width: 100%; display: grid; gap: 12px; align-content: start; }
   .wariant h2 { font-size: 23px; line-height: 1.3; color: #123A6B; }
-  /* Telefon: wnętrze dokładnie 390 × 844 px */
+  /* Telefon: wnętrze dokładnie 390 × 844 px, bez paska przewijania (jak w telefonie) */
   .ekran { --wysokosc-ekranu: 100%; width: 410px; max-width: 100%; height: 864px; overflow-y: auto;
     border: 10px solid #1A1F27; border-radius: 40px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.2);
-    scrollbar-width: none; } /* jak w telefonie: bez paska przewijania, wnętrze ma pełne 390 px */
+    scrollbar-width: none; }
   .ekran::-webkit-scrollbar { display: none; }
   .opis { display: grid; gap: 8px; }
   .wariant a { color: #123A6B; font-weight: 700; display: inline-flex; align-items: center; min-height: 48px; }
@@ -36,60 +40,67 @@
 </head>
 <body>
   <div class="wstep">
-    <h1>Ekran Start — runda 2: trzy warianty w duchu B</h1>
-    <p>Każdy telefon pokazuje ten sam ekran dla Haliny (71 lat) w rozmiarze 390 × 844 px. Bez przewijania widać powitanie, sprawę pilną i pole asystenta. Ekran w telefonie można przewijać, a przyciski mówią, dokąd poprowadzą.</p>
-    <fieldset>
-      <legend>Rozmiar tekstu we wszystkich wariantach:</legend>
-      <label><input type="radio" name="rozmiar" value="standardowy"> Standardowy</label>
-      <label><input type="radio" name="rozmiar" value="duzy"> Duży</label>
-      <label><input type="radio" name="rozmiar" value="bardzo-duzy"> Bardzo duży</label>
-    </fieldset>
+    <h1>Ekran Dokumenty — runda 3: trzy wyglądy tego samego układu</h1>
+    <p>Układ jest ten sam co w specyfikacji 2.0; różnią się kolory, karty, kształty i czcionka. Każdy telefon ma wnętrze 390 × 844 px i dane Haliny. Ekran w telefonie przewijasz kółkiem myszy, a przyciski mówią, dokąd poprowadzą.</p>
+    <div class="przelaczniki">
+      <fieldset>
+        <legend>Rozmiar tekstu:</legend>
+        <label><input type="radio" name="rozmiar" value="standardowy"> Standardowy</label>
+        <label><input type="radio" name="rozmiar" value="duzy"> Duży</label>
+        <label><input type="radio" name="rozmiar" value="bardzo-duzy"> Bardzo duży</label>
+      </fieldset>
+      <fieldset>
+        <legend>Motyw:</legend>
+        <label><input type="radio" name="motyw" value="jasny"> Jasny</label>
+        <label><input type="radio" name="motyw" value="ciemny"> Ciemny</label>
+        <label><input type="radio" name="motyw" value="kontrast"> Wysoki kontrast</label>
+      </fieldset>
+    </div>
   </div>
 
   <ul class="warianty">
     <li class="wariant">
-      <h2>B1 — Granatowa góra</h2>
-      <div class="ekran" data-wariant="b1" role="region" aria-label="Podgląd wariantu B1"></div>
+      <h2>1 — Ciepły</h2>
+      <div class="ekran" data-wyglad="1" role="region" aria-label="Podgląd wyglądu 1"></div>
       <div class="opis">
-        <p>To dopracowany wariant B: granatowa góra z powitaniem i inicjałem, kremowe tło i miękkie, zaokrąglone karty.</p>
-        <p>Pole asystenta stoi w granatowej części jak wyszukiwarka w aplikacji bankowej, a pod nim jest sprawa pilna.</p>
-        <p>Kafle spraw są w dwóch kolumnach, a gotowe pytania do asystenta mają osobny rząd pod sprawą pilną.</p>
+        <p>Granatowa góra z powitaniem, kremowe tło i miękkie, zaokrąglone kształty, jak w wariancie B1.</p>
+        <p>mDowód wygląda jak pastelowy dokument: brzoskwiniowo-różowe tło z delikatnym wzorem, miejsce na zdjęcie z inicjałami i złoty chip.</p>
+        <p>Przyciski mają kształt pigułek, a gotowe pytania do asystenta są jasnoniebieskie.</p>
       </div>
-      <a href="start-b1.html">Otwórz wariant B1 osobno</a>
+      <a href="dokumenty-1.html">Otwórz wygląd 1 osobno</a>
     </li>
     <li class="wariant">
-      <h2>B2 — Rozmowa</h2>
-      <div class="ekran" data-wariant="b2" role="region" aria-label="Podgląd wariantu B2"></div>
+      <h2>2 — Profesjonalny i żywy</h2>
+      <div class="ekran" data-wyglad="2" role="region" aria-label="Podgląd wyglądu 2"></div>
       <div class="opis">
-        <p>Ekran zaczyna się jak rozmowa: asystent wita Halinę w dymku i od razu pokazuje sprawę pilną.</p>
-        <p>Pod spodem jest pole do pisania z okrągłymi przyciskami „Powiedz” i „Wyślij” oraz gotowe pytania w kształcie odpowiedzi.</p>
-        <p>Białe tło z chłodną lawendą, a sprawy to szerokie „pigułki” w jednej kolumnie, z krótkim opisem.</p>
+        <p>Chłodna biel i góra w przejściu od granatu do fioletu dają nowoczesny, energiczny charakter.</p>
+        <p>mDowód przypomina nowoczesną kartę z połyskiem: intensywny gradient, białe dane, złoty chip i jasne zdjęcie z inicjałami.</p>
+        <p>Kształty są precyzyjne, a tytuły sekcji wyróżnia kolorowa kreska.</p>
       </div>
-      <a href="start-b2.html">Otwórz wariant B2 osobno</a>
+      <a href="dokumenty-2.html">Otwórz wygląd 2 osobno</a>
     </li>
     <li class="wariant">
-      <h2>B3 — Mozaika</h2>
-      <div class="ekran" data-wariant="b3" role="region" aria-label="Podgląd wariantu B3"></div>
+      <h2>3 — Czysty, bliski oficjalnemu</h2>
+      <div class="ekran" data-wyglad="3" role="region" aria-label="Podgląd wyglądu 3"></div>
       <div class="opis">
-        <p>Ciepłe, miodowe tło i pastelowe kafle różnej wielkości, ułożone w mozaikę jak w nowoczesnej aplikacji.</p>
-        <p>Najpierw powitanie z dzisiejszą datą i sprawa pilna jako baner, potem karta asystenta z dużym przyciskiem „Powiedz”.</p>
-        <p>Mocno zaokrąglone kształty i jeden szeroki, granatowy kafel „Wszystkie sprawy” zamykający listę.</p>
+        <p>Dużo bieli, cienkie szare linie, małe zaokrąglenia i czcionka systemowa — spokojnie i czysto, jak w oficjalnej aplikacji.</p>
+        <p>Czerwony akcent pojawia się w znaku, w cienkiej linii u góry ekranu i w pasku na karcie mDowodu.</p>
+        <p>mDowód ma prawie białe tło z subtelnym wzorem, więc wygląda jak prawdziwy dokument.</p>
       </div>
-      <a href="start-b3.html">Otwórz wariant B3 osobno</a>
+      <a href="dokumenty-3.html">Otwórz wygląd 3 osobno</a>
     </li>
   </ul>
   <noscript><p>Ten podgląd potrzebuje włączonego JavaScriptu.</p></noscript>
 
-  <script src="wspolne.js"></script>
-  <script src="b1.js"></script>
-  <script src="b2.js"></script>
-  <script src="b3.js"></script>
+  <script src="dokumenty-wspolne.js"></script>
+  <script src="wyglad-1.js"></script>
+  <script src="wyglad-2.js"></script>
+  <script src="wyglad-3.js"></script>
   <script>
-    Prototyp.ustawRozmiar(Prototyp.rozmiarZAdresu());
-    Prototyp.podlaczPrzelacznik();
-    Array.prototype.forEach.call(document.querySelectorAll('.ekran[data-wariant]'), function (ekran) {
-      Prototyp.zamontuj(ekran, ekran.getAttribute('data-wariant'));
+    Array.prototype.forEach.call(document.querySelectorAll('.ekran[data-wyglad]'), function (ekran) {
+      Dokumenty.zamontuj(ekran, ekran.getAttribute('data-wyglad'));
     });
+    Dokumenty.podlaczPrzelaczniki();
   </script>
 </body>
 </html>

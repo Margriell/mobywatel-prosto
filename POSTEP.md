@@ -1,11 +1,12 @@
-# Postęp prac — mObywatel Prosto
+# Postęp prac — mObywatel dla każdego
 
 Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj sekcję „Stan”.
 
 ## Stan
 
-- Ukończony etap: 1, runda 2 — warianty B1, B2, B3 ekranu Start (czeka na wybór autorki).
-- Następny etap: 2 — szkielet całej aplikacji i nawigacja (po wyborze B1, B2 albo B3).
+- Obowiązuje SPECYFIKACJA.md w wersji 2.0 (ekran startowy: Dokumenty).
+- Ukończony etap: 1, runda 3 — trzy wyglądy ekranu Dokumenty (czeka na wybór autorki).
+- Następny etap: 2 — szkielet całej aplikacji (po wyborze wyglądu 1, 2 albo 3).
 
 ## Decyzje autorki
 
@@ -14,7 +15,42 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 - 24.11.2026: kierunek wyglądu — wariant B. Warianty A i C przeniesione do `warianty/archiwum/`.
 - 24.11.2026: stałe dla wszystkich wariantów (wpisane do SPECYFIKACJA.md, wersja 1.1): nazwa „mObywatel” w nagłówku; bez paska „Prototyp” na ekranach aplikacji; bez przewijania widać powitanie, kartę pilną i pole asystenta; dolny pasek zawsze w 1 rzędzie z podpisami 16 px; kafle w 1 lub 2 kolumnach; karta pilna zależna od osoby; wszystko działa po dwukliku i na GitHub Pages; folder `.claude/` w `.gitignore`.
 
+- 25.11.2026: specyfikacja 2.0 — ekranem startowym są Dokumenty; dolny pasek Dokumenty · Usługi · Asystent · Kod QR · Więcej.
+- 25.11.2026: przycisk „Aa Wygląd” w nagłówku (otwiera panel „Wygląd i dostępność”, ten sam co w Więcej) — dopisany do SPECYFIKACJA.md, sekcja „Mapa aplikacji”.
+- 25.11.2026: warianty B1–B3 przeniesione do `warianty/archiwum/`.
+
 ## Dziennik
+
+### 25.11.2026 Etap 1, runda 3 — trzy wyglądy ekranu Dokumenty
+- Zrobione:
+  - Jeden wspólny układ ekranu Dokumenty dokładnie według specyfikacji 2.0, w tej kolejności: nagłówek (znak + „mObywatel”, „Aa Wygląd”, Skrzynka z licznikiem), „Dzień dobry, Halino”, duża karta mDowodu, trzy pełne wiersze dokumentów z ważnością, „Wymaga Twojej uwagi” (pismo z Urzędu Miasta, etykieta „Nowe”, bez czerwieni), blok asystenta („Co chcesz załatwić?”, „Powiedz”, „Wyślij”, 3 pytania), dolny pasek.
+  - Karta mDowodu wygląda jak dokument, a nie jak przycisk: ma tło z delikatnym wzorem jak na dokumentach, miejsce na zdjęcie z inicjałami „HW”, imię i nazwisko, ważność ze znaczkiem i ozdobny chip. Klikalny jest tylko przycisk „Pokaż dane”.
+  - **Wygląd 1 — Ciepły.** Granatowa góra z powitaniem, kremowe tło i miękkie, zaokrąglone kształty, jak w wariancie B1. mDowód wygląda jak pastelowy dokument: brzoskwiniowo-różowe tło z delikatnym wzorem, miejsce na zdjęcie z inicjałami i złoty chip. Przyciski mają kształt pigułek, a gotowe pytania do asystenta są jasnoniebieskie.
+  - **Wygląd 2 — Profesjonalny i żywy.** Chłodna biel i góra w przejściu od granatu do fioletu dają nowoczesny, energiczny charakter. mDowód przypomina nowoczesną kartę z połyskiem: intensywny gradient, białe dane, złoty chip i jasne zdjęcie z inicjałami. Kształty są precyzyjne, a tytuły sekcji wyróżnia kolorowa kreska.
+  - **Wygląd 3 — Czysty, bliski oficjalnemu.** Dużo bieli, cienkie szare linie, małe zaokrąglenia i czcionka systemowa — spokojnie i czysto, jak w oficjalnej aplikacji. Czerwony akcent pojawia się w znaku, w cienkiej linii u góry ekranu i w pasku na karcie mDowodu. mDowód ma prawie białe tło z subtelnym wzorem, więc wygląda jak prawdziwy dokument.
+  - Każdy wygląd ma trzy motywy: jasny, ciemny i wysoki kontrast (czarne tło, biały tekst, żółte przyciski — wspólny dla wszystkich wyglądów).
+  - Porównanie: trzy telefony obok siebie, nad nimi przełączniki rozmiaru tekstu i motywu, które działają na wszystkie trzy naraz.
+  - Każdy przycisk otwiera okno „To jest podgląd wyglądu” z informacją, dokąd poprowadzi w gotowej aplikacji.
+- Pliki: `warianty/dokumenty-1.html`, `dokumenty-2.html`, `dokumenty-3.html`, `dokumenty-wspolne.js` (układ, dane Haliny, motyw wysokiego kontrastu), `wyglad-1.js`, `wyglad-2.js`, `wyglad-3.js` (kolory, kształty i czcionka każdego wyglądu), `porownanie.html` (przebudowane); B1–B3 razem z ich skryptami w `warianty/archiwum/`; `SPECYFIKACJA.md` (przycisk „Aa Wygląd” w „Mapie aplikacji”).
+- Jak sprawdzić: dwuklik na `warianty/porownanie.html`. Przełączniki u góry zmieniają rozmiar tekstu i motyw we wszystkich trzech telefonach. Ekran w telefonie przewija się kółkiem myszy. Działają też adresy z parametrami, np. `porownanie.html?motyw=ciemny&tekst=duzy`.
+- Kontrola (według sekcji „Kontrola” specyfikacji; pliki otwierane jako `file://`, tak jak po dwukliku, w Edge i Chrome):
+  - 3 wyglądy × 3 rozmiary tekstu × 3 motywy × 3 szerokości (390 px, 320 px i 640 × 360 px, czyli okno 1280 × 720 przy powiększeniu 200%) = 81 ekranów, 0 błędów.
+  - Najmniejszy tekst: 16 px we wszystkich wyglądach.
+  - Najsłabszy kontrast tekstu: wygląd 1 — 6,1:1, wygląd 2 — 5,0:1 (jasny tekst na fioletowej części karty mDowodu), wygląd 3 — 6,9:1.
+  - Wszystkie elementy klikalne mają co najmniej 48 × 48 px, a odstępy między nimi co najmniej 8 px.
+  - Nic się nie nakłada i nic nie wychodzi poza ekran.
+  - Dolny pasek zawsze ma jeden rząd z podpisami 16 px, bez ucinania.
+  - Każdy przycisk coś robi (otwiera okno podglądu albo przewija do góry).
+  - Przy tekście Standardowym na 390 × 844 bez przewijania widać mDowód, kartę „Wymaga Twojej uwagi” i pole asystenta. Zapas nad dolnym paskiem jest mały: wygląd 1 — 10 px, wygląd 2 — 12 px, wygląd 3 — 5 px. Przyciski „Powiedz” / „Wyślij” i 3 pytania są już niżej, pod paskiem.
+  - Poprawione w trakcie:
+    - Pole asystenta było o ok. 100 px za nisko. Pomogło zmniejszenie odstępów, krótszy status „1 pojazd, OC ważne” oraz strzałka zamiast osobnej linii „Przeczytaj pismo” na karcie uwagi.
+    - Z karty mDowodu wypadła data urodzenia (moje dodatkowe pole, nie ma jej w specyfikacji).
+    - Przy 320 px i tekście Bardzo dużym karty i wiersze wychodziły w bok — teraz ich zawartość przechodzi do następnej linii.
+- Znane problemy / do decyzji:
+  - Halina ma w specyfikacji ustawiony tekst Duży. Przy Dużym pole asystenta jest ok. 340 px niżej i trzeba przewinąć. Reguła „bez przewijania” w specyfikacji dotyczy tylko tekstu Standardowego.
+  - Wygląd 3 a specyfikacja: w wyglądzie 3 góra ekranu jest biała, a specyfikacja (ekran 4, punkt 1) mówi o „granatowej górnej części”. Czerwień w wyglądzie 3 jest tylko ozdobą marki (znak, linia u góry, pasek na mDowodzie). Przyciski i zaznaczona zakładka zostały granatowe, bo specyfikacja zostawia czerwień dla spraw z terminem i błędów. Do decyzji: czy zaznaczona zakładka ma być czerwona, jak w oficjalnej aplikacji.
+  - Dane na karcie są wymyślone: nazwisko „Wiśniewska”, „Ważny do 12.03.2031”, mPrawo jazdy „Ważne do 04.09.2033”, Karta Dużej Rodziny „Ważna bezterminowo”, „1 pojazd, OC ważne”.
+  - Tryb prosty (Halina ma go w ustawieniach startowych) nie był częścią tej rundy.
 
 ### 24.11.2026 Etap 1, runda 2 — warianty B1, B2, B3
 - Zrobione:

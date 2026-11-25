@@ -86,7 +86,7 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 ## Mapa aplikacji
 
 - **Wejście** (pierwsze uruchomienie): Wybór osoby → Dopasuj do siebie → Poznaj asystenta (jeden ekran, można pominąć) → Dokumenty.
-- **Nagłówek:** ikona + „mObywatel”, po prawej Skrzynka (ikona z podpisem i licznikiem).
+- **Nagłówek:** ikona + „mObywatel”, po prawej przycisk „Aa Wygląd” (otwiera panel „Wygląd i dostępność”, ten sam co w Więcej) i Skrzynka (ikona z podpisem i licznikiem).
 - **Dolny pasek:** Dokumenty (ekran startowy) · Usługi · Asystent · Kod QR · Więcej.
 - **Do każdej sprawy prowadzą trzy drogi:** Usługi, asystent (pole na ekranie Dokumenty i zakładka), szczegóły dokumentu.
 - **Każda sprawa kończy się tak samo:** Potwierdzenie → Gotowe → wiadomość w Skrzynce.

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start, wariant B3: Mozaika · mObywatel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  html { font-size: var(--tekst, 137.5%); }
+  body { margin: 0; font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px; line-height: 1.5; color: #1A1F27; background: #fff; }
+  :focus-visible { outline: 3px solid #1A1A1A; outline-offset: 3px; }
+  .narzedzia { display: none; }
+  /* Na komputerze: ramka telefonu 390 × 844 px (z obramowaniem 410 × 864) */
+  @media (min-width: 31em) and (min-height: 46em) {
+    body { background: #EDE3CF; display: flex; flex-direction: column; align-items: center; padding: 12px; gap: 12px; }
+    .narzedzia { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 20px; }
+    .ekran { --wysokosc-ekranu: 100%; width: 410px; height: min(864px, calc(100dvh - 96px)); overflow-y: auto;
+      border: 10px solid #1A1F27; border-radius: 40px; box-shadow: 0 10px 40px rgba(0,0,0,.25); background: #fff;
+      scrollbar-width: none; } /* jak w telefonie: bez paska przewijania, wnętrze ma pełne 390 px */
+    .ekran::-webkit-scrollbar { display: none; }
+  }
+  .narzedzia p { margin: 0; font-weight: 700; }
+  .narzedzia fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .narzedzia legend { float: left; margin-right: 6px; }
+  .narzedzia label { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 12px;
+    background: #fff; border: 2px solid #6B7A8C; border-radius: 999px; cursor: pointer; }
+  .narzedzia input { width: 20px; height: 20px; accent-color: #123A6B; }
+  .narzedzia a { color: #123A6B; font-weight: 700; display: inline-flex; align-items: center; min-height: 48px; }
+</style>
+</head>
+<body>
+  <div class="narzedzia">
+    <p>Wariant B3: Mozaika</p>
+    <fieldset>
+      <legend>Rozmiar tekstu:</legend>
+      <label><input type="radio" name="rozmiar" value="standardowy"> Standardowy</label>
+      <label><input type="radio" name="rozmiar" value="duzy"> Duży</label>
+      <label><input type="radio" name="rozmiar" value="bardzo-duzy"> Bardzo duży</label>
+    </fieldset>
+    <a href="../porownanie.html">Porównanie wariantów</a>
+  </div>
+  <div class="ekran" id="ekran"></div>
+  <noscript><p>Ten podgląd potrzebuje włączonego JavaScriptu.</p></noscript>
+
+  <script src="wspolne.js"></script>
+  <script src="b3.js"></script>
+  <script>
+    Prototyp.ustawRozmiar(Prototyp.rozmiarZAdresu());
+    Prototyp.podlaczPrzelacznik();
+    Prototyp.zamontuj(document.getElementById('ekran'), 'b3');
+  </script>
+</body>
+</html>
