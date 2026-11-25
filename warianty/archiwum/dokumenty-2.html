@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dokumenty, wygląd 1: Ciepły · mObywatel</title>
+<title>Dokumenty, wygląd 2: Profesjonalny i żywy · mObywatel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
@@ -33,7 +33,7 @@
 </head>
 <body>
   <div class="narzedzia">
-    <p>Dokumenty — wygląd 1: Ciepły</p>
+    <p>Dokumenty — wygląd 2: Profesjonalny i żywy</p>
     <fieldset>
       <legend>Rozmiar tekstu:</legend>
       <label><input type="radio" name="rozmiar" value="standardowy"> Standardowy</label>
@@ -46,15 +46,15 @@
       <label><input type="radio" name="motyw" value="ciemny"> Ciemny</label>
       <label><input type="radio" name="motyw" value="kontrast"> Wysoki kontrast</label>
     </fieldset>
-    <a href="porownanie.html">Porównanie wariantów</a>
+    <a href="../porownanie.html">Porównanie wariantów</a>
   </div>
   <div class="ekran" id="ekran" role="region" aria-label="Podgląd ekranu Dokumenty"></div>
   <noscript><p>Ten podgląd potrzebuje włączonego JavaScriptu.</p></noscript>
 
   <script src="dokumenty-wspolne.js"></script>
-  <script src="wyglad-1.js"></script>
+  <script src="wyglad-2.js"></script>
   <script>
-    Dokumenty.zamontuj(document.getElementById('ekran'), '1');
+    Dokumenty.zamontuj(document.getElementById('ekran'), '2');
     Dokumenty.podlaczPrzelaczniki();
   </script>
 </body>

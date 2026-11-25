@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Makieta – ekran Dokumenty</title>
+<style>
+  :root {
+    --tlo: #F3F4F7;
+    --powierzchnia: #FFFFFF;
+    --tekst: #1A1D26;
+    --tekst-2: #4A5163;
+    --linia: #DCDFE6;
+    --akcent: #1D3F8F;
+    --akcent-jasny: #E8EDF8;
+    --sukces: #1E6B3A;
+    --logo: #D4213D;
+    --dowod: #1E4E9C;
+    --prawko: #A3264B;
+    --pojazdy: #9A4508;
+    --kdr: #5A3E9E;
+    --fs: 18px;
+  }
+  :root[data-tekst="duzy"] { --fs: 22px; }
+  :root[data-motyw="ciemny"] {
+    --tlo: #121419;
+    --powierzchnia: #1C1F27;
+    --tekst: #F2F3F6;
+    --tekst-2: #B9BFCC;
+    --linia: #343947;
+    --akcent: #9DB8FF;
+    --akcent-jasny: #243154;
+    --sukces: #7FD39B;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { font-size: var(--fs); }
+  body {
+    font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #D9DCE3;
+    display: flex; justify-content: center; padding: 24px 16px;
+  }
+  .telefon {
+    width: 390px; height: 844px; border-radius: 48px; background: #111;
+    padding: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25);
+  }
+  .ekran {
+    width: 100%; height: 100%; border-radius: 38px; overflow: hidden;
+    background: var(--tlo); color: var(--tekst);
+    display: flex; flex-direction: column; position: relative;
+  }
+  .status {
+    height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px 0 32px; font-size: 16px; font-weight: 700; background: var(--powierzchnia);
+  }
+  .status .ikony { display: flex; gap: 6px; align-items: center; }
+  .tresc { flex: 1; overflow-y: auto; scrollbar-width: none; }
+  .tresc::-webkit-scrollbar { display: none; }
+
+  header {
+    background: var(--powierzchnia); padding: 2px 16px 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--linia);
+  }
+  .marka { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; }
+  .logo {
+    width: 36px; height: 36px; border-radius: 10px; background: var(--logo);
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 22px; line-height: 1;
+  }
+  .naglowek-akcje { display: flex; gap: 4px; }
+  .ikona-btn {
+    min-width: 64px; min-height: 52px; border: 0; background: none; color: var(--tekst);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    font: inherit; font-size: 16px; border-radius: 12px; position: relative; padding: 2px 6px;
+  }
+  .ikona-btn svg { width: 24px; height: 24px; }
+  .licznik {
+    position: absolute; top: 0; right: 10px; min-width: 22px; height: 22px; border-radius: 11px;
+    background: var(--akcent); color: var(--powierzchnia); font-size: 14px; font-weight: 700;
+    display: grid; place-items: center; padding: 0 5px; border: 2px solid var(--powierzchnia);
+  }
+
+  .sekcja { padding: 12px 16px 0; }
+  .sekcja h2 { font-size: 1.1rem; margin-bottom: 10px; }
+
+  /* Portfel dokumentów */
+  .portfel { position: relative; }
+  .karta {
+    border-radius: 18px; color: #fff; position: relative; overflow: hidden;
+    box-shadow: 0 -4px 10px rgba(0,0,0,.18);
+  }
+  .karta + .karta { margin-top: -32px; }
+  .karta::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(135deg, rgba(255,255,255,.05) 0 2px, transparent 2px 14px);
+  }
+  .pasek-karty {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px 44px; min-height: 92px;
+  }
+  .pasek-karty b { font-size: 1.05rem; }
+  .pasek-karty .status-karty { font-size: 16px; display: flex; align-items: center; gap: 6px; opacity: .95; }
+  .pasek-karty svg { width: 20px; height: 20px; }
+  .karta.pojazdy { background: var(--pojazdy); }
+  .karta.prawko { background: var(--prawko); }
+  .karta.kdr { background: var(--kdr); }
+  .karta.dowod { background: linear-gradient(160deg, #2458B0, var(--dowod)); padding: 16px 18px 18px; }
+  .dowod-gora { display: flex; justify-content: space-between; align-items: center; }
+  .dowod-gora b { font-size: 1.2rem; }
+  .chip { width: 34px; height: 26px; border-radius: 6px; background: linear-gradient(135deg,#F3D27A,#D9A93F); }
+  .dowod-srodek { display: flex; gap: 14px; margin: 10px 0 12px; align-items: center; }
+  .zdjecie {
+    width: 64px; height: 76px; border-radius: 10px; background: #E6ECF7; color: var(--dowod);
+    display: grid; place-items: center; font-weight: 800; font-size: 24px;
+  }
+  .dowod-srodek .imie { font-size: 1.1rem; font-weight: 700; }
+  .dowod-srodek .waznosc { font-size: 16px; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .dowod-srodek svg { width: 20px; height: 20px; }
+  .btn-pokaz {
+    width: 100%; min-height: 52px; border: 0; border-radius: 12px; background: #fff; color: var(--dowod);
+    font: inherit; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-pokaz svg { width: 22px; height: 22px; }
+
+  /* Wymaga uwagi */
+  .uwaga {
+    background: var(--powierzchnia); border-radius: 16px; padding: 14px 14px 14px 16px;
+    display: flex; gap: 14px; align-items: center; border: 1px solid var(--linia);
+  }
+  .uwaga .ikona {
+    flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--akcent-jasny); color: var(--akcent);
+    display: grid; place-items: center;
+  }
+  .uwaga .ikona svg { width: 24px; height: 24px; }
+  .uwaga .tekst { flex: 1; }
+  .uwaga .etykieta { font-size: 16px; font-weight: 700; color: var(--akcent); }
+  .uwaga .opis { font-size: 1rem; line-height: 1.35; }
+  .uwaga > svg { width: 24px; height: 24px; color: var(--tekst-2); flex: none; }
+
+  /* Asystent */
+  .asystent {
+    background: var(--powierzchnia); border-radius: 16px; padding: 16px; border: 1px solid var(--linia);
+  }
+  .asystent h2 { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .asystent h2 svg { width: 22px; height: 22px; color: var(--akcent); }
+  .pole {
+    width: 100%; min-height: 52px; border-radius: 12px; border: 2px solid #8A91A3; background: var(--tlo);
+    padding: 0 14px; display: flex; align-items: center; color: var(--tekst-2); font-size: 1rem;
+  }
+  .przyciski { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .btn {
+    min-height: 52px; border-radius: 12px; font: inherit; font-weight: 700; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+  }
+  .btn svg { width: 22px; height: 22px; }
+  .btn.drugi { background: var(--powierzchnia); color: var(--akcent); border: 2px solid var(--akcent); }
+  .btn.glowny { background: var(--akcent); color: var(--powierzchnia); border: 2px solid var(--akcent); }
+  .podpowiedzi { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .podpowiedz {
+    min-height: 48px; padding: 0 14px; border-radius: 24px; background: var(--akcent-jasny); color: var(--akcent);
+    display: flex; align-items: center; font-weight: 700; font-size: 16px;
+  }
+
+
+  .asystent-pasek {
+    flex: none; background: var(--powierzchnia); border-top: 1px solid var(--linia);
+    padding: 10px 12px; display: flex; gap: 8px; align-items: center;
+  }
+  .asystent-pasek .pole { flex: 1; border-radius: 26px; gap: 8px; }
+  .asystent-pasek .pole svg { width: 22px; height: 22px; color: var(--akcent); flex: none; }
+  .mow {
+    flex: none; min-width: 64px; min-height: 56px; border-radius: 16px; border: 0;
+    background: var(--akcent); color: var(--powierzchnia); font: inherit; font-size: 16px; font-weight: 700;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  }
+  .mow svg { width: 22px; height: 22px; }
+  nav {
+    flex: none; background: var(--powierzchnia); border-top: 1px solid var(--linia);
+    display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr; padding: 6px 2px 18px;
+  }
+  nav a {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--tekst-2);
+    text-decoration: none; font-size: 16px; min-height: 56px; justify-content: center; letter-spacing: -.01em; white-space: nowrap;
+  }
+  nav a svg { width: 24px; height: 24px; }
+  nav a .tlo-ikony { width: 52px; height: 30px; border-radius: 15px; display: grid; place-items: center; }
+  nav a.aktywna { color: var(--akcent); }
+  nav a.aktywna .tlo-ikony { background: var(--akcent-jasny); }
+  svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+<div class="telefon"><div class="ekran">
+  <div class="status">
+    <span>9:41</span>
+    <span class="ikony">
+      <svg width="18" height="12" viewBox="0 0 18 12" style="stroke:none;fill:currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+      <svg width="26" height="12" viewBox="0 0 26 12" style="stroke-width:1.2"><rect x=".6" y=".6" width="22" height="10.8" rx="3"/><rect x="2.5" y="2.5" width="16" height="7" rx="1.5" style="fill:currentColor;stroke:none"/><path d="M24.5 4v4"/></svg>
+    </span>
+  </div>
+
+  <div class="tresc">
+    <header>
+      <div class="marka"><div class="logo">m</div>mObywatel</div>
+      <div class="naglowek-akcje">
+        <button class="ikona-btn" aria-label="Dostosuj wygląd">
+          <svg viewBox="0 0 24 24"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+          Dostosuj
+        </button>
+        <button class="ikona-btn" aria-label="Skrzynka, 1 nowa wiadomość">
+          <svg viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          Skrzynka
+          <span class="licznik">1</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="sekcja">
+      <h2>Dzień dobry, Halino</h2>
+      <div class="portfel">
+        <div class="karta pojazdy"><div class="pasek-karty"><b>Moje pojazdy</b><span class="status-karty">1 pojazd</span></div></div>
+        <div class="karta prawko"><div class="pasek-karty"><b>mPrawo jazdy</b><span class="status-karty"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Ważne</span></div></div>
+        <div class="karta kdr"><div class="pasek-karty"><b>Karta Dużej Rodziny</b><span class="status-karty"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Ważna</span></div></div>
+        <div class="karta dowod">
+          <div class="dowod-gora"><b>mDowód</b><span class="chip"></span></div>
+          <div class="dowod-srodek">
+            <div class="zdjecie">HW</div>
+            <div>
+              <div class="imie">Halina Wiśniewska</div>
+              <div class="waznosc"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Ważny do 12.03.2031</div>
+            </div>
+          </div>
+          <button class="btn-pokaz"><svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Pokaż dane</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="sekcja">
+      <h2>Wymaga Twojej uwagi</h2>
+      <div class="uwaga">
+        <div class="ikona"><svg viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
+        <div class="tekst"><div class="etykieta">Nowe pismo</div><div class="opis">Urząd Miasta: podatek od nieruchomości</div></div>
+        <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+    </section>
+    <div style="height:16px"></div>
+  </div>
+
+  <div class="asystent-pasek">
+    <div class="pole"><svg viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>Co chcesz załatwić?</div>
+    <button class="mow"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>Powiedz</button>
+  </div>
+
+  <nav>
+    <a class="aktywna" href="#"><span class="tlo-ikony"><svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span>Dokumenty</a>
+    <a href="#"><span class="tlo-ikony"><svg viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></span>Usługi</a>
+    <a href="#"><span class="tlo-ikony"><svg viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span>Asystent</a>
+    <a href="#"><span class="tlo-ikony"><svg viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></span>Kod QR</a>
+    <a href="#"><span class="tlo-ikony"><svg viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></span>Więcej</a>
+  </nav>
+</div></div>
+</body>
+</html>

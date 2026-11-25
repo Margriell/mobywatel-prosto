@@ -67,7 +67,7 @@
         <p>mDowód wygląda jak pastelowy dokument: brzoskwiniowo-różowe tło z delikatnym wzorem, miejsce na zdjęcie z inicjałami i złoty chip.</p>
         <p>Przyciski mają kształt pigułek, a gotowe pytania do asystenta są jasnoniebieskie.</p>
       </div>
-      <a href="dokumenty-1.html">Otwórz wygląd 1 osobno</a>
+      <a href="archiwum/dokumenty-1.html">Otwórz wygląd 1 osobno</a>
     </li>
     <li class="wariant">
       <h2>2 — Profesjonalny i żywy</h2>
@@ -77,7 +77,7 @@
         <p>mDowód przypomina nowoczesną kartę z połyskiem: intensywny gradient, białe dane, złoty chip i jasne zdjęcie z inicjałami.</p>
         <p>Kształty są precyzyjne, a tytuły sekcji wyróżnia kolorowa kreska.</p>
       </div>
-      <a href="dokumenty-2.html">Otwórz wygląd 2 osobno</a>
+      <a href="archiwum/dokumenty-2.html">Otwórz wygląd 2 osobno</a>
     </li>
     <li class="wariant">
       <h2>3 — Czysty, bliski oficjalnemu</h2>
@@ -87,15 +87,15 @@
         <p>Czerwony akcent pojawia się w znaku, w cienkiej linii u góry ekranu i w pasku na karcie mDowodu.</p>
         <p>mDowód ma prawie białe tło z subtelnym wzorem, więc wygląda jak prawdziwy dokument.</p>
       </div>
-      <a href="dokumenty-3.html">Otwórz wygląd 3 osobno</a>
+      <a href="archiwum/dokumenty-3.html">Otwórz wygląd 3 osobno</a>
     </li>
   </ul>
   <noscript><p>Ten podgląd potrzebuje włączonego JavaScriptu.</p></noscript>
 
-  <script src="dokumenty-wspolne.js"></script>
-  <script src="wyglad-1.js"></script>
-  <script src="wyglad-2.js"></script>
-  <script src="wyglad-3.js"></script>
+  <script src="archiwum/dokumenty-wspolne.js"></script>
+  <script src="archiwum/wyglad-1.js"></script>
+  <script src="archiwum/wyglad-2.js"></script>
+  <script src="archiwum/wyglad-3.js"></script>
   <script>
     Array.prototype.forEach.call(document.querySelectorAll('.ekran[data-wyglad]'), function (ekran) {
       Dokumenty.zamontuj(ekran, ekran.getAttribute('data-wyglad'));

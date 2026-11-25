@@ -1,0 +1,561 @@
+/* =====================================================================
+   mObywatel Prosto — wygląd.
+   Wzór: warianty/makieta-dokumenty.html (kolory, czcionka, karty, nagłówek,
+   dolny pasek, odstępy). Kolor mają tylko karty dokumentów; reszta to białe
+   powierzchnie i jeden akcent (granat). Czerwień tylko dla spraw z terminem.
+   Wszystkie kolory jako zmienne. Rozmiar tekstu: jedna zmienna --fs.
+   ===================================================================== */
+
+/* ---------- Motyw jasny (makieta) ---------- */
+:root {
+  --tlo: #F3F4F7;
+  --powierzchnia: #FFFFFF;
+  --tekst: #1A1D26;
+  --tekst-2: #4A5163;
+  --linia: #DCDFE6;
+  --akcent: #1D3F8F;
+  --akcent-jasny: #E8EDF8;
+  --sukces: #1E6B3A;
+  --sukces-jasny: #E6F4EA;
+  --pilne: #B3261E;
+  --pilne-jasne: #FCEBEA;
+  --pole-ramka: #8A91A3;
+  --fokus: #1D3F8F;
+  --logo: #D4213D;
+  --dowod: #1E4E9C;
+  --dowod-jasny: #2458B0;
+  --prawko: #A3264B;
+  --pojazdy: #9A4508;
+  --kdr: #5A3E9E;
+  --legitymacja: #0E6B62;
+  --tlo-strony: #D9DCE3;
+  --cien-okna: rgba(10, 15, 30, .55);
+  --fs: 18px;
+  color-scheme: light;
+}
+:root[data-tekst="duzy"] { --fs: 22px; }
+:root[data-tekst="bardzo-duzy"] { --fs: 26px; }
+
+/* ---------- Motyw ciemny (makieta) ---------- */
+:root[data-motyw="ciemny"] {
+  --tlo: #121419;
+  --powierzchnia: #1C1F27;
+  --tekst: #F2F3F6;
+  --tekst-2: #B9BFCC;
+  --linia: #343947;
+  --akcent: #9DB8FF;
+  --akcent-jasny: #243154;
+  --sukces: #7FD39B;
+  --sukces-jasny: #1C3326;
+  --pilne: #FF9C92;
+  --pilne-jasne: #3A1F1F;
+  --fokus: #9DB8FF;
+  --tlo-strony: #2A2E38;
+  --cien-okna: rgba(0, 0, 0, .7);
+  color-scheme: dark;
+}
+
+/* ---------- Motyw wysoki kontrast ---------- */
+:root[data-motyw="kontrast"] {
+  --tlo: #000;
+  --powierzchnia: #000;
+  --tekst: #FFF;
+  --tekst-2: #FFF;
+  --linia: #FFF;
+  --akcent: #FFE500;
+  --akcent-jasny: #000;
+  --sukces: #7CFF9B;
+  --sukces-jasny: #000;
+  --pilne: #FF9C92;
+  --pilne-jasne: #000;
+  --pole-ramka: #FFF;
+  --fokus: #FFE500;
+  --tlo-strony: #222;
+  --cien-okna: rgba(0, 0, 0, .8);
+  color-scheme: dark;
+}
+
+/* ---------- Podstawy ---------- */
+* { box-sizing: border-box; margin: 0; }
+html { font-size: var(--fs); -webkit-text-size-adjust: 100%; }
+body {
+  font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--tlo); color: var(--tekst);
+}
+[hidden] { display: none !important; }
+ul { list-style: none; padding: 0; }
+p, dd, li { line-height: 1.5; }
+a { color: var(--akcent); }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+:focus-visible { outline: 3px solid var(--fokus); outline-offset: 2px; }
+:focus:not(:focus-visible) { outline: none; }
+.ukryte {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.bez-js { padding: 24px; font-size: 1rem; }
+
+/* ---------- Telefon: na telefonie pełny ekran, na komputerze ramka ---------- */
+.ekran {
+  width: 100%; height: 100vh; height: 100dvh;
+  background: var(--tlo); color: var(--tekst);
+  display: flex; flex-direction: column; position: relative; overflow: hidden;
+}
+.status { display: none; }
+@media (min-width: 31em) and (min-height: 46em) {
+  body {
+    background: var(--tlo-strony); min-height: 100vh;
+    display: flex; justify-content: center; align-items: center; padding: 16px;
+  }
+  .telefon {
+    width: 414px; height: min(868px, calc(100vh - 32px)); border-radius: 48px; background: #111;
+    padding: 12px; box-shadow: 0 12px 40px rgba(0, 0, 0, .25); flex: none;
+  }
+  .ekran { height: 100%; border-radius: 38px; }
+  .status {
+    height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px 0 32px; font-size: 16px; font-weight: 700; background: var(--powierzchnia);
+  }
+  .status .ikony { display: flex; gap: 6px; align-items: center; }
+  .naglowek { padding-top: 2px; }
+}
+.tresc { flex: 1; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; }
+.tresc::-webkit-scrollbar { display: none; }
+/* Niski ekran (np. powiększenie 200%): przewija się cała strona, dolny pasek zostaje na dole */
+@media (max-height: 30em) {
+  .ekran { height: auto; min-height: 100vh; overflow: visible; }
+  .tresc { overflow: visible; flex: 1 0 auto; }
+  .dolny-pasek { position: sticky; bottom: 0; z-index: 2; }
+}
+
+/* ---------- Nagłówek (makieta) ---------- */
+.naglowek {
+  background: var(--powierzchnia); padding: 8px 16px 8px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 8px;
+  border-bottom: 1px solid var(--linia);
+}
+.marka { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: min(1.1rem, 22px); }
+.logo {
+  width: 36px; height: 36px; border-radius: 10px; background: var(--logo); flex: none;
+  display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 22px; line-height: 1;
+}
+.naglowek-akcje { display: flex; gap: 4px; margin-left: auto; }
+.ikona-btn {
+  min-width: 64px; min-height: 52px; border: 0; background: none; color: var(--tekst); text-decoration: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font-size: 16px; line-height: 1.2; border-radius: 12px; position: relative; padding: 2px 6px;
+}
+.ikona-btn:hover { background: var(--akcent-jasny); }
+.ikona-btn svg { width: 24px; height: 24px; }
+.licznik {
+  position: absolute; top: 0; right: 6px; min-width: 24px; height: 24px; border-radius: 12px;
+  background: var(--akcent); color: var(--powierzchnia); font-size: 16px; font-weight: 700; line-height: 1;
+  display: grid; place-items: center; padding: 0 5px; border: 2px solid var(--powierzchnia);
+}
+/* Wąski telefon: nagłówek mieści się w jednym rzędzie przy tekście Standardowym */
+@media (max-width: 359px) {
+  .naglowek { padding-left: 12px; padding-right: 12px; gap: 0 4px; }
+  .marka { gap: 8px; }
+  .logo { width: 32px; height: 32px; font-size: 20px; }
+  .naglowek-akcje { gap: 0; }
+  .ikona-btn { padding: 2px 3px; min-width: 56px; }
+}
+/* Podekrany: „Wstecz” z napisem */
+.naglowek-pod { padding-top: 6px; padding-bottom: 6px; justify-content: flex-start; }
+.wstecz {
+  min-height: 48px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px 0 4px;
+  border: 0; background: none; color: var(--akcent); font-weight: 700; font-size: 1rem; border-radius: 12px;
+}
+.wstecz:hover { background: var(--akcent-jasny); }
+.wstecz svg { width: 26px; height: 26px; }
+/* Ekran wyboru osoby: sam znak */
+.naglowek-wejscie { justify-content: flex-start; min-height: 60px; }
+
+/* ---------- Sekcje i tytuły ---------- */
+.sekcja { padding: 12px 16px 0; }
+.sekcja h2, .h2 { font-size: 1.1rem; line-height: 1.3; margin-bottom: 10px; }
+.sekcja h2 + .lista, .sekcja h2 + .dane { margin-top: 0; }
+.sekcja > * + h2 { margin-top: 20px; }
+.tytul-strony { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.tytul-strony h1 { font-size: 1.3rem; line-height: 1.3; }
+.tytul-powitanie h1 { font-size: 1.1rem; } /* jak w makiecie */
+.podtytul { color: var(--tekst-2); margin: -4px 0 14px; }
+.odstep-dol { height: 16px; }
+h1:focus { outline: none; }
+
+/* ---------- Przycisk „Przeczytaj” (widoczny, gdy czytanie na głos jest włączone) ---------- */
+.tylko-czytanie { display: none !important; }
+[data-czytanie="tak"] .tylko-czytanie { display: inline-flex !important; }
+.btn-czytaj {
+  min-height: 48px; padding: 0 14px; border-radius: 24px; border: 0; background: var(--akcent-jasny); color: var(--akcent);
+  display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 16px; line-height: 1.2;
+}
+.btn-czytaj svg { width: 22px; height: 22px; }
+
+/* ---------- Portfel dokumentów (makieta) ---------- */
+.portfel { position: relative; }
+.karta {
+  border-radius: 18px; color: #fff; position: relative; overflow: hidden;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, .18);
+}
+.karta + .karta { margin-top: -32px; }
+.karta::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(135deg, rgba(255, 255, 255, .05) 0 2px, transparent 2px 14px);
+}
+.pasek-karty {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 12px;
+  padding: 12px 18px 44px; min-height: 92px; color: #fff; text-decoration: none; line-height: 1.3;
+}
+a.pasek-karty:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.pasek-karty b { font-size: 1.05rem; }
+.status-karty { font-size: 16px; display: flex; align-items: center; gap: 6px; opacity: .95; }
+.pasek-karty svg { width: 20px; height: 20px; }
+.karta :focus-visible { outline: 3px solid #fff; outline-offset: -6px; border-radius: 16px; }
+.karta.pojazdy { background: var(--pojazdy); }
+.karta.prawko { background: var(--prawko); }
+.karta.kdr { background: var(--kdr); }
+.karta.legitymacja { background: var(--legitymacja); }
+.karta.dowod { background: var(--dowod); background: linear-gradient(160deg, var(--dowod-jasny), var(--dowod)); padding: 16px 18px 18px; }
+/* Pojedyncza karta (szczegóły dokumentu) — bez nakładania */
+.karta.pojedyncza { margin-bottom: 16px; }
+.karta.pojedyncza .pasek-karty { padding-bottom: 14px; min-height: 64px; }
+.dowod-gora { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.dowod-gora b { font-size: 1.2rem; }
+.chip { width: 34px; height: 26px; border-radius: 6px; background: linear-gradient(135deg, #F3D27A, #D9A93F); flex: none; }
+.dowod-srodek { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0 12px; align-items: center; line-height: 1.3; }
+.zdjecie {
+  width: 64px; height: 76px; border-radius: 10px; background: #E6ECF7; color: var(--dowod); flex: none;
+  display: grid; place-items: center; font-weight: 800; font-size: 24px;
+}
+.dowod-srodek .imie { font-size: 1.1rem; font-weight: 700; }
+.dowod-srodek .waznosc { font-size: 16px; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.dowod-srodek svg { width: 20px; height: 20px; }
+.dowod-dane { min-width: 0; flex: 1 1 8em; }
+.btn-pokaz {
+  width: 100%; min-height: 52px; border: 0; border-radius: 12px; background: #fff; color: var(--dowod);
+  font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+  position: relative; z-index: 1; padding: 6px 12px; text-align: center;
+}
+.btn-pokaz svg { width: 22px; height: 22px; }
+.karta .btn-pokaz:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* ---------- Wymaga Twojej uwagi (makieta) ---------- */
+.uwaga {
+  background: var(--powierzchnia); border-radius: 16px; padding: 14px 14px 14px 16px;
+  display: flex; gap: 14px; align-items: center; border: 1px solid var(--linia);
+  color: var(--tekst); text-decoration: none;
+}
+a.uwaga:hover { border-color: var(--akcent); }
+.ikona-kolo {
+  flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--akcent-jasny); color: var(--akcent);
+  display: grid; place-items: center;
+}
+.ikona-kolo svg { width: 24px; height: 24px; }
+.uwaga .tekst { flex: 1; min-width: 0; }
+.uwaga .etykieta { font-size: 16px; font-weight: 700; color: var(--akcent); display: flex; align-items: center; gap: 6px; line-height: 1.4; }
+.uwaga .opis { font-size: 1rem; line-height: 1.35; display: block; }
+.chevron { width: 24px; height: 24px; color: var(--tekst-2); flex: none; }
+.uwaga.pilne { border: 2px solid var(--pilne); }
+.uwaga.pilne .ikona-kolo { background: var(--pilne-jasne); color: var(--pilne); }
+.uwaga.pilne .etykieta { color: var(--pilne); }
+.uwaga.ok .ikona-kolo { background: var(--sukces-jasny); color: var(--sukces); }
+.uwaga.ok .etykieta { color: var(--sukces); }
+
+/* ---------- Pole asystenta przypięte nad dolnym paskiem (makieta) ---------- */
+.asystent-pasek {
+  flex: none; background: var(--powierzchnia); border-top: 1px solid var(--linia);
+  padding: 10px 12px;
+}
+.wiersz-pola { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pole {
+  min-height: 52px; border-radius: 12px; border: 2px solid var(--pole-ramka); background: var(--tlo);
+  padding: 0 14px; display: flex; align-items: center; gap: 8px; color: var(--tekst-2); font-size: 1rem;
+}
+.pole:focus-within { outline: 3px solid var(--fokus); outline-offset: 2px; }
+.pole input {
+  flex: 1 1 0; width: 0; min-width: 0; border: 0; background: none; outline: none; min-height: 48px; padding: 0;
+  font-size: 1rem; color: var(--tekst);
+}
+.pole input::placeholder { color: var(--tekst-2); opacity: 1; }
+.pole svg { width: 22px; height: 22px; color: var(--akcent); flex: none; }
+/* Pole przechodzi do osobnej linii, gdy podpowiedź „Co chcesz załatwić?” by się nie zmieściła */
+.asystent-pasek .pole { flex: 999 1 calc(8.8em + 62px); min-width: 0; border-radius: 26px; }
+.mow {
+  flex: 1 0 auto; min-width: 64px; min-height: 56px; border-radius: 16px; border: 0;
+  background: var(--akcent); color: var(--powierzchnia); font-size: 16px; font-weight: 700; line-height: 1.2;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 6px;
+}
+.mow svg { width: 22px; height: 22px; }
+@media (max-width: 359px) {
+  .asystent-pasek { padding-left: 8px; padding-right: 8px; }
+  .asystent-pasek .pole { padding: 0 10px; flex-basis: calc(8.8em + 54px); }
+}
+.pasek-podpowiedzi { padding: 2px 0 12px; }
+.podpowiedzi-tytul { font-size: 16px; color: var(--tekst-2); font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+.podpowiedzi { display: flex; flex-wrap: wrap; gap: 8px; }
+.podpowiedz {
+  min-height: 48px; padding: 6px 14px; border-radius: 24px; border: 0; background: var(--akcent-jasny); color: var(--akcent);
+  display: flex; align-items: center; font-weight: 700; font-size: 16px; line-height: 1.3; text-align: left;
+}
+.podpowiedz:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (prefers-reduced-motion: no-preference) {
+  .pasek-podpowiedzi { animation: pojaw .18s ease-out; }
+  @keyframes pojaw { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
+/* ---------- Dolny pasek (makieta) ---------- */
+.dolny-pasek {
+  flex: none; background: var(--powierzchnia); border-top: 1px solid var(--linia);
+  display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr; padding: 6px 2px 8px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+@media (min-width: 31em) and (min-height: 46em) { .dolny-pasek { padding-bottom: 18px; } }
+.dolny-pasek a {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--tekst-2);
+  text-decoration: none; font-size: 16px; line-height: 1.2; min-height: 56px; justify-content: center;
+  letter-spacing: -.01em; white-space: nowrap; border-radius: 12px; min-width: 0;
+}
+.dolny-pasek a svg { width: 24px; height: 24px; }
+.dolny-pasek .tlo-ikony { width: 52px; height: 30px; border-radius: 15px; display: grid; place-items: center; }
+.dolny-pasek a[aria-current="page"] { color: var(--akcent); font-weight: 700; }
+.dolny-pasek a[aria-current="page"] .tlo-ikony { background: var(--akcent-jasny); }
+/* Wąski telefon: każda zakładka dostaje tyle miejsca, ile potrzebuje jej podpis (zawsze 1 rząd, 16 px) */
+@media (max-width: 359px) {
+  .dolny-pasek { grid-template-columns: repeat(5, max-content); justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .dolny-pasek a { letter-spacing: -.02em; padding: 0 1px; }
+}
+
+/* ---------- Przyciski ---------- */
+.btn {
+  min-height: 56px; width: 100%; border-radius: 12px; border: 2px solid var(--akcent); font-weight: 700; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; text-decoration: none;
+  line-height: 1.3; text-align: center;
+}
+.btn svg { width: 22px; height: 22px; }
+.btn.glowny { background: var(--akcent); color: var(--powierzchnia); }
+.btn.drugi { background: var(--powierzchnia); color: var(--akcent); }
+.btn:hover { filter: brightness(1.08); }
+.btn.drugi:hover { background: var(--akcent-jasny); }
+.przyciski-pion { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.link-strzalka {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 48px; font-weight: 700; color: var(--akcent);
+  text-underline-offset: 3px;
+}
+.link-strzalka svg { width: 22px; height: 22px; }
+
+/* ---------- Listy (Usługi, Więcej, Skrzynka) ---------- */
+.lista { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; overflow: hidden; }
+.lista > li + li { border-top: 1px solid var(--linia); }
+.wiersz-listy {
+  display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 12px 14px 12px 16px;
+  background: none; border: 0; text-align: left; color: var(--tekst); text-decoration: none; line-height: 1.35;
+}
+.wiersz-listy:hover { background: var(--akcent-jasny); }
+.wiersz-listy:focus-visible { outline-offset: -3px; }
+.wiersz-listy .tekst { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.tytul-wiersza { font-weight: 700; font-size: 1rem; }
+.opis { font-size: max(16px, .9rem); color: var(--tekst-2); line-height: 1.4; }
+.etykieta-dziala {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
+  font-size: 16px; font-weight: 700; color: var(--akcent); background: var(--akcent-jasny); border-radius: 12px; padding: 2px 10px 2px 6px;
+}
+.etykieta-dziala svg { width: 18px; height: 18px; }
+.kategoria + .kategoria { margin-top: 20px; }
+.kategoria h2, .naglowek-sekcji { display: flex; align-items: center; gap: 8px; }
+.kategoria h2 svg, .naglowek-sekcji svg { width: 24px; height: 24px; color: var(--akcent); }
+.licznik-uslug { font-size: max(16px, .9rem); color: var(--tekst-2); }
+
+/* ---------- Wyszukiwarka usług ---------- */
+.szukaj { margin-bottom: 18px; }
+.szukaj-etykieta { display: block; font-weight: 700; margin-bottom: 6px; }
+.pole-szukaj { background: var(--powierzchnia); }
+.wyniki-naglowek { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px; margin-bottom: 10px; }
+.wyniki-naglowek p { font-weight: 700; }
+.btn-tekst {
+  min-height: 48px; padding: 0 12px; border: 0; background: none; color: var(--akcent); font-weight: 700;
+  text-decoration: underline; text-underline-offset: 3px; border-radius: 12px;
+}
+.pusty-wynik { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 16px; }
+.pusty-wynik p + p { margin-top: 6px; }
+
+/* ---------- Szczegóły dokumentu ---------- */
+.dane { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; overflow: hidden; }
+.dane > div { padding: 10px 16px; }
+.dane > div + div { border-top: 1px solid var(--linia); }
+.dane dt { font-size: max(16px, .9rem); color: var(--tekst-2); line-height: 1.4; }
+.dane dd { font-weight: 700; margin: 0; overflow-wrap: anywhere; }
+.status-ok, .status-pilne { display: inline-flex; align-items: center; gap: 6px; }
+.status-ok { color: var(--sukces); }
+.status-pilne { color: var(--pilne); }
+.status-ok svg, .status-pilne svg { width: 20px; height: 20px; }
+.pojazd + .pojazd { margin-top: 16px; }
+.pojazd h2 { margin-bottom: 6px; }
+
+/* ---------- Wybór osoby ---------- */
+.lista-osob { display: flex; flex-direction: column; gap: 10px; }
+.karta-osoby {
+  width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 14px 14px 16px; text-align: left;
+  background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; color: var(--tekst); line-height: 1.35;
+}
+.karta-osoby:hover { border-color: var(--akcent); }
+.karta-osoby .tekst { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.awatar {
+  flex: none; width: 56px; height: 56px; border-radius: 50%; background: var(--akcent-jasny); color: var(--akcent);
+  display: grid; place-items: center; font-weight: 800; font-size: 20px;
+}
+.awatar.duzy { width: 64px; height: 64px; font-size: 22px; }
+.ustawienia-osoby { display: inline-flex; align-items: center; gap: 6px; }
+.ustawienia-osoby svg { width: 18px; height: 18px; }
+.informacja { display: flex; align-items: flex-start; gap: 8px; margin-top: 16px; color: var(--tekst-2); }
+.informacja svg { width: 22px; height: 22px; margin-top: .2em; }
+
+/* ---------- Dopasuj do siebie / Wygląd i dostępność ---------- */
+.podglad {
+  border: 2px dashed var(--pole-ramka); border-radius: 18px; padding: 10px 12px 12px; background: var(--tlo); margin-bottom: 20px;
+}
+.podglad-etykieta { font-size: 16px; font-weight: 700; color: var(--tekst-2); margin-bottom: 6px; }
+.podglad .tytul-strony { margin-bottom: 8px; }
+.podglad-h { font-size: 1.1rem; font-weight: 700; }
+.ustawienie { border: 0; padding: 0; margin: 0 0 20px; min-width: 0; }
+.ustawienie legend { font-size: 1.1rem; font-weight: 700; padding: 0; margin-bottom: 10px; line-height: 1.3; }
+.opcje { display: flex; flex-direction: column; gap: 8px; }
+.opcja {
+  display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 14px; cursor: pointer;
+  background: var(--powierzchnia); border: 2px solid var(--linia); border-radius: 12px; line-height: 1.3;
+}
+.opcja:hover { border-color: var(--akcent); }
+.opcja input { width: 24px; height: 24px; margin: 0; flex: none; accent-color: var(--akcent); }
+.opcja-nazwa { flex: 1; min-width: 0; }
+.opcja.wybrana { border-color: var(--akcent); background: var(--akcent-jasny); font-weight: 700; }
+.opcja:focus-within { outline: 3px solid var(--fokus); outline-offset: 2px; }
+.opcja input:focus-visible { outline: none; }
+.probka { font-weight: 700; line-height: 1; }
+.probka-motywu {
+  flex: none; width: 52px; height: 36px; border-radius: 8px; display: grid; place-items: center;
+  font-weight: 700; font-size: 18px; border: 2px solid;
+}
+.probka-jasny { background: #FFFFFF; color: #1A1D26; border-color: #1D3F8F; }
+.probka-ciemny { background: #1C1F27; color: #F2F3F6; border-color: #9DB8FF; }
+.probka-kontrast { background: #000; color: #FFE500; border-color: #FFF; }
+.przelacznik {
+  width: 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px;
+  min-height: 64px; padding: 10px 14px; margin-bottom: 12px; text-align: left; line-height: 1.35;
+  background: var(--powierzchnia); border: 2px solid var(--linia); border-radius: 12px; color: var(--tekst);
+}
+.przelacznik:hover { border-color: var(--akcent); }
+.przelacznik .tekst { flex: 1 1 9em; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.przelacznik-stan { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; }
+.tor {
+  width: 52px; height: 32px; border-radius: 16px; background: var(--pole-ramka); position: relative; flex: none;
+}
+.galka {
+  position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: var(--powierzchnia);
+  transition: left .15s;
+}
+.przelacznik[aria-checked="true"] .tor { background: var(--akcent); }
+.przelacznik[aria-checked="true"] .galka { left: 24px; }
+.dopisek { color: var(--tekst-2); margin-top: 12px; }
+
+/* ---------- Poznaj asystenta i puste stany ---------- */
+.ilustracja {
+  width: 88px; height: 88px; border-radius: 50%; background: var(--akcent-jasny); color: var(--akcent);
+  display: grid; place-items: center; margin: 8px 0 16px;
+}
+.ilustracja svg { width: 44px; height: 44px; }
+.akapity p + p { margin-top: 8px; }
+.sposoby { display: flex; flex-direction: column; gap: 10px; margin: 18px 0 4px; }
+.sposoby li { display: flex; align-items: center; gap: 14px; line-height: 1.35; }
+.sposoby .tekst { display: flex; flex-direction: column; }
+.zgoda { display: flex; align-items: center; gap: 8px; color: var(--tekst-2); font-weight: 700; margin: -4px 0 16px; }
+.zgoda svg { width: 22px; height: 22px; color: var(--sukces); }
+.pusty-stan {
+  background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 18px 16px;
+}
+.pusty-stan .ilustracja { width: 64px; height: 64px; margin: 0 0 12px; }
+.pusty-stan .ilustracja svg { width: 32px; height: 32px; }
+.pusty-stan .podpowiedzi { margin: 14px 0 10px; }
+
+/* ---------- Kod QR ---------- */
+.kafle { display: flex; flex-direction: column; gap: 12px; }
+.kafel {
+  width: 100%; display: flex; align-items: center; gap: 16px; padding: 18px 16px; min-height: 112px; text-align: left;
+  background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; color: var(--tekst); line-height: 1.35;
+}
+.kafel:hover { border-color: var(--akcent); }
+.kafel .ikona-kolo { width: 60px; height: 60px; }
+.kafel .ikona-kolo svg { width: 30px; height: 30px; }
+.kafel .tekst { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.kafel .tytul-wiersza { font-size: 1.1rem; }
+
+/* ---------- Więcej ---------- */
+.profil {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 20px; line-height: 1.35;
+  background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px;
+}
+.profil .tekst { display: flex; flex-direction: column; min-width: 0; }
+.karta-info { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 16px; }
+.karta-info .mocne { font-weight: 700; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+.karta-info .mocne svg { width: 22px; height: 22px; color: var(--akcent); margin-top: .2em; }
+.wyrozniki { display: flex; flex-direction: column; gap: 8px; padding-left: 1.2em; list-style: decimal; }
+
+/* ---------- Skrzynka ---------- */
+.wiadomosc .tytul-wiersza { font-weight: 400; }
+.wiadomosc.nowa .tytul-wiersza { font-weight: 700; }
+.etykieta-nowa {
+  align-self: flex-start; font-size: 16px; font-weight: 700; color: var(--powierzchnia); background: var(--akcent);
+  border-radius: 12px; padding: 1px 10px; margin-bottom: 2px;
+}
+.metryczka { color: var(--tekst-2); margin: -4px 0 14px; }
+.pismo { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 16px; }
+.pismo p + p { margin-top: 8px; }
+
+/* ---------- W budowie ---------- */
+.w-budowie .wybrane { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 12px 16px; margin-top: 14px; }
+.w-budowie .wybrane span { color: var(--tekst-2); display: block; font-size: max(16px, .9rem); }
+
+/* ---------- Okno („Niedostępne w prototypie”) ---------- */
+.okno {
+  margin: auto; border: 0; border-radius: 20px; padding: 20px; width: min(360px, calc(100vw - 32px)); max-height: calc(100vh - 32px);
+  overflow-y: auto; background: var(--powierzchnia); color: var(--tekst); box-shadow: 0 16px 48px rgba(0, 0, 0, .3);
+}
+.okno::backdrop { background: var(--cien-okna); }
+.okno h2 { font-size: 1.25rem; line-height: 1.3; margin-bottom: 8px; }
+.okno .okno-nazwa { font-weight: 700; margin-bottom: 4px; }
+.okno .ikona-kolo { margin-bottom: 12px; }
+.okno .przyciski-pion { margin-top: 14px; }
+
+/* ---------- Tryb prosty: większe przyciski, mniej elementów ---------- */
+[data-prosty="tak"] .btn, [data-prosty="tak"] .btn-pokaz { min-height: 64px; }
+[data-prosty="tak"] .wiersz-listy { min-height: 76px; padding-top: 14px; padding-bottom: 14px; }
+[data-prosty="tak"] .podpowiedzi { flex-direction: column; }
+[data-prosty="tak"] .podpowiedz { min-height: 56px; border-radius: 16px; width: 100%; }
+[data-prosty="tak"] .mow { min-height: 64px; }
+[data-prosty="tak"] .asystent-pasek .pole { min-height: 60px; }
+[data-prosty="tak"] .karta-osoby, [data-prosty="tak"] .kafel { padding-top: 18px; padding-bottom: 18px; }
+
+/* ---------- Wysoki kontrast: obramowania zamiast tła ---------- */
+[data-motyw="kontrast"] .karta { background: #000; border: 3px solid #fff; box-shadow: none; }
+[data-motyw="kontrast"] .karta::after, [data-motyw="kontrast"] .chip { display: none; }
+[data-motyw="kontrast"] .zdjecie { background: #000; color: #fff; border: 2px solid #fff; }
+[data-motyw="kontrast"] .btn-pokaz { background: #FFE500; color: #000; }
+[data-motyw="kontrast"] .karta :focus-visible, [data-motyw="kontrast"] .karta .btn-pokaz:focus-visible { outline-color: #FFE500; }
+[data-motyw="kontrast"] .podpowiedz, [data-motyw="kontrast"] .btn-czytaj, [data-motyw="kontrast"] .etykieta-dziala,
+[data-motyw="kontrast"] .ikona-kolo, [data-motyw="kontrast"] .awatar, [data-motyw="kontrast"] .ilustracja { border: 2px solid #fff; }
+[data-motyw="kontrast"] .uwaga, [data-motyw="kontrast"] .lista, [data-motyw="kontrast"] .dane, [data-motyw="kontrast"] .karta-osoby,
+[data-motyw="kontrast"] .kafel, [data-motyw="kontrast"] .profil, [data-motyw="kontrast"] .karta-info, [data-motyw="kontrast"] .pismo,
+[data-motyw="kontrast"] .pusty-stan, [data-motyw="kontrast"] .okno { border: 2px solid #fff; }
+[data-motyw="kontrast"] .uwaga.pilne { border-color: var(--pilne); }
+[data-motyw="kontrast"] .dolny-pasek a[aria-current="page"] .tlo-ikony { outline: 2px solid #FFE500; }
+[data-motyw="kontrast"] .logo { box-shadow: 0 0 0 2px #fff; }
+[data-motyw="kontrast"] .mow { border: 2px solid #FFE500; }
+[data-motyw="kontrast"] .wiersz-listy:hover, [data-motyw="kontrast"] .ikona-btn:hover, [data-motyw="kontrast"] .wstecz:hover,
+[data-motyw="kontrast"] .btn.drugi:hover { background: #000; text-decoration: underline; }
+[data-motyw="kontrast"] .etykieta-nowa { color: #000; }
+
+/* ---------- Ogranicz ruch ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}

@@ -1,6 +1,6 @@
 # Specyfikacja prototypu „mObywatel dla każdego”
 
-Wersja 2.0 · 25.11.2026 · zastępuje wszystkie wcześniejsze wersje
+Wersja 2.1 · 25.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty)
 
 Klikalny prototyp aplikacji mObywatel na konkurs mObywatel Challenge (termin zgłoszenia: 26.11 wieczorem). Konkurs ma pierwszeństwo: prototyp ma być lepszy od prototypu referencyjnego Janusza Cieszyńskiego (mobywatel.ai), mieć na to dowody i wyróżniać się.
 
@@ -20,7 +20,7 @@ Ten plik jest jedynym źródłem prawdy. Nie zmieniaj go bez zgody autorki.
 
 | | Oficjalny mObywatel | Prototyp Cieszyńskiego | Nasz prototyp |
 | --- | --- | --- | --- |
-| Co widać na starcie | Dokumenty | Dokumenty (nachodzące karty) | Dokumenty, czytelne, nic się nie nakłada |
+| Co widać na starcie | Dokumenty | Dokumenty (nachodzące karty) | Dokumenty jako portfel kart: każda karta ma czytelny pasek z nazwą i statusem, mDowód z przodu w całości |
 | Jak załatwić sprawę | Ręcznie, przez Usługi | Tylko rozmowa z AI | Ręcznie przez Usługi **albo** z asystentem — obie drogi prowadzą do tych samych kroków |
 | Czy widać, co można zrobić | Tak | Nie — trzeba wiedzieć, o co zapytać; aplikacja wydaje się pusta | Tak — pełna lista usług z opisami + podpowiedzi asystenta |
 | Asystent | Tylko odpowiada na pytania | Załatwia sprawy w czacie | Załatwia sprawy i prowadzi widocznymi krokami |
@@ -37,7 +37,7 @@ Zostaje z oficjalnej aplikacji: dokumenty na starcie, dolny pasek (Dokumenty, Us
 
 ## Zakres i etapy (w tej kolejności)
 
-1. ~~Warianty ekranu startowego~~ — zakończony; kierunek wyglądu: `warianty/start-b1.html` (granatowa góra, kremowe tło, miękkie karty), logika podpowiedzi i opisów spraw z `start-b2.html`.
+1. ~~Warianty ekranu startowego~~ — zakończony. **Wzór wyglądu i układu: `warianty/makieta-dokumenty.html`** (zatwierdzony przez autorkę; zastępuje kierunek B1) — kolory, czcionka, karty, nagłówek, dolny pasek, odstępy.
 2. **Szkielet całej aplikacji:** wybór osoby, „Dopasuj do siebie”, motywy, ekran Dokumenty, Usługi, Asystent (pusty stan), Kod QR, Więcej/Ustawienia, Skrzynka, okno „Niedostępne w prototypie”.
 3. **Sprawa A — zgubione dokumenty** w pełni, dostępna trzema drogami (Usługi, asystent, szczegóły dowodu), razem z asystentem dla tej sprawy.
 4. **Sprawa B — samochód: OC i badanie techniczne.**
@@ -64,12 +64,12 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 | --- | --- |
 | Tekst | Podstawowy 18 px, nagłówki 22–28 px, nic poniżej 16 px. Interlinia 1,5. Rozmiary: Standardowy (18), Duży (22), Bardzo duży (26), skalowane jedną zmienną. Podpisy dolnego paska stałe 16 px, pasek zawsze w jednym rzędzie |
 | Czcionka | Atkinson Hyperlegible (Google Fonts) albo systemowa |
-| Motywy | Jasny (jak B1: granat, kremowe tło), Ciemny, Wysoki kontrast. Wszystkie kolory jako zmienne CSS. W każdym motywie tekst min. 4,5:1, ikony i obramowania min. 3:1 |
-| Kolory | Granat — akcje. Czerwień — wyłącznie sprawy z terminem lub ryzykiem i błędy. Zieleń — sukces. Zawsze z ikoną i słowem |
+| Motywy | Jasny (jak makieta: jasnoszare tło, białe powierzchnie, granatowy akcent), Ciemny, Wysoki kontrast. Wszystkie kolory jako zmienne CSS. W każdym motywie tekst min. 4,5:1, ikony i obramowania min. 3:1 |
+| Kolory | Kolor mają tylko karty dokumentów. Reszta interfejsu jest spokojna: białe powierzchnie, jeden akcent (granat) — akcje. Czerwień — wyłącznie sprawy z terminem lub ryzykiem i błędy. Zieleń — sukces. Zawsze z ikoną i słowem |
 | Przyciski | Min. 48 × 48 px, odstęp min. 8 px. Główny przycisk na całą szerokość, 56 px |
 | Ikony | Zawsze z podpisem |
 | Język | Zdania do 15 słów, na „Ty”, bez żargonu, formy neutralne płciowo |
-| Układ | Jedna kolumna, naturalny przepływ, nic się nie nakłada, jednostki rem. Działa przy 320 px i powiększeniu 200% |
+| Układ | Jedna kolumna, naturalny przepływ, nic się nie nakłada, jednostki rem. Działa przy 320 px i powiększeniu 200%. Jedyny wyjątek: portfel kart dokumentów — karty leżą jedna za drugą, ale pasek każdej karty (nazwa i status) jest w całości widoczny i ma min. 48 px wysokości |
 | Nawigacja | Dolny pasek widoczny poza krokami sprawy. Na podekranach „Wstecz” z napisem. W sprawach „Krok 2 z 4” |
 | Czas i ruch | Brak limitów czasu i znikających komunikatów. Animacje subtelne, wyłączone przy „ogranicz ruch” |
 | Czytniki ekranu | `lang="pl"`, nagłówki, etykiety pól, `aria-live` dla asystenta, pola wyboru ogłaszające zaznaczenie, widoczny fokus |
@@ -86,9 +86,11 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 ## Mapa aplikacji
 
 - **Wejście** (pierwsze uruchomienie): Wybór osoby → Dopasuj do siebie → Poznaj asystenta (jeden ekran, można pominąć) → Dokumenty.
-- **Nagłówek:** ikona + „mObywatel”, po prawej przycisk „Aa Wygląd” (otwiera panel „Wygląd i dostępność”, ten sam co w Więcej) i Skrzynka (ikona z podpisem i licznikiem).
+- **Pasek telefonu:** na górze ekranu godzina i bateria, żeby prototyp wyglądał jak prawdziwa aplikacja.
+- **Nagłówek:** ikona + „mObywatel”, po prawej „Dostosuj” (ikona suwaków z podpisem; otwiera panel „Wygląd i dostępność”, ten sam co w Więcej) i „Skrzynka” (ikona z podpisem i licznikiem).
+- **Pole asystenta** przypięte nad dolnym paskiem: pole „Co chcesz załatwić?” + przycisk „Powiedz” (jak u Cieszyńskiego). Po dotknięciu pola pokazują się 3 gotowe pytania.
 - **Dolny pasek:** Dokumenty (ekran startowy) · Usługi · Asystent · Kod QR · Więcej.
-- **Do każdej sprawy prowadzą trzy drogi:** Usługi, asystent (pole na ekranie Dokumenty i zakładka), szczegóły dokumentu.
+- **Do każdej sprawy prowadzą trzy drogi:** Usługi, asystent (pole przypięte na ekranie Dokumenty i zakładka), szczegóły dokumentu.
 - **Każda sprawa kończy się tak samo:** Potwierdzenie → Gotowe → wiadomość w Skrzynce.
 - Sprawy spoza prototypu otwierają okno „Niedostępne w prototypie”, które pokazuje działające sprawy.
 
@@ -105,11 +107,11 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 
 **3. Poznaj asystenta.** „Możesz kliknąć, napisać albo powiedzieć, co chcesz załatwić. Asystent poprowadzi Cię krok po kroku i nic nie wyśle bez Twojej zgody.” „Zaczynam” / „Pomiń”.
 
-**4. Dokumenty (ekran startowy).** Od góry:
-1. Powitanie „Dzień dobry, Halino” w granatowej górnej części.
-2. mDowód jako duża karta (inicjały zamiast zdjęcia, imię, „Pokaż dane”). Pod nią mPrawo jazdy, Moje pojazdy, Karta Dużej Rodziny jako pełne wiersze z nazwą i statusem („Ważny do…” z ikoną). Nic się nie nakłada.
+**4. Dokumenty (ekran startowy).** Wzór: `warianty/makieta-dokumenty.html`. Od góry:
+1. Pasek telefonu (godzina, bateria), nagłówek (znak + „mObywatel”, „Dostosuj”, „Skrzynka” z licznikiem), powitanie „Dzień dobry, Halino”.
+2. Portfel kart ułożonych jedna za drugą, jak w oryginałach: Moje pojazdy, mPrawo jazdy, Karta Dużej Rodziny — każda z czytelnym paskiem z nazwą i statusem; mDowód z przodu w całości (inicjały zamiast zdjęcia, imię, ważność, „Pokaż dane”). Dotknięcie paska karty otwiera szczegóły tego dokumentu.
 3. „Wymaga Twojej uwagi” — karta zależna od osoby.
-4. Asystent: pole „Co chcesz załatwić?”, szerokie przyciski „Powiedz” i „Wyślij” z napisem, 3 przykładowe pytania tuż pod polem, jako jeden blok.
+4. Pole asystenta przypięte nad dolnym paskiem („Co chcesz załatwić?” + „Powiedz”); po dotknięciu pola 3 gotowe pytania. Wcześniejszy blok asystenta pod kartą sprawy usunięty.
 Przy tekście Standardowym na 390 × 844 bez przewijania widać mDowód, kartę sprawy i pole asystenta. Jeśli się nie mieści — zapytaj autorkę, zanim coś ukryjesz.
 
 **5. Szczegóły dokumentu.** Dane jako lista „etykieta — wartość”. Przyciski: „Pokaż kod QR” (niedostępne w prototypie), „Zgłoś utratę tego dokumentu” → sprawa A z zaznaczonym dokumentem.

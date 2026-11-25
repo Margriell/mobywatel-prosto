@@ -4,9 +4,9 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 
 ## Stan
 
-- Obowiązuje SPECYFIKACJA.md w wersji 2.0 (ekran startowy: Dokumenty).
-- Ukończony etap: 1, runda 3 — trzy wyglądy ekranu Dokumenty (czeka na wybór autorki).
-- Następny etap: 2 — szkielet całej aplikacji (po wyborze wyglądu 1, 2 albo 3).
+- Obowiązuje SPECYFIKACJA.md w wersji 2.1 (wzór wyglądu: `warianty/makieta-dokumenty.html`).
+- Ukończony etap: 2 — szkielet całej aplikacji (`index.html`, `style.css`, `app.js`, `dane.js`).
+- Następny etap: 3 — sprawa A „Zgubione dokumenty” z asystentem (wtedy powstanie `asystent.js`).
 
 ## Decyzje autorki
 
@@ -18,8 +18,48 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 - 25.11.2026: specyfikacja 2.0 — ekranem startowym są Dokumenty; dolny pasek Dokumenty · Usługi · Asystent · Kod QR · Więcej.
 - 25.11.2026: przycisk „Aa Wygląd” w nagłówku (otwiera panel „Wygląd i dostępność”, ten sam co w Więcej) — dopisany do SPECYFIKACJA.md, sekcja „Mapa aplikacji”.
 - 25.11.2026: warianty B1–B3 przeniesione do `warianty/archiwum/`.
+- 25.11.2026: wzorem wyglądu i układu jest `warianty/makieta-dokumenty.html` (zatwierdzona przez autorkę). Warianty Dokumenty 1–3 przeniesione do `warianty/archiwum/`.
+- 25.11.2026: decyzje z makiety wpisane do SPECYFIKACJA.md (wersja 2.1): (1) dokumenty jako portfel kart jedna za drugą, każda z czytelnym paskiem, mDowód z przodu w całości, dotknięcie paska otwiera szczegóły; (2) kolor mają tylko karty dokumentów, reszta spokojna — białe powierzchnie i granat, czerwień tylko dla spraw z terminem; (3) w nagłówku „Dostosuj” (suwaki z podpisem) i „Skrzynka” z licznikiem; (4) pole asystenta przypięte nad dolnym paskiem, po dotknięciu 3 gotowe pytania, blok asystenta pod kartą sprawy usunięty; (5) pasek telefonu z godziną i baterią.
 
 ## Dziennik
+
+### 25.11.2026 Etap 2 — szkielet całej aplikacji
+- Zrobione:
+  - Cała aplikacja w stylu makiety: jasnoszare tło, białe powierzchnie, granatowy akcent, kolorowe tylko karty dokumentów. Pasek telefonu z prawdziwą godziną i baterią (w ramce telefonu na komputerze), nagłówek z „Dostosuj” i „Skrzynką” z licznikiem, dolny pasek jak w makiecie.
+  - **Wejście:** wybór osoby (Halina, Tomasz, Ola; pod spodem „Prototyp konkursowy, dane fikcyjne”) → „Jak Ci wygodnie?” (rozmiar tekstu, motyw, tryb prosty, czytanie na głos; podgląd na żywo, zmiany działają od razu) → „Poznaj asystenta” („Zaczynam” otwiera Dokumenty z 3 gotowymi pytaniami pod polem asystenta, „Pomiń” — same Dokumenty).
+  - **Dokumenty:** portfel kart jedna za drugą, mDowód z przodu w całości. Każdy pasek karty otwiera szczegóły dokumentu. Karta „Wymaga Twojej uwagi” zależna od osoby: Halina — nowe pismo (granat, prowadzi do pisma w Skrzynce), Tomasz — OC kończy się za 12 dni (czerwień, ikona ostrzeżenia), Ola — „Wszystko w porządku” (zieleń). Pole asystenta przypięte nad dolnym paskiem; po dotknięciu 3 gotowe pytania. Gdy coś wpiszesz, przycisk „Powiedz” zmienia się na „Wyślij”.
+  - **Szczegóły dokumentu:** karta dokumentu i dane jako lista „etykieta — wartość”; „Pokaż kod QR” (okno „Niedostępne w prototypie”) i „Zgłoś utratę tego dokumentu” (otwiera sprawę A z zaznaczonym dokumentem). Moje pojazdy: OC i badanie techniczne ze statusem (ikona + słowo) i przycisk do sprawy B.
+  - **Usługi:** wyszukiwarka (działa bez polskich znaków, po synonimach i odmianach, np. „zgubiłam dowód”, „ukradli portfel”, „Do kiedy mam OC?”); „Najczęstsze”; 7 sytuacji życiowych po 3–4 usługi z jednozdaniowym opisem; etykieta „Działa w prototypie” przy sprawach A i B. Gdy nic nie znajdzie: „Zapytaj asystenta” i przyciski działających spraw. W trybie prostym: same kategorie jako duże przyciski, usługi po wejściu w kategorię.
+  - **Asystent** (pusty stan): „Nic nie wyśle bez Twojej zgody”, „W czym mogę pomóc?”, 4 podpowiedzi, „Zobacz wszystkie usługi”.
+  - **Kod QR:** „Pokaż swój kod” i „Zeskanuj kod” — oba otwierają okno „Niedostępne w prototypie”.
+  - **Więcej:** osoba, „Wygląd i dostępność” (ten sam panel co „Dostosuj”), „Zmień osobę”, „Pokaż wprowadzenie ponownie”, „O prototypie” z 3 wyróżnikami.
+  - **Skrzynka:** wiadomości osoby; nowe z etykietą „Nowa” i pogrubione; po otwarciu wiadomość staje się przeczytana, a licznik w nagłówku maleje.
+  - **Okno „Niedostępne w prototypie”:** nazwa usługi, „Działają:” + przyciski do spraw A i B, „Zamknij”.
+  - **Sprawy A i B oraz rozmowa z asystentem:** prosty ekran „W budowie” (pokazuje zaznaczony dokument albo wpisane pytanie, żeby było widać, że droga działa).
+  - **Motyw wysoki kontrast:** czarne tło, biały tekst, żółte przyciski, karty dokumentów jako czarne z białą ramką.
+  - **Czytanie na głos:** po włączeniu przy tytule każdego ekranu jest „Przeczytaj” (czyta ekran polskim głosem; drugi raz — „Zatrzymaj”). Jeśli przeglądarka nie umie czytać, pokazuje okno z wyjaśnieniem.
+  - Każdy ekran ma własny adres (`#/dokumenty`, `#/uslugi`, `#/dokument/dowod`…). Działają `?osoba=halina|tomasz|ola` (od razu Dokumenty tej osoby) i `?reset=1` (od początku). Ustawienia zapamiętywane w przeglądarce. „Wstecz” wraca do poprzedniego ekranu.
+  - SPECYFIKACJA.md: wersja 2.1 z 5 decyzjami z makiety.
+- Pliki: `index.html`, `style.css`, `app.js`, `dane.js` (nowe); `SPECYFIKACJA.md` (wersja 2.1); `warianty/dokumenty-1.html`, `dokumenty-2.html`, `dokumenty-3.html`, `dokumenty-wspolne.js`, `wyglad-1.js`, `wyglad-2.js`, `wyglad-3.js` → `warianty/archiwum/`; `warianty/porownanie.html` (poprawione ścieżki, nadal działa).
+- Jak sprawdzić: dwuklik na `index.html` w folderze projektu. Na start wybór osoby. Szybkie wejście: dopisz do adresu `?osoba=tomasz` (albo `halina`, `ola`); od początku: `?reset=1`.
+- Kontrola (według sekcji „Kontrola” specyfikacji; automatycznie, w przeglądarce opartej na Chrome):
+  - 71 ekranów na zestaw (wszystkie ekrany dla trzech osób, w tym szczegóły każdego dokumentu, każda wiadomość, wyniki wyszukiwania, brak wyników, gotowe pytania pod polem asystenta, okno „Niedostępne”), z włączonym czytaniem na głos.
+  - Szerokość 390 px (ramka telefonu): 3 rozmiary tekstu × 3 motywy + 3 zestawy z trybem prostym. Szerokość 320 px: 6 zestawów. Powiększenie 200% (640 × 360 px): 3 zestawy. Razem 21 zestawów — 0 błędów.
+  - Najmniejszy tekst: 16 px. Najsłabszy kontrast tekstu: 5,1:1 (biała litera „m” w czerwonym znaku aplikacji); reszta wyżej.
+  - Wszystkie elementy klikalne mają co najmniej 48 × 48 px (w portfelu: widoczna część paska karty), odstępy między nimi co najmniej 8 px.
+  - Nic nie wychodzi poza ekran, tekst nie nachodzi na tekst, napisy nie są ucięte (także podpowiedzi w polach). Dolny pasek zawsze w jednym rzędzie, podpisy 16 px.
+  - Każdy przycisk coś robi; każdy adres prowadzi do ekranu.
+  - Działa po otwarciu z pliku (bez serwera): sprawdzone w Edge i Chrome.
+  - Poprawione w trakcie: zdjęcie na karcie mDowodu rozciągało się przy dużym tekście; przy 320 px napis „Dokumenty” w dolnym pasku był o włos za szeroki, nagłówek zawijał się do dwóch linii, a pole asystenta wychodziło w bok; ucinała się podpowiedź w wyszukiwarce (teraz nad polem jest etykieta „Szukaj usługi”, a w polu „np. PESEL”); napis „Powiedz” był ściśnięty; okno „Niedostępne” pokazywało się w rogu zamiast na środku; za mały odstęp pod podpowiedziami na ekranie Asystent.
+- Znane problemy / do decyzji:
+  - **Reguła „bez przewijania”** (390 × 844, tekst Standardowy): u Tomasza i Oli (3 karty) widać mDowód, całą kartę „Wymaga Twojej uwagi” i pole asystenta, z zapasem 43 px. U Haliny (4 karty, jak w makiecie) karta uwagi wystaje 15 px pod pole asystenta; z jej trybem prostym — 35 px. Tak samo jest w samej makiecie. Nic nie ukryłem. Możliwe rozwiązania: krótszy tekst na karcie („Podatek od nieruchomości” w jednej linii) albo trochę niższe paski kart w portfelu.
+  - **Czcionka:** makieta wymienia Atkinson Hyperlegible, ale jej nie wczytuje, więc na komputerze autorki wyświetla się czcionka systemowa (Segoe UI). Zrobiłem tak samo. Do decyzji: czy wczytywać Atkinson Hyperlegible z Google Fonts (wtedy aplikacja wygląda tak samo na każdym komputerze, ale potrzebuje internetu do czcionki).
+  - **Wyszukiwarka:** tekst „Szukaj usługi, np. PESEL” rozdzielony na etykietę nad polem i podpowiedź „np. PESEL”, bo przy 320 px i dużym tekście się ucinał.
+  - **Pasek telefonu** jest tylko w ramce na komputerze; na prawdziwym telefonie jest jego własny pasek.
+  - **Pole asystenta** jest tylko na ekranach Dokumenty i Asystent (tak mówi specyfikacja). Przy wąskim ekranie i dużym tekście przycisk „Powiedz” przechodzi pod pole, żeby podpowiedź „Co chcesz załatwić?” była cała.
+  - **Licznik Skrzynki** ma 16 px zamiast 14 px z makiety (zasada: nic poniżej 16 px).
+  - **Dane wymyślone:** dokumenty osób (Tomasz: Skoda Octavia WX 4821K, prawo jazdy B, C, C+E; Ola: mLegitymacja studencka Uniwersytetu Gdańskiego, mPrawo jazdy), treść pism w Skrzynce (podatek 412 zł dla Haliny, przypomnienie o OC dla Tomasza, mLegitymacja dla Oli), lista 25 usług i ich opisy. Numery PESEL mają celowo błędną cyfrę kontrolną.
+  - Każdy wybór osoby zaczyna od świeżej Skrzynki (wiadomości znów są nowe) — wygodne przy pokazywaniu jury.
 
 ### 25.11.2026 Etap 1, runda 3 — trzy wyglądy ekranu Dokumenty
 - Zrobione:
