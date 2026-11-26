@@ -4,8 +4,9 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 
 ## Stan
 
-- Obowiązuje SPECYFIKACJA.md w wersji 2.5 (asystent zna wszystkie usługi i język ludzi; bez modelu językowego).
-- Ukończone (26.11.2026): rozbudowa asystenta (wszystkie usługi, język ludzi, dwie sprawy w zdaniu), „Powiedz” zawsze z komunikatem, rezygnacja z Bielika. Test zrozumienia: 100% na 167 zdaniach, 92,5% na nowych zdaniach przed poprawkami, 0 ślepych zaułków. Kontrola: 21 zestawów, 0 błędów.
+- Obowiązuje SPECYFIKACJA.md w wersji 2.6 (nowocześniejsze karty dokumentów, czerwień marki; wcześniej 2.5: asystent zna wszystkie usługi i język ludzi, bez modelu językowego).
+- Ukończone (26.11.2026, ostatnie): nowy wygląd kart dokumentów — własny gradient, wzór giloszowy i ikona każdego dokumentu, ilustrowane portrety, auto w kolorze z tablicą „PL”, głębia i błysk, jeden układ statusu we wszystkich rozmiarach; czerwony licznik Skrzynki; „Nic nie słychać — spróbuj jeszcze raz”. Kontrola: 72 zestawy, 600 ekranów, 0 błędów (po poprawkach); najsłabszy kontrast 4,72:1, najmniejszy tekst 16 px.
+- Wcześniej (26.11.2026): rozbudowa asystenta (wszystkie usługi, język ludzi, dwie sprawy w zdaniu), „Powiedz” zawsze z komunikatem, rezygnacja z Bielika. Test zrozumienia: 100% na 167 zdaniach, 92,5% na nowych zdaniach przed poprawkami, 0 ślepych zaułków. Kontrola: 21 zestawów, 0 błędów.
 - Wcześniej: etap 3 — asystent offline i sprawy A, B, C.
 - Następny krok: publikacja na GitHub Pages (robi autorka w GitHub Desktop), potem sprawdzenie adresu w podglądzie linku.
 - **Etap „Asystent i sprawy offline” (26.11.2026) — wszystkie kroki 1–6 ukończone:**
@@ -35,6 +36,36 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 - 26.11.2026: rezygnacja z modelu językowego Bielik — usunięte `bielik/`, `config.js` i kod łączenia z modelem; asystent działa wyłącznie na scenariuszach. Asystent zna wszystkie usługi, rozumie język ludzi i dwie sprawy w jednym zdaniu; „Powiedz” zawsze pokazuje komunikat (SPECYFIKACJA.md 2.5).
 
 ## Dziennik
+
+### 26.11.2026 Nowy wygląd kart dokumentów (SPECYFIKACJA.md 2.6)
+- Zrobione:
+  - **Każdy dokument ma własny charakter:** własny gradient (kolor i kierunek), własny wzór giloszowy (mDowód — rozeta i fale, mPrawo jazdy — koncentryczne kręgi, mLegitymacja studencka — siatka przeplatanych fal, mLegitymacja emeryta-rencisty — wstęgi, Karta Dużej Rodziny — splecione pierścienie, Moje pojazdy — szprychy koła i bieżnik) i własna ikona w prawym górnym rogu, narysowana od zera (tarcza z chipem, kierownica, czapka absolwenta, dłoń z sercem, rodzina, samochód). Bez godła i oficjalnych znaków. Ikona jest też na kartach z tyłu portfela.
+  - **Portrety zamiast inicjałów:** proste, płaskie ilustracje w SVG — Halina (siwe loki, okulary, fioletowy sweter z perełkami), Tomasz (krótkie włosy, broda, niebieska koszula), Ola (długie rude włosy, kolczyki, musztardowy sweter). Awatary na ekranie wyboru osoby i w „Więcej” zostają z inicjałów.
+  - **Moje pojazdy:** sylwetka auta w kolorze pojazdu (niebieska Skoda Octavia, szyby, światło, koła) i numer rejestracyjny jako tablica w polskim stylu — białe tło, niebieski pasek z „PL”. Czytnik ekranu czyta sam numer.
+  - **Karty jak plastikowe:** cień pod kartą, jasna krawędź u góry, jasna obwódka zdjęcia. Karta z przodu portfela co ok. 8 sekund dostaje delikatny przelatujący błysk; wyłączony przy „ogranicz ruch” i w trybie wysokiego kontrastu.
+  - **Kontrast ma pierwszeństwo:** najjaśniejsze miejsce każdej karty (jasny koniec gradientu + skrzyżowanie dwóch jasnych linii wzoru + błysk) liczone osobno; kolory dobrane tak, by biały tekst miał tam min. 4,5:1 (najsłabiej: 4,72:1).
+  - **Jeden układ statusu:** przy tekście Standardowym status zawsze po prawej od nazwy, przy Dużym i Bardzo dużym zawsze pod nazwą — na każdej karcie (z tyłu, z przodu, w szczegółach, w podglądzie). Żeby długie nazwy („mLegitymacja emeryta”) mieściły się w jednej linii obok statusu i ikony, nazwa na karcie ma 18 px (wcześniej 19), a ikona 24 px.
+  - **Wysoki kontrast:** grubsze białe ramki kart i statusów nie zabierają już miejsca (karty mają te same wymiary co w innych motywach) — dzięki temu u Tomasza dane mDowodu znów są w dwóch kolumnach, a pod portfelem jest więcej miejsca.
+  - **Czerwień marki:** licznik nowych wiadomości przy „Skrzynce” jest teraz czerwony (jak znak „m”, biała cyfra; w wysokim kontraście z białą obwódką). Poza tym czerwień nadal tylko dla spraw pilnych i błędów.
+  - **„Powiedz”:** zamiast „Nic nie usłyszałam” — neutralne „Nic nie słychać — spróbuj jeszcze raz.”
+  - SPECYFIKACJA.md 2.6: sekcja „Karty dokumentów” (gradient, wzory, ikony, portrety, głębia, błysk, jeden układ paska), „Kolory” (czerwień marki), „Czas i ruch”, „Oznaczenia”, pole Moje pojazdy (tablica), komunikat „Nic nie słychać”. README: grafiki kart.
+- Pliki: `app.js`, `dane.js` (kolor auta, pole tablicy), `style.css`, `SPECYFIKACJA.md`, `README.md`, `POSTEP.md`.
+- Jak sprawdzić: dwuklik na `index.html`, potem `?osoba=tomasz` (trzy różne karty, auto z tablicą: dotknij „Moje pojazdy”), `?osoba=halina` (tekst Duży — status pod nazwą na każdej karcie), `?osoba=ola` (ciemny motyw). Błysk widać na karcie z przodu co ok. 8 s. W „Dostosuj” zmień rozmiar tekstu i motyw — układ paska zmienia się tak samo na wszystkich kartach.
+- Kontrola (automatycznie w przeglądarce, z czekaniem na czcionkę Atkinson; na każdy zestaw: Dokumenty, każda karta z tyłu przesunięta na przód, szczegóły każdego dokumentu, układy „Małe karty” i „Lista”, Skrzynka — 25 ekranów na zestaw):
+  - 390 px (ramka telefonu): 3 osoby × 3 rozmiary tekstu × 3 motywy = 27 zestawów, 225 ekranów. Pierwszy przebieg: 13 błędów — w wysokim kontraście klikalny pasek karty z tyłu miał 46 px (po moim wyrównaniu ramek). Poprawione; powtórka wysokiego kontrastu (9 zestawów, 75 ekranów) — 0 błędów.
+  - 320 px: 27 zestawów, 225 ekranów — 0 błędów (powtórka wysokiego kontrastu po poprawce też 0).
+  - Powiększenie 200% (320 × 180 px widocznego obszaru): 9 zestawów, 75 ekranów — 0 błędów. Tryb prosty (390 px): 9 zestawów, 75 ekranów — 0 błędów.
+  - Razem 72 zestawy, 600 ekranów (+150 w powtórce). Najmniejszy tekst 16 px. Najsłabszy kontrast tekstu 4,72:1 — biały napis w najjaśniejszym miejscu karty mDowód (jasny koniec gradientu + skrzyżowanie jasnych linii + szczyt błysku); w wysokim kontraście min. 5,14:1. Najmniejszy element klikalny 48 px (widoczny pasek karty z tyłu). Nic nie wychodzi poza kartę ani poza ekran; nazwa, status i ikona nigdy się nie nakładają.
+  - **Układ statusu** sprawdzony na każdej karcie każdej osoby: tekst Standardowy — 240 z 240 pasków „status po prawej”, Duży — 240 z 240 „pod nazwą”, Bardzo duży — 240 z 240 „pod nazwą”. Ikona zawsze w prawym górnym rogu.
+  - **Błysk:** włączony w motywie jasnym i ciemnym, wyłączony w wysokim kontraście (sprawdzone na każdym zestawie); przy „ogranicz ruch” wyłącza go ta sama reguła co pozostałe animacje.
+  - **Bez przewijania** (390 × 844, tekst Standardowy): mDowód, karta „Wymaga Twojej uwagi” i pole asystenta widoczne u wszystkich, zapas: Halina 90 px (z trybem prostym 66), Tomasz 88 (64), Ola 115 (91); w wysokim kontraście 82 / 82 / 110 (wcześniej Halina 34, Tomasz 10).
+  - Poprawione w trakcie: ikona schodziła na środek paska przy nazwie w dwóch liniach; długie nazwy zawijały się przez ikonę i u Haliny karta uwagi wystawała pod pole asystenta (−6 px w wysokim kontraście) — teraz nazwa 18 px, ikona 24 px, a ramki wysokiego kontrastu nie zabierają miejsca; portrety dostawały czarny kontur ze wspólnego stylu ikon.
+  - Nie sprawdzałem ponownie: testu zdań asystenta (zmienił się tylko tekst komunikatu „Powiedz”) i otwarcia z pliku dwuklikiem (nie doszły żadne nowe pliki ani wczytywanie — wzory i rysunki są w kodzie).
+- Do decyzji:
+  - **Obrazek podglądu linku** (`media/podglad.png`) pokazuje jeszcze stary wygląd kart. Mogę go zrobić od nowa, jeśli chcesz.
+  - **Kolor auta Tomasza** — wybrałem niebieski (fikcyjny; jest tylko na rysunku, nie w danych).
+  - **Nazwa na karcie 18 px zamiast 19 px** — potrzebne, żeby ikona zmieściła się w pasku bez zawijania długich nazw (inaczej u Haliny karta „Wymaga Twojej uwagi” wystawała pod pole asystenta). Nadal pogrubiona i powyżej minimum 16 px.
+  - **Ikona dokumentu w pasku**, nie na środku karty — tylko tam jest „prawym górnym rogiem” i na karcie z przodu, i na kartach z tyłu.
 
 ### 26.11.2026 Rozbudowa asystenta, „Powiedz”, rezygnacja z Bielika (SPECYFIKACJA.md 2.5)
 - Zrobione:

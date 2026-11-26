@@ -22,13 +22,15 @@
   --pole-ramka: #8A91A3;
   --fokus: #1D3F8F;
   --logo: #D4213D;
-  --dowod: #1E4E9C;
-  --dowod-jasny: #2458B0;
-  --prawko: #A3264B;
-  --pojazdy: #9A4508;
-  --kdr: #5A3E9E;
-  --legitymacja: #0E6B62;
-  --emeryt: #22663F;
+  /* Karty dokumentów: kolor główny (też tekst przycisku na karcie) + gradient od jasnego do ciemnego.
+     Najjaśniejszy odcień dobrany tak, by biały tekst miał min. 4,5:1 nawet na skrzyżowaniu
+     jasnych linii wzoru i podczas błysku. */
+  --dowod: #1E4E9C;       --dowod-jasny: #2355A8;       --dowod-ciemny: #163A75;
+  --prawko: #962244;      --prawko-jasny: #AA2850;      --prawko-ciemny: #6A1931;
+  --pojazdy: #833A06;     --pojazdy-jasny: #904107;     --pojazdy-ciemny: #632C05;
+  --kdr: #573D9C;         --kdr-jasny: #6043A9;         --kdr-ciemny: #3B2968;
+  --legitymacja: #0B5B54; --legitymacja-jasny: #0C625A; --legitymacja-ciemny: #08443F;
+  --emeryt: #1E5A38;      --emeryt-jasny: #20603C;      --emeryt-ciemny: #154229;
   --tlo-strony: #D9DCE3;
   --cien-okna: rgba(10, 15, 30, .55);
   --fs: 18px;
@@ -156,7 +158,7 @@ html, .tresc { scroll-padding-top: calc(var(--pasek-gora, 0px) + 8px); }
 .ikona-btn svg { width: 24px; height: 24px; }
 .licznik {
   position: absolute; top: 0; right: 6px; min-width: 24px; height: 24px; border-radius: 12px;
-  background: var(--akcent); color: var(--powierzchnia); font-size: 16px; font-weight: 700; line-height: 1;
+  background: var(--logo); color: #fff; font-size: 16px; font-weight: 700; line-height: 1;
   display: grid; place-items: center; padding: 0 5px; border: 2px solid var(--powierzchnia);
 }
 /* Wąski telefon: nagłówek mieści się w jednym rzędzie przy tekście Standardowym */
@@ -206,35 +208,61 @@ h1:focus { outline: none; }
 }
 .btn-czytaj svg { width: 22px; height: 22px; }
 
-/* ---------- Karty dokumentów: jeden szablon, każda w swoim kolorze, z wzorem giloszowym ---------- */
-.k-dowod { --karta: var(--dowod); }
-.k-prawko { --karta: var(--prawko); }
-.k-pojazdy { --karta: var(--pojazdy); }
-.k-kdr { --karta: var(--kdr); }
-.k-legitymacja { --karta: var(--legitymacja); }
-.k-emeryt { --karta: var(--emeryt); }
+/* ---------- Karty dokumentów: jeden szablon, każdy dokument z własnym charakterem ----------
+   Własny gradient (kąt i odcienie), własny wzór giloszowy i własna ikona w prawym górnym rogu.
+   Głębia jak w plastikowej karcie: cień pod spodem i jasna krawędź u góry. */
+.k-dowod { --karta: var(--dowod); --karta-tlo: linear-gradient(135deg, var(--dowod-jasny), var(--dowod-ciemny)); --gilosz: var(--gilosz-dowod); }
+.k-prawko { --karta: var(--prawko); --karta-tlo: linear-gradient(160deg, var(--prawko-jasny) 10%, var(--prawko-ciemny)); --gilosz: var(--gilosz-prawko); }
+.k-pojazdy { --karta: var(--pojazdy); --karta-tlo: linear-gradient(115deg, var(--pojazdy-jasny), var(--pojazdy-ciemny) 90%); --gilosz: var(--gilosz-pojazdy); }
+.k-kdr { --karta: var(--kdr); --karta-tlo: linear-gradient(150deg, var(--kdr-jasny), var(--kdr-ciemny)); --gilosz: var(--gilosz-kdr); }
+.k-legitymacja { --karta: var(--legitymacja); --karta-tlo: linear-gradient(105deg, var(--legitymacja-jasny), var(--legitymacja-ciemny)); --gilosz: var(--gilosz-legitymacja); }
+.k-emeryt { --karta: var(--emeryt); --karta-tlo: linear-gradient(175deg, var(--emeryt-jasny), var(--emeryt-ciemny)); --gilosz: var(--gilosz-emeryt); }
 .portfel { position: relative; }
 .karta {
   display: block; position: relative; border-radius: 18px; color: #fff; overflow: hidden;
   padding: 14px 16px 16px; line-height: 1.25; text-decoration: none;
   background-color: var(--karta);
-  /* Wzór giloszowy (rozeta i fale z cienkich linii) + lekkie przyciemnienie ku dołowi */
-  background-image: var(--gilosz-rozeta), var(--gilosz-fale), linear-gradient(160deg, rgba(255, 255, 255, 0) 35%, rgba(0, 0, 0, .16));
+  background-image: var(--gilosz), var(--karta-tlo);
   background-repeat: no-repeat;
-  background-size: 340px 340px, 100% 72px, 100% 100%;
-  background-position: right -120px top -150px, 0 104px, 0 0;
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, .18);
+  background-size: 100% 100%, 100% 100%;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26), inset 0 0 0 1px rgba(255, 255, 255, .08), 0 -4px 10px rgba(0, 0, 0, .18);
 }
-.karta.k-dowod { background-image: var(--gilosz-rozeta), var(--gilosz-fale), linear-gradient(160deg, var(--dowod-jasny), var(--dowod)); }
-/* Pasek karty: nazwa i status — widoczny także na kartach z tyłu */
-.karta-gora { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px; }
-.karta-nazwa { font-weight: 700; font-size: 1.05rem; line-height: 1.3; }
+/* Karta z przodu i w szczegółach: wyraźniejszy cień pod spodem */
+.karta.przod, .karta.szczegoly {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26), inset 0 0 0 1px rgba(255, 255, 255, .08),
+    0 1px 2px rgba(0, 0, 0, .2), 0 12px 24px -10px rgba(8, 16, 40, .5);
+}
+/* Treść karty leży nad błyskiem */
+.karta-gora, .karta-cialo, .karta-kod { position: relative; z-index: 1; }
+/* Błysk: co ok. 8 s przez kartę z przodu przelatuje delikatne światło.
+   Wyłączony przy „ogranicz ruch” i w trybie wysokiego kontrastu. */
+.karta.przod::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; transform: translateX(-120%);
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .07) 55%, rgba(255, 255, 255, 0) 70%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motyw="kontrast"]) .karta.przod::after { animation: blysk 8s ease-in-out 2s infinite; }
+  @keyframes blysk { 0% { transform: translateX(-120%); } 16%, 100% { transform: translateX(120%); } }
+}
+/* Pasek karty: nazwa, status i ikona — widoczny także na kartach z tyłu.
+   Jeden układ na wszystkich kartach: przy tekście Standardowym status po prawej od nazwy,
+   przy Dużym i Bardzo dużym zawsze pod nazwą. Ikona zawsze w prawym górnym rogu. */
+.karta-gora { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: start; gap: 4px 8px; }
+.karta-nazwa { grid-column: 1; grid-row: 1; font-weight: 700; font-size: 1rem; line-height: 1.35; overflow-wrap: break-word; }
 .karta-status {
-  display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px 2px 7px; border-radius: 14px;
-  background: rgba(0, 0, 0, .24); font-size: 16px; font-weight: 700; line-height: 1.3;
+  grid-column: 2; grid-row: 1; justify-self: end; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 6px; border-radius: 14px;
+  background: rgba(0, 0, 0, .26); font-size: 16px; font-weight: 700; line-height: 1.3;
 }
 .karta-status svg { width: 18px; height: 18px; }
 .karta-status.alarm { background: #fff; color: #B3261E; }
+.karta-ikona {
+  grid-column: 3; grid-row: 1; width: 24px; height: 24px;
+  fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+:root[data-tekst="duzy"] .karta-gora, :root[data-tekst="bardzo-duzy"] .karta-gora { grid-template-columns: minmax(0, 1fr) auto; }
+:root[data-tekst="duzy"] .karta-status, :root[data-tekst="bardzo-duzy"] .karta-status { grid-column: 1; grid-row: 2; justify-self: start; }
+:root[data-tekst="duzy"] .karta-ikona, :root[data-tekst="bardzo-duzy"] .karta-ikona { grid-column: 2; grid-row: 1 / span 2; align-self: start; }
 /* Portfel: karty z tyłu to przyciski „Pokaż … na przodzie”; widać ich pasek (min. 48 px) */
 .portfel .karta + .karta { margin-top: -30px; }
 .karta.tyl { padding: 0; }
@@ -248,11 +276,28 @@ button.karta-gora:hover .karta-nazwa { text-decoration: underline; text-underlin
 .karta-cialo { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 14px; margin-top: 12px; }
 .karta-zdjecie {
   flex: none; width: 60px; height: 76px; border-radius: 10px; background: rgba(255, 255, 255, .92); color: var(--karta);
-  display: grid; place-items: center; font-weight: 800; font-size: 22px; line-height: 1;
+  display: grid; place-items: center; overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .55), 0 2px 6px rgba(0, 0, 0, .25);
 }
-.karta-zdjecie.auto { width: 84px; height: 60px; }
-.sylwetka { width: 68px; height: 43px; fill: currentColor; stroke: none; }
-.sylwetka .jasne { fill: rgba(255, 255, 255, .92); }
+.portret { display: block; width: 100%; height: 100%; stroke: none; }
+.karta-zdjecie.auto { width: 84px; height: 60px; background: linear-gradient(#F4F6FA 62%, #DFE3EA 62%); }
+.sylwetka { width: 72px; height: 45px; fill: currentColor; stroke: none; }
+.sylwetka .szyba { fill: #CFE0F2; }
+.sylwetka .blik { fill: none; stroke: rgba(255, 255, 255, .55); stroke-width: 1.2; stroke-linecap: round; }
+.sylwetka .lampa { fill: #F7D774; }
+.sylwetka .opona { fill: #262A33; }
+.sylwetka .felga { fill: #C9CED8; }
+.sylwetka .cien { fill: rgba(0, 0, 0, .16); }
+/* Tablica rejestracyjna w polskim stylu */
+.tablica {
+  display: inline-flex; align-items: stretch; margin-top: 3px; border: 2px solid #1A1D26; border-radius: 5px;
+  background: #fff; color: #111; overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, .3); max-width: 100%;
+}
+.tablica-pl {
+  display: flex; align-items: flex-end; justify-content: center; padding: 2px 4px 1px; background: #1F3F99; color: #fff;
+  font-size: 16px; font-weight: 700; line-height: 1.2;
+}
+.tablica-nr { padding: 1px 8px; font-weight: 700; letter-spacing: .06em; white-space: nowrap; line-height: 1.3; }
 .karta-pola { flex: 1 1 13em; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 0; }
 .karta-pole { flex: 1 1 6.4em; }
 .karta-pole.dlugie { flex-basis: 100%; }
@@ -283,20 +328,20 @@ button.karta-gora:hover .karta-nazwa { text-decoration: underline; text-underlin
   @keyframes wjazd { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
 }
 /* Szczegóły dokumentu: cała karta na górze */
-.karta.szczegoly { margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0, 0, 0, .14); }
+.karta.szczegoly { margin-bottom: 18px; }
 /* Układ „Małe karty”: wszystkie karty widać naraz */
 .male-karty { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.6em), 1fr)); gap: 10px; }
 .karta.mala {
   min-height: 112px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 10px;
-  padding: 14px; background-size: 220px 220px, 100% 50px, 100% 100%; background-position: right -90px top -100px, 0 64px, 0 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .14);
+  padding: 14px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26), 0 2px 6px rgba(0, 0, 0, .2);
 }
 a.karta.mala:hover .karta-nazwa { text-decoration: underline; text-underline-offset: 3px; }
 /* Mała karta w listach (układ „Lista”, Zarządzaj) */
 .mini-karta {
   flex: none; width: 46px; height: 32px; border-radius: 6px; background-color: var(--karta);
-  background-image: var(--gilosz-rozeta); background-size: 120px 120px; background-position: right -50px top -50px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12);
+  background-image: var(--gilosz), var(--karta-tlo); background-size: 160px 100px, 100% 100%; background-position: right top, 0 0;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26), 0 1px 3px rgba(0, 0, 0, .25);
 }
 /* Nad portfelem: „Zarządzaj” */
 .tytul-akcje { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
@@ -768,10 +813,17 @@ fieldset.z-bledem .opcja { border-color: var(--pilne); }
 /* ---------- Wysoki kontrast: obramowania zamiast tła ---------- */
 [data-motyw="kontrast"] .karta, [data-motyw="kontrast"] .mini-karta { background: #000; border: 3px solid #fff; box-shadow: none; }
 [data-motyw="kontrast"] .mini-karta { border-width: 2px; }
-[data-motyw="kontrast"] .karta-status { background: #000; border: 2px solid #fff; }
-[data-motyw="kontrast"] .karta-status.alarm, [data-motyw="kontrast"] .pole-alarm { background: #000; color: #FF9C92; border: 2px solid #FF9C92; }
-[data-motyw="kontrast"] .karta-zdjecie { background: #000; color: #fff; border: 2px solid #fff; }
-[data-motyw="kontrast"] .sylwetka .jasne { fill: #000; }
+/* Ramki w wysokim kontraście nie zabierają miejsca: karta i status mają te same wymiary co w innych motywach */
+[data-motyw="kontrast"] .karta { padding: 11px 13px 13px; }
+[data-motyw="kontrast"] .karta.tyl { padding: 0; }
+[data-motyw="kontrast"] .karta.tyl > .karta-gora { padding: 12px 13px 39px; }
+[data-motyw="kontrast"] .karta.mala { padding: 11px; }
+[data-motyw="kontrast"] .karta-status { background: #000; border: 0; box-shadow: inset 0 0 0 2px #fff; }
+[data-motyw="kontrast"] .karta-status.alarm { color: #FF9C92; box-shadow: inset 0 0 0 2px #FF9C92; }
+[data-motyw="kontrast"] .pole-alarm { background: #000; color: #FF9C92; border: 2px solid #FF9C92; }
+[data-motyw="kontrast"] .karta-zdjecie { background: #000; color: #fff; border: 2px solid #fff; box-shadow: none; }
+[data-motyw="kontrast"] .tablica { border-color: #fff; }
+[data-motyw="kontrast"] .licznik { border-color: #fff; }
 [data-motyw="kontrast"] .btn-pokaz { background: #FFE500; color: #000; }
 [data-motyw="kontrast"] .btn-zarzadzaj, [data-motyw="kontrast"] .rozwijane, [data-motyw="kontrast"] .kolejnosc-wiersz,
 [data-motyw="kontrast"] .komunikat-ok, [data-motyw="kontrast"] .ogloszenie:not(:empty), [data-motyw="kontrast"] .komunikat-dokumentu { border: 2px solid #fff; }

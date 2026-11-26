@@ -75,12 +75,69 @@
   function ikona(nazwa, klasa) {
     return '<svg' + (klasa ? ' class="' + klasa + '"' : '') + ' viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (IKONY[nazwa] || '') + '</svg>';
   }
-  /* Sylwetka auta (zamiast zdjęcia na karcie Moje pojazdy) — własny rysunek */
-  var SYLWETKA_AUTA = '<svg class="sylwetka" viewBox="0 0 64 40" aria-hidden="true" focusable="false">' +
-    '<path d="M3 26.5C3 24.3 4.5 22.5 6.6 22l7.9-1.9 6.6-7.3A6 6 0 0 1 25.6 11h13.2a6 6 0 0 1 4.6 2.1l6.1 7.1 7.9 1.5A4 4 0 0 1 61 25.6V29a2 2 0 0 1-2 2h-3.6a6.6 6.6 0 0 0-13 0H21.6a6.6 6.6 0 0 0-13 0H5a2 2 0 0 1-2-2z"/>' +
-    '<path class="jasne" d="M20.6 20.2l5.3-5.9a3 3 0 0 1 2.2-1H31.5v6.9zM34.5 13.3h4.3a3 3 0 0 1 2.3 1.1l5 5.8H34.5z"/>' +
-    '<circle cx="15.1" cy="31" r="5.2"/><circle cx="48.9" cy="31" r="5.2"/>' +
-    '<circle class="jasne" cx="15.1" cy="31" r="2"/><circle class="jasne" cx="48.9" cy="31" r="2"/></svg>';
+  /* Sylwetka auta w kolorze pojazdu (zamiast zdjęcia na karcie Moje pojazdy) — własny rysunek */
+  function sylwetkaAuta(kolor) {
+    return '<svg class="sylwetka" viewBox="0 0 64 40" aria-hidden="true" focusable="false" style="color:' + (kolor || '#5A6275') + '">' +
+      '<ellipse class="cien" cx="32" cy="36.6" rx="29" ry="2.4"/>' +
+      '<path d="M3 26.5C3 24.3 4.5 22.5 6.6 22l7.9-1.9 6.6-7.3A6 6 0 0 1 25.6 11h13.2a6 6 0 0 1 4.6 2.1l6.1 7.1 7.9 1.5A4 4 0 0 1 61 25.6V29a2 2 0 0 1-2 2h-3.6a6.6 6.6 0 0 0-13 0H21.6a6.6 6.6 0 0 0-13 0H5a2 2 0 0 1-2-2z"/>' +
+      '<path class="szyba" d="M20.6 20.2l5.3-5.9a3 3 0 0 1 2.2-1H31.5v6.9zM34.5 13.3h4.3a3 3 0 0 1 2.3 1.1l5 5.8H34.5z"/>' +
+      '<path class="blik" d="M8 24.6h5.5M27 23.6h2.6M37 23.6h2.6"/>' +
+      '<path class="lampa" d="M57.6 23.2l2.6.6a1.6 1.6 0 0 1 1 1.4v.6h-3.6z"/>' +
+      '<circle class="opona" cx="15.1" cy="31" r="5.4"/><circle class="opona" cx="48.9" cy="31" r="5.4"/>' +
+      '<circle class="felga" cx="15.1" cy="31" r="2.4"/><circle class="felga" cx="48.9" cy="31" r="2.4"/></svg>';
+  }
+  /* Tablica rejestracyjna w polskim stylu: białe tło, niebieski pasek z „PL” */
+  function tablica(numer) {
+    return '<span class="tablica"><span class="tablica-pl" aria-hidden="true">PL</span><span class="tablica-nr">' + numer + '</span></span>';
+  }
+
+  /* Portrety na kartach: proste, płaskie ilustracje (nie zdjęcia prawdziwych osób) */
+  function portret(id) {
+    var skora = { halina: '#F1C9A8', tomasz: '#E2AA82', ola: '#F4CDAA' }[id] || '#EBC1A0';
+    var szyja = { halina: '#E3B391', tomasz: '#D0946B', ola: '#E6B793' }[id] || '#DDAE8B';
+    var tlo = { halina: '#EFE7F4', tomasz: '#E4ECF5', ola: '#F6EDDF' }[id] || '#ECEFF4';
+    var s = '<svg class="portret" viewBox="0 0 60 76" aria-hidden="true" focusable="false"><rect width="60" height="76" fill="' + tlo + '"/>';
+    /* Włosy z tyłu (Ola: długie) */
+    if (id === 'ola') s += '<path d="M14.5 36C12.5 21 20 14.5 30 14.5S47.5 21 45.5 36l2.5 26c-5 2.5-9.5 1-11-3H24c-1.5 4-6 5.5-11 3z" fill="#7A3B27"/>';
+    /* Ubranie */
+    var ubranie = { halina: '#7B4B94', tomasz: '#2F5D8A', ola: '#D99A1E' }[id] || '#5A6275';
+    s += '<path d="M3 76C3 62.5 14.5 56 30 56s27 6.5 27 20z" fill="' + ubranie + '"/>';
+    if (id === 'halina') s += '<path d="M23.5 56.5 30 65l6.5-8.5z" fill="#F7F3EE"/><g fill="#F7F3EE"><circle cx="24" cy="59.5" r="1.1"/><circle cx="27" cy="62.3" r="1.1"/><circle cx="30" cy="63.3" r="1.1"/><circle cx="33" cy="62.3" r="1.1"/><circle cx="36" cy="59.5" r="1.1"/></g>';
+    if (id === 'tomasz') s += '<path d="M24 56.2 30 63l-2.6 2.4-6.4-6.6zM36 56.2 30 63l2.6 2.4 6.4-6.6z" fill="#F4F6F9"/>';
+    if (id === 'ola') s += '<path d="M22 57.5c2 3 5 4.5 8 4.5s6-1.5 8-4.5" fill="none" stroke="#B87D12" stroke-width="1.6"/>';
+    /* Szyja, głowa, uszy */
+    s += '<rect x="25" y="45" width="10" height="13" rx="4" fill="' + szyja + '"/>' +
+      '<circle cx="17.6" cy="35.5" r="2.8" fill="' + szyja + '"/><circle cx="42.4" cy="35.5" r="2.8" fill="' + szyja + '"/>' +
+      '<ellipse cx="30" cy="34" rx="12.6" ry="14.6" fill="' + skora + '"/>';
+    /* Włosy z przodu */
+    if (id === 'halina') s += '<path d="M15.6 38.5C13.5 26 19 16.5 30 16.5S46.5 26 44.4 38.5c-1.2-4.6-2.6-8.2-5-10.4-2.6 1.9-5.9 2.4-9.4 1.2-3.5 1.2-6.8.7-9.4-1.2-2.4 2.2-3.8 5.8-5 10.4z" fill="#B9BEC9"/>' +
+      '<g fill="#B9BEC9"><circle cx="16.4" cy="30" r="3.4"/><circle cx="43.6" cy="30" r="3.4"/><circle cx="21" cy="20.5" r="3.6"/><circle cx="39" cy="20.5" r="3.6"/><circle cx="30" cy="17.6" r="3.8"/></g>';
+    if (id === 'tomasz') s += '<path d="M17.4 32.5C16.8 22.5 22 18 30 18s13.2 4.5 12.6 14.5c-1.3-4.6-3.6-7.4-7.2-8.4-3.6 2-10.2 2.4-14.6.4-1.9 1.9-3 4.6-3.4 8z" fill="#3B2A22"/>' +
+      '<path d="M17.6 37.5c.6 8.6 6 12.8 12.4 12.8s11.8-4.2 12.4-12.8c-1.6 4.4-4 6.6-7.2 7.2-1.6-1.2-3.4-1.6-5.2-1.6s-3.6.4-5.2 1.6c-3.2-.6-5.6-2.8-7.2-7.2z" fill="#4D372C"/>';
+    if (id === 'ola') s += '<path d="M17.3 32C17.6 23 22.6 19 30 19s12.4 4 12.7 13c-3.6-3.4-7.6-5.4-12.2-6-2.6 3.2-7.4 5.2-13.2 6z" fill="#7A3B27"/>' +
+      '<circle cx="17.4" cy="39.6" r="1.4" fill="#E9B949"/><circle cx="42.6" cy="39.6" r="1.4" fill="#E9B949"/>';
+    /* Twarz: oczy, policzki, uśmiech */
+    s += '<circle cx="25.4" cy="35" r="1.5" fill="#2B2B33"/><circle cx="34.6" cy="35" r="1.5" fill="#2B2B33"/>' +
+      '<circle cx="22.3" cy="40.2" r="2.3" fill="#E58C7A" opacity=".45"/><circle cx="37.7" cy="40.2" r="2.3" fill="#E58C7A" opacity=".45"/>' +
+      '<path d="M26.2 41.6q3.8 3 7.6 0" fill="none" stroke="' + (id === 'tomasz' ? '#F6E3D6' : '#9A4E3C') + '" stroke-width="1.5" stroke-linecap="round"/>';
+    if (id === 'halina') s += '<g fill="none" stroke="#4A5163" stroke-width="1.2"><circle cx="25.4" cy="35" r="3.7"/><circle cx="34.6" cy="35" r="3.7"/><path d="M29.1 34.6q.9-.8 1.8 0M21.7 34.4l-3.3-1M38.3 34.4l3.3-1"/></g>';
+    if (id === 'ola') s += '<path d="M23 31.4q2.4-1.4 4.8-.3M32.2 31.1q2.4-1.1 4.8.3" fill="none" stroke="#5E2D1E" stroke-width="1.1" stroke-linecap="round"/>';
+    if (id === 'tomasz') s += '<path d="M22.8 31.2h5M32.2 31.2h5" fill="none" stroke="#3B2A22" stroke-width="1.4" stroke-linecap="round"/>';
+    return s + '</svg>';
+  }
+
+  /* Własne ikony dokumentów (prawy górny róg karty) — bez godła i oficjalnych znaków */
+  var IKONY_DOKUMENTOW = {
+    dowod: '<path d="M12 2.6 4.6 5.6v5.9c0 4.6 3.1 8.3 7.4 9.9 4.3-1.6 7.4-5.3 7.4-9.9V5.6z"/><rect x="8.6" y="8.4" width="6.8" height="6.4" rx="1.3"/><path d="M12 8.4v6.4M8.6 11.6h6.8"/>',
+    prawko: '<circle cx="12" cy="12" r="9.4"/><circle cx="12" cy="12" r="2.6"/><path d="M2.8 10.6 9.5 11.4M14.5 11.4l6.7-.8M12 14.6v6.8"/>',
+    legitymacja: '<path d="M2 9.2 12 4.6l10 4.6-10 4.6z"/><path d="M6 11v4.4c0 1.7 2.7 3.1 6 3.1s6-1.4 6-3.1V11"/><path d="M21.6 9.4v5.4"/><circle cx="21.6" cy="16.2" r=".9"/>',
+    emeryt: '<path d="M12 12.6S7.2 9.9 7.2 6.6a2.5 2.5 0 0 1 4.8-1 2.5 2.5 0 0 1 4.8 1c0 3.3-4.8 6-4.8 6z"/><path d="M2.4 15.4h3.2l3.6 1.6h4.3a1.5 1.5 0 0 1 0 3H9.8"/><path d="m13.9 19.5 5-2.5a1.5 1.5 0 0 1 1.7 2.4l-3.2 2.4H8.6l-2.9-1.2H2.4"/>',
+    kdr: '<circle cx="5.6" cy="6" r="2.4"/><circle cx="18.4" cy="6" r="2.4"/><circle cx="12" cy="11.6" r="1.9"/><path d="M2 20.6v-5.2a3.6 3.6 0 0 1 7.2 0v5.2M14.8 20.6v-5.2a3.6 3.6 0 0 1 7.2 0v5.2M9.6 21v-2.6a2.4 2.4 0 0 1 4.8 0V21"/>',
+    pojazdy: '<path d="M3.4 16.6v-3.4l2-4.8A2 2 0 0 1 7.3 7.1h9.4a2 2 0 0 1 1.9 1.3l2 4.8v3.4z"/><path d="M5.6 12.6h12.8"/><circle cx="7.6" cy="17.6" r="1.9"/><circle cx="16.4" cy="17.6" r="1.9"/>'
+  };
+  function ikonaDokumentu(rodzaj) {
+    return '<svg class="karta-ikona" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (IKONY_DOKUMENTOW[rodzaj] || '') + '</svg>';
+  }
 
   /* Kod kreskowy: paski z cyfr numeru (wzory cyfr jak w kodzie EAN; ilustracja w prototypie) */
   var WZORY_CYFR = ['3211', '2221', '2122', '1411', '1132', '1231', '1114', '1312', '1213', '3112'];
@@ -99,31 +156,92 @@
     return '<svg class="kod-paski" viewBox="0 0 ' + x + ' 40" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true" focusable="false">' + paski + '</svg>';
   }
 
-  /* Wzór giloszowy (jak na prawdziwych dokumentach): jasna rozeta z przeplatanych krzywych
-     i ciemne fale. Cienkie, prawie przezroczyste linie — tekst na karcie zostaje w pełni czytelny
-     (jasne linie są tak słabe, że nawet na ich skrzyżowaniu kontrast białego tekstu to min. 4,5:1;
-     ciemne fale kontrast tylko zwiększają). */
+  /* Wzory giloszowe (jak na prawdziwych dokumentach) — każdy dokument ma własny układ linii:
+     mDowód — rozeta i fale, mPrawo jazdy — koncentryczne kręgi, mLegitymacja studencka — siatka
+     przeplatanych fal, mLegitymacja emeryta-rencisty — wstęgi, Karta Dużej Rodziny — splecione
+     pierścienie, Moje pojazdy — szprychy koła i bieżnik opony.
+     Jasne linie są bardzo słabe (krzyżują się najwyżej dwie), ciemne tylko zwiększają kontrast:
+     biały tekst ma min. 4,5:1 także w najjaśniejszym miejscu karty, nawet podczas błysku. */
   function ustawGilosz() {
-    function krzywa(cx, cy, r0, amp, platki, faza, kroki) {
-      var d = '';
-      for (var i = 0; i <= kroki; i++) {
-        var a = i / kroki * Math.PI * 2;
-        var r = r0 + amp * Math.sin(platki * a + faza);
-        d += (i ? 'L' : 'M') + (cx + r * Math.cos(a)).toFixed(1) + ' ' + (cy + r * Math.sin(a)).toFixed(1);
+    var PI2 = Math.PI * 2;
+    function sciezka(punkty, zamknij) {
+      return '<path d="' + punkty.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('') + (zamknij ? 'Z' : '') + '"/>';
+    }
+    function rozeta(cx, cy, r0, amp, platki, faza) {
+      var pk = [];
+      for (var i = 0; i <= 240; i++) {
+        var a = i / 240 * PI2, r = r0 + amp * Math.sin(platki * a + faza);
+        pk.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
       }
-      return '<path d="' + d + 'Z"/>';
+      return sciezka(pk, true);
     }
-    var r = '', f = '', k, x;
-    for (k = 0; k < 10; k++) r += krzywa(150, 150, 112, 22, 9, k * Math.PI * 2 / 10, 216);
-    for (k = 0; k < 7; k++) r += krzywa(150, 150, 60, 12, 7, k * Math.PI * 2 / 7, 168);
-    for (k = 0; k < 5; k++) {
-      var d = '';
-      for (x = 0; x <= 400; x += 5) d += (x ? 'L' : 'M') + x + ' ' + (32 + 16 * Math.sin(x / 400 * Math.PI * 8 + k * Math.PI * 2 / 5)).toFixed(1);
-      f += '<path d="' + d + '"/>';
+    function fala(f) {
+      var pk = [];
+      for (var x = -10; x <= 410; x += 5) pk.push([x, f(x)]);
+      return sciezka(pk);
     }
+    function grupa(kolor, krycie, grubosc, tresc) {
+      return '<g stroke="' + kolor + '" stroke-opacity="' + krycie + '" stroke-width="' + grubosc + '">' + tresc + '</g>';
+    }
+    var JASNE = function (t) { return grupa('#fff', 0.06, 1, t); };
+    var CIEMNE = function (t) { return grupa('#000', 0.15, 1.2, t); };
+    var k, t, w = {};
+
+    /* mDowód: rozeta w prawym górnym rogu + fale przez środek */
+    t = ''; for (k = 0; k < 9; k++) t += rozeta(345, 30, 96, 20, 9, k * PI2 / 9);
+    var fale = ''; for (k = 0; k < 5; k++) fale += fala(function (x) { return 150 + 15 * Math.sin(x / 400 * Math.PI * 8 + k * PI2 / 5); });
+    w.dowod = JASNE(t) + CIEMNE(fale);
+
+    /* mPrawo jazdy: koncentryczne kręgi (jak kierownica) + falujące pierścienie z dołu */
+    t = ''; for (k = 30; k <= 330; k += 15) t += '<circle cx="372" cy="22" r="' + k + '"/>';
+    var pierscienie = '';
+    for (k = 70; k <= 320; k += 26) {
+      var pk = [], r0 = k;
+      for (var i = 0; i <= 240; i++) { var a = i / 240 * PI2, r = r0 + 5 * Math.sin(16 * a); pk.push([20 + r * Math.cos(a), 270 + r * Math.sin(a)]); }
+      pierscienie += sciezka(pk, true);
+    }
+    w.prawko = JASNE(t) + CIEMNE(pierscienie);
+
+    /* mLegitymacja studencka: siatka przeplatanych fal po skosie + mała rozeta */
+    var siatka = '';
+    for (k = -400; k <= 400; k += 24) {
+      siatka += fala(function (x) { return 0.45 * x + k + 5 * Math.sin(x / 14); });
+      siatka += fala(function (x) { return -0.45 * x + k + 200 + 5 * Math.sin(x / 14); });
+    }
+    t = ''; for (k = 0; k < 6; k++) t += rozeta(350, 34, 44, 9, 12, k * PI2 / 6);
+    w.legitymacja = JASNE(t) + grupa('#000', 0.12, 1, siatka);
+
+    /* mLegitymacja emeryta-rencisty: dwie łagodne wstęgi równoległych linii */
+    t = ''; for (k = 0; k < 14; k++) t += fala(function (x) { return 30 + k * 5 + 24 * Math.sin(x / 70 + 0.6); });
+    var wstega = ''; for (k = 0; k < 10; k++) wstega += fala(function (x) { return 168 + k * 6 + 18 * Math.sin(x / 55 + 2.4 + k * 0.04); });
+    w.emeryt = JASNE(t) + CIEMNE(wstega);
+
+    /* Karta Dużej Rodziny: rząd splecionych pierścieni + pętle u dołu */
+    t = ''; for (k = 190; k <= 430; k += 34) t += '<circle cx="' + k + '" cy="40" r="28"/>';
+    var petle = '';
+    for (k = 0; k < 3; k++) {
+      var pp = [];
+      for (var j = 0; j <= 600; j++) { var u = j / 600 * 56; pp.push([-10 + u * 8 + 12 * Math.cos(u), 190 + k * 18 + 12 * Math.sin(u)]); }
+      petle += sciezka(pp);
+    }
+    w.kdr = JASNE(t) + CIEMNE(petle);
+
+    /* Moje pojazdy: szprychy koła w rogu + bieżnik opony (jodełka) */
+    t = '';
+    for (k = 0; k < 36; k++) { var kat = k * PI2 / 36; t += sciezka([[360 + 26 * Math.cos(kat), 30 + 26 * Math.sin(kat)], [360 + 190 * Math.cos(kat), 30 + 190 * Math.sin(kat)]]); }
+    t += '<circle cx="360" cy="30" r="22"/>';
+    var biez = '';
+    for (k = 0; k < 7; k++) {
+      var zz = [], n = 0;
+      for (var xx = -20; xx <= 420; xx += 18) zz.push([xx, 140 + k * 15 + (n++ % 2 ? 7 : -7)]);
+      biez += sciezka(zz);
+    }
+    w.pojazdy = JASNE(t) + CIEMNE(biez);
+
     function adres(svg) { return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")'; }
-    html.style.setProperty('--gilosz-rozeta', adres('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none" stroke="#fff" stroke-opacity=".075" stroke-width="1">' + r + '</svg>'));
-    html.style.setProperty('--gilosz-fale', adres('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 64" preserveAspectRatio="none" fill="none" stroke="#000" stroke-opacity=".16" stroke-width="1.2">' + f + '</svg>'));
+    Object.keys(w).forEach(function (rodzaj) {
+      html.style.setProperty('--gilosz-' + rodzaj, adres('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" preserveAspectRatio="xMaxYMin slice" fill="none">' + w[rodzaj] + '</svg>'));
+    });
   }
 
   /* ---------- Pomocnicze ---------- */
@@ -304,12 +422,13 @@
   }
   function poleKarty(p) {
     var cechy = p[2] || '';
-    var wartosc = cechy.indexOf('alarm') >= 0 ? '<span class="pole-alarm">' + ikona('uwaga') + '<span>' + p[1] + '</span></span>' : p[1];
+    var wartosc = cechy.indexOf('alarm') >= 0 ? '<span class="pole-alarm">' + ikona('uwaga') + '<span>' + p[1] + '</span></span>' :
+      cechy.indexOf('tablica') >= 0 ? tablica(p[1]) : p[1];
     return '<div class="karta-pole' + (cechy.indexOf('dlugie') >= 0 ? ' dlugie' : '') + '"><dt>' + p[0] + '</dt><dd>' + wartosc + '</dd></div>';
   }
   function zdjecieKarty(o, d) {
-    if (d.rodzaj === 'pojazdy') return '<div class="karta-zdjecie auto" aria-hidden="true">' + SYLWETKA_AUTA + '</div>';
-    return '<div class="karta-zdjecie" aria-hidden="true">' + o.inicjaly + '</div>';
+    if (d.rodzaj === 'pojazdy') return '<div class="karta-zdjecie auto" aria-hidden="true">' + sylwetkaAuta(d.pojazd && d.pojazd.kolorAuta) + '</div>';
+    return '<div class="karta-zdjecie" aria-hidden="true">' + portret(o.id) + '</div>';
   }
   /* tryb: 'przod' (z przodu portfela), 'tyl' (karta z tyłu — przycisk), 'szczegoly',
      'podglad' i 'tyl-podglad' (podgląd w ustawieniach, bez klikania), 'mala' (układ Małe karty) */
@@ -317,13 +436,15 @@
     var klasa = 'karta k-' + d.kolor;
     /* W portfelu krótsza nazwa (np. „mLegitymacja emeryta”), pełna w szczegółach */
     var nazwa = '<span class="karta-nazwa">' + (tryb === 'szczegoly' ? d.nazwa : d.nazwaKrotka || d.nazwa) + '</span>';
+    /* Pasek karty: nazwa, status i własna ikona dokumentu — ten sam układ na każdej karcie */
+    var gora = nazwa + statusKarty(d) + ikonaDokumentu(d.rodzaj);
     if (tryb === 'tyl') {
       return '<div class="' + klasa + ' tyl" data-id="' + d.id + '">' +
         '<button type="button" class="karta-gora" data-akcja="na-przod" data-id="' + d.id + '" aria-label="Pokaż ' + d.nazwa + ' na przodzie. ' + d.status + '">' +
-          nazwa + statusKarty(d) + '</button></div>';
+          gora + '</button></div>';
     }
     if (tryb === 'tyl-podglad') {
-      return '<div class="' + klasa + ' tyl" data-id="' + d.id + '"><div class="karta-gora">' + nazwa + statusKarty(d) + '</div></div>';
+      return '<div class="' + klasa + ' tyl" data-id="' + d.id + '"><div class="karta-gora">' + gora + '</div></div>';
     }
     if (tryb === 'mala') {
       return '<a class="' + klasa + ' mala" href="#/dokument/' + d.id + '">' + nazwa + statusKarty(d) + '</a>';
@@ -334,7 +455,7 @@
     if (tryb === 'przod') przycisk = '<a class="btn-pokaz" href="#/dokument/' + d.id + '" aria-label="Pokaż szczegóły: ' + d.nazwa + '">' + ikona('oko') + 'Pokaż szczegóły</a>';
     if (tryb === 'podglad') przycisk = '<span class="btn-pokaz">' + ikona('oko') + 'Pokaż szczegóły</span>';
     return '<div class="' + klasa + (tryb === 'szczegoly' ? ' szczegoly' : ' przod') + '" data-id="' + d.id + '">' +
-      '<div class="karta-gora">' + nazwa + statusKarty(d) + '</div>' + cialo + przycisk + '</div>';
+      '<div class="karta-gora">' + gora + '</div>' + cialo + przycisk + '</div>';
   }
   function statusWiersza(d) {
     return d.alarm ? '<span class="status-pilne">' + ikona('uwaga') + d.status + '</span>' :
@@ -1652,7 +1773,7 @@
   /* „Powiedz” nigdy nie milczy: „Słucham…” podczas nagrywania, a przy każdym błędzie jasny komunikat */
   var MOWA_MIKROFON = 'Zezwól na mikrofon w ustawieniach przeglądarki. Możesz też wpisać pytanie.';
   var MOWA_BEZ_MIKROFONU = 'Nie znaleziono mikrofonu. Podłącz mikrofon albo wpisz pytanie.';
-  var MOWA_CISZA = 'Nic nie usłyszałam — spróbuj jeszcze raz.';
+  var MOWA_CISZA = 'Nic nie słychać — spróbuj jeszcze raz.';
   var MOWA_INNY = 'Nie udało się rozpoznać mowy. Spróbuj jeszcze raz albo wpisz pytanie.';
   var statusMowy = document.getElementById('status-mowy');
   function pokazStatusMowy(tekst) {

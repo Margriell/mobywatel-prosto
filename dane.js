@@ -35,7 +35,7 @@
 
   /* Dokumenty: kolejność jak w Zarządzaj — pierwszy leży z przodu portfela.
      pola = dane na karcie (jak na prawdziwym dokumencie); dane = sekcja „Dane” w szczegółach.
-     Trzeci element: 'dlugie' (cała szerokość karty), 'alarm' (ostrzeżenie: ikona + słowa). */
+     Trzeci element: 'dlugie' (cała szerokość karty), 'alarm' (ostrzeżenie: ikona + słowa), 'tablica' (tablica rejestracyjna). */
   var OSOBY = {
     halina: {
       id: 'halina', imie: 'Halina', wolacz: 'Halino', nazwisko: 'Wiśniewska', inicjaly: 'HW', wiek: '71 lat',
@@ -113,9 +113,9 @@
           dane: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Kategorie', 'B, C, C+E'], ['Ważne do', '22.06.2031']],
           aktualizacja: aktualizacja(4, '18:31') },
         { id: 'pojazdy', rodzaj: 'pojazdy', nazwa: 'Moje pojazdy', kolor: 'pojazdy', status: 'OC: 12 dni', ikonaStatusu: 'uwaga', alarm: true,
-          pojazd: { marka: 'Skoda Octavia', numer: 'WX 4821K', oc: KONIEC_OC_TOMASZA, ocDni: 12, badanie: '14.05.2027',
+          pojazd: { marka: 'Skoda Octavia', numer: 'WX 4821K', kolorAuta: '#2D6CC0', oc: KONIEC_OC_TOMASZA, ocDni: 12, badanie: '14.05.2027',
             przypomnienieOc: formatuj(dataZaDni(5)), przypomnienieBadanie: '07.05.2027' },
-          pola: [['Marka i model', 'Skoda Octavia'], ['Numer rejestracyjny', 'WX 4821K'],
+          pola: [['Marka i model', 'Skoda Octavia'], ['Numer rejestracyjny', 'WX 4821K', 'tablica'],
             ['OC ważne do', KONIEC_OC_TOMASZA + ' — zostało 12 dni', 'alarm dlugie'], ['Badanie techniczne do', '14.05.2027', 'dlugie']],
           dane: [['Marka i model', 'Skoda Octavia'], ['Numer rejestracyjny', 'WX 4821K'],
             ['OC ważne do', KONIEC_OC_TOMASZA + ' — zostało 12 dni', 'alarm'], ['Badanie techniczne do', '14.05.2027']],

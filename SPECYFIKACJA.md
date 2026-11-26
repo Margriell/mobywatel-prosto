@@ -1,6 +1,6 @@
 # Specyfikacja prototypu „mObywatel dla każdego”
 
-Wersja 2.5 · 26.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu; 2.3: asystent offline i sprawy A, B, C; 2.4: poprawki po teście, publikacja; 2.5: asystent zna wszystkie usługi i język ludzi, rezygnacja z modelu językowego)
+Wersja 2.6 · 26.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu; 2.3: asystent offline i sprawy A, B, C; 2.4: poprawki po teście, publikacja; 2.5: asystent zna wszystkie usługi i język ludzi, rezygnacja z modelu językowego; 2.6: nowocześniejsze karty dokumentów, czerwień marki)
 
 Klikalny prototyp aplikacji mObywatel na konkurs mObywatel Challenge (termin zgłoszenia: 26.11 wieczorem). Konkurs ma pierwszeństwo: prototyp ma być lepszy od prototypu referencyjnego Janusza Cieszyńskiego (mobywatel.ai), mieć na to dowody i wyróżniać się.
 
@@ -65,15 +65,15 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 | Tekst | Podstawowy 18 px, nagłówki 22–28 px, nic poniżej 16 px. Interlinia 1,5. Rozmiary: Standardowy (18), Duży (22), Bardzo duży (26), skalowane jedną zmienną. Podpisy dolnego paska stałe 16 px, pasek zawsze w jednym rzędzie |
 | Czcionka | Atkinson Hyperlegible wczytywana z Google Fonts; zapasowo czcionka systemowa — bez internetu aplikacja działa dalej |
 | Motywy | Jasny (jak makieta: jasnoszare tło, białe powierzchnie, granatowy akcent), Ciemny, Wysoki kontrast. Wszystkie kolory jako zmienne CSS. W każdym motywie tekst min. 4,5:1, ikony i obramowania min. 3:1 |
-| Kolory | Kolor mają tylko karty dokumentów. Reszta interfejsu jest spokojna: białe powierzchnie, jeden akcent (granat) — akcje. Czerwień — wyłącznie sprawy z terminem lub ryzykiem i błędy. Zieleń — sukces. Zawsze z ikoną i słowem |
+| Kolory | Kolor mają tylko karty dokumentów. Reszta interfejsu jest spokojna: białe powierzchnie, jeden akcent (granat) — akcje. Czerwień — akcent marki (znak „mObywatel” i licznik nowych wiadomości przy „Skrzynce”), poza tym wyłącznie sprawy z terminem lub ryzykiem i błędy. Zieleń — sukces. Zawsze z ikoną i słowem |
 | Przyciski | Min. 48 × 48 px, odstęp min. 8 px. Główny przycisk na całą szerokość, 56 px |
 | Ikony | Zawsze z podpisem |
 | Język | Zdania do 15 słów, na „Ty”, bez żargonu, formy neutralne płciowo |
 | Układ | Jedna kolumna, naturalny przepływ, nic się nie nakłada, jednostki rem. Działa przy 320 px i powiększeniu 200%. Jedyny wyjątek: portfel kart dokumentów — karty leżą jedna za drugą, ale pasek każdej karty (nazwa i status) jest w całości widoczny i ma min. 48 px wysokości |
 | Nawigacja | Dolny pasek widoczny poza krokami sprawy, zawsze na samym dole ekranu — na każdej zakładce, w każdym rozmiarze tekstu i motywie (przewija się tylko treść, nigdy cała ramka). Na każdym podekranie górny pasek z „Wstecz” (z napisem) i tytułem ekranu, przyklejony u góry — nie znika przy przewijaniu. W sprawach „Krok 2 z 4” |
-| Czas i ruch | Brak limitów czasu i znikających komunikatów. Animacje subtelne, wyłączone przy „ogranicz ruch” |
+| Czas i ruch | Brak limitów czasu i znikających komunikatów. Animacje subtelne, wyłączone przy „ogranicz ruch” (także błysk na karcie dokumentu, który dodatkowo nie działa w trybie wysokiego kontrastu) |
 | Czytniki ekranu | `lang="pl"`, nagłówki, etykiety pól, `aria-live` dla asystenta, pola wyboru ogłaszające zaznaczenie, widoczny fokus |
-| Oznaczenia | Nazwa „mObywatel”. Ikona: czerwony kwadrat z zaokrąglonymi rogami i prostym białym znakiem własnego projektu — bez godła i oficjalnego logo. Informacja „Prototyp konkursowy, dane fikcyjne” tylko na ekranie wyboru osoby i w „Więcej”. Awatary z inicjałów |
+| Oznaczenia | Nazwa „mObywatel”. Ikona: czerwony kwadrat z zaokrąglonymi rogami i prostym białym znakiem własnego projektu — bez godła i oficjalnego logo. Informacja „Prototyp konkursowy, dane fikcyjne” tylko na ekranie wyboru osoby i w „Więcej”. Awatary z inicjałów (wybór osoby, Więcej); na kartach dokumentów ilustrowane portrety (nie zdjęcia prawdziwych osób) |
 
 ## Osoby (pokazują, że aplikacja jest dla młodych i starszych)
 
@@ -123,13 +123,21 @@ Gotowe pytania asystenta (3 pierwsze pod polem asystenta, 4 na pustym ekranie As
 5. Pole asystenta przypięte nad dolnym paskiem („Co chcesz załatwić?” + „Powiedz”); po dotknięciu pola 3 gotowe pytania. Wcześniejszy blok asystenta pod kartą sprawy usunięty.
 Przy tekście Standardowym na 390 × 844 bez przewijania widać mDowód, kartę sprawy i pole asystenta. Jeśli się nie mieści — zapytaj autorkę, zanim coś ukryjesz.
 
-**Karty dokumentów.** Każda karta wygląda jak prawdziwy dokument: jeden wspólny szablon, każda w swoim kolorze, z delikatnym wzorem giloszowym jak na prawdziwych dokumentach. Tekst pozostaje w pełni czytelny (kontrast min. 4,5:1). Na górze karty pasek z nazwą i statusem. Pola na kartach:
-- mDowód: zdjęcie (inicjały), imię, nazwisko, data urodzenia, PESEL.
+**Karty dokumentów.** Każda karta wygląda jak prawdziwa plastikowa karta: jeden wspólny szablon, ale każdy dokument ma własny charakter. Nowocześnie, po swojemu — nie kopiujemy prototypu referencyjnego. Czytelność i kontrast min. 4,5:1 mają pierwszeństwo przed efektami (także w najjaśniejszym miejscu karty i podczas błysku).
+- **Tło:** gradient w kolorze dokumentu (każdy dokument ma własny kolor i kierunek gradientu).
+- **Wzór giloszowy:** inny układ cienkich linii dla każdego dokumentu — mDowód: rozeta i fale; mPrawo jazdy: koncentryczne kręgi; mLegitymacja studencka: siatka przeplatanych fal; mLegitymacja emeryta-rencisty: wstęgi; Karta Dużej Rodziny: splecione pierścienie; Moje pojazdy: szprychy koła i bieżnik.
+- **Ikona dokumentu** w prawym górnym rogu, narysowana przez nas (bez godła i oficjalnych znaków): mDowód — tarcza z chipem, mPrawo jazdy — kierownica, mLegitymacja studencka — czapka absolwenta, mLegitymacja emeryta-rencisty — dłoń z sercem, Karta Dużej Rodziny — rodzina, Moje pojazdy — samochód.
+- **„Zdjęcie”:** prosty, ilustrowany portret osoby w SVG (przyjazny, płaski styl, inny dla Haliny, Tomasza i Oli). Nie używamy zdjęć prawdziwych osób.
+- **Głębia:** delikatny cień pod kartą i subtelny połysk krawędzi. Karta z przodu portfela co ok. 8 sekund dostaje delikatny przelatujący błysk — wyłączony przy „ogranicz ruch” i w trybie wysokiego kontrastu.
+- **Pasek karty (nazwa, status, ikona):** ten sam układ na wszystkich kartach — z tyłu i z przodu, w szczegółach i w podglądzie. Tekst Standardowy: status zawsze po prawej od nazwy (długa nazwa zawija się w swojej kolumnie). Tekst Duży i Bardzo duży: status zawsze pod nazwą. Ikona zawsze w prawym górnym rogu.
+
+Pola na kartach:
+- mDowód: zdjęcie (portret), imię, nazwisko, data urodzenia, PESEL.
 - mPrawo jazdy: zdjęcie, imię, nazwisko, kategorie, ważne do.
 - mLegitymacja studencka: zdjęcie, imię, nazwisko, data urodzenia, PESEL, nazwa uczelni, numer albumu, data wydania, kod kreskowy.
 - mLegitymacja emeryta-rencisty: zdjęcie, imię, nazwisko, PESEL, organ wydający (ZUS), ważność.
 - Karta Dużej Rodziny: zdjęcie, imię, nazwisko, numer karty, ważna bezterminowo.
-- Moje pojazdy: sylwetka auta zamiast zdjęcia, marka i model, numer rejestracyjny, OC ważne do, badanie techniczne do (u Tomasza ostrzeżenie o OC).
+- Moje pojazdy: sylwetka auta w kolorze pojazdu zamiast zdjęcia, marka i model, numer rejestracyjny jako tablica w polskim stylu (białe tło, niebieski pasek z „PL”), OC ważne do, badanie techniczne do (u Tomasza ostrzeżenie o OC).
 
 **5. Szczegóły dokumentu** (jak w mObywatelu). Na górze podgląd karty, pod nim sekcja „Dane”, ostatnia aktualizacja, a potem akcje. Akcje spoza prototypu otwierają okno „Niedostępne w prototypie”.
 - mDowód — Dane: seria i numer dowodu, termin ważności, data wydania, imię ojca, imię matki, rozwijane „Twoje dodatkowe dane”, ostatnia aktualizacja. Akcje: „Potwierdź swoje dane osobiste”, „Dane dowodu osobistego”. „Pozostałe skróty”: Zastrzeż PESEL, Zgłoś utratę dowodu (→ sprawa A), Mandaty, Wybory, Usuń dokument.
@@ -192,7 +200,7 @@ Rozpoznaje sprawę, zadaje najwyżej 1–2 pytania i przekazuje do tych samych w
 - Działa bez internetu i bez serwera. Każda sprawa to jeden wpis w jednym miejscu w `asystent.js`: słowa kluczowe, odpowiedź, przyciski, dokąd prowadzi. Całe rozpoznawanie w jednej funkcji `rozpoznajSprawe(tekst)`, wyłącznie na scenariuszach — bez modelu językowego (autorka zrezygnowała z niego 26.11.2026).
 - Tekst bez polskich znaków i małymi literami, z tolerancją literówek (1 literówka w słowach od 5 liter, 2 od 8 liter); szerokie listy słów: A — zgubić, ukradli, kradzież, portfel, torebka, dowód, zastrzec, PESEL, karta; B — OC, ubezpieczenie, przegląd, badanie, samochód, auto; C — meldunek, zameldować, przeprowadzka, nowy adres. Gdy żadna sprawa nie pasuje, asystent szuka w liście Usług.
 - Gdy nie rozumie: „Nie rozumiem jeszcze tej prośby. Mogę pomóc w tych sprawach:” + przyciski działających spraw + „Zobacz wszystkie usługi”. Nigdy „tego nie załatwię”.
-- Najwyżej 2 krótkie zdania na wiadomość, jedno pytanie naraz, każda wiadomość kończy się przyciskami następnego kroku albo kartą sprawy („Zacznij” / „Wolę przejść krok po kroku sam(a)”). Wybór wielu opcji jako pola wyboru. Przy każdej odpowiedzi „Przeczytaj na głos” (głosy systemu — działa bez internetu). „Powiedz” używa rozpoznawania mowy w przeglądarce (Chrome, Edge) i **nigdy nie milczy**: podczas nagrywania nad polem jest „Słucham… Powiedz, co chcesz załatwić.”, a przy błędzie zawsze jasny komunikat — brak dostępu do mikrofonu: „Zezwól na mikrofon w ustawieniach przeglądarki”; nic nie usłyszano: „Nic nie usłyszałam — spróbuj jeszcze raz”; brak mikrofonu; brak internetu: „Mówienie wymaga internetu…”; przeglądarka bez obsługi mówienia (np. Opera, Firefox) albo taka, która nie zacznie słuchać w 5 sekund: „Ta przeglądarka nie obsługuje mówienia. Wpisz pytanie albo otwórz aplikację w Chrome lub Edge.”
+- Najwyżej 2 krótkie zdania na wiadomość, jedno pytanie naraz, każda wiadomość kończy się przyciskami następnego kroku albo kartą sprawy („Zacznij” / „Wolę przejść krok po kroku sam(a)”). Wybór wielu opcji jako pola wyboru. Przy każdej odpowiedzi „Przeczytaj na głos” (głosy systemu — działa bez internetu). „Powiedz” używa rozpoznawania mowy w przeglądarce (Chrome, Edge) i **nigdy nie milczy**: podczas nagrywania nad polem jest „Słucham… Powiedz, co chcesz załatwić.”, a przy błędzie zawsze jasny komunikat — brak dostępu do mikrofonu: „Zezwól na mikrofon w ustawieniach przeglądarki”; nic nie usłyszano: „Nic nie słychać — spróbuj jeszcze raz” (forma neutralna); brak mikrofonu; brak internetu: „Mówienie wymaga internetu…”; przeglądarka bez obsługi mówienia (np. Opera, Firefox) albo taka, która nie zacznie słuchać w 5 sekund: „Ta przeglądarka nie obsługuje mówienia. Wpisz pytanie albo otwórz aplikację w Chrome lub Edge.”
 - Szybkie sprawy (odpowiedź 1–2 zdania + przycisk do właściwego ekranu lub danych): wytłumacz pismo (od kogo, ile, do kiedy, co zrobić; „Pokaż pismo”, „Jak zapłacić?”), czy ten SMS to oszustwo (3 znaki rozpoznawcze, czego nie robić, przekazanie SMS-a na 8080), pokaż dowód / kod QR, ważność dokumentu, punkty karne, mandat do zapłaty, gdzie głosuję, zniżki z legitymacji (ogólnie, bez liczb), gdzie użyć Karty Dużej Rodziny (ogólnie), czy PESEL jest zastrzeżony (+ „Zastrzeż PESEL”). Gdy osoba nie ma dokumentu, o który pyta — uprzejma informacja i co może zrobić.
 - **Asystent zna wszystkie usługi** z zakładki Usługi: każda ma wpis w `asystent.js` (słowa kluczowe i synonimy + jedno zdanie, czym jest usługa — ogólnie, bez kwot i terminów — + przycisk „Otwórz usługę”; niedziałające otwierają okno „Niedostępne w prototypie” z listą działających spraw).
 - **Język ludzi:** asystent rozumie długie, grzeczne zdania („Dzień dobry, chciałabym zapytać, co mam zrobić, bo zgubiłam…”), potoczne słowa i zdrobnienia (dowodzik, portfelik, autko, legitka, ubezpieczenie od auta, meldunek, przeprowadzka, ściema), literówki, brak polskich znaków oraz tekst z rozpoznawania mowy (bez interpunkcji i wielkich liter, np. „o ce” zamiast „OC”).

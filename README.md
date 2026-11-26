@@ -55,5 +55,5 @@ Asystent działa bez serwera i bez internetu, wyłącznie na wbudowanych scenari
 - **Kod prototypu:** © 2026 autorka projektu. Udostępniony do oceny w konkursie mObywatel Challenge. Prototyp konkursowy, dane fikcyjne.
 - **Ikony:** [Lucide](https://lucide.dev) — licencja ISC (wcześniej Feather, licencja MIT).
 - **Czcionka:** [Atkinson Hyperlegible](https://fonts.google.com/specimen/Atkinson+Hyperlegible) (Braille Institute of America) — licencja SIL Open Font License 1.1, wczytywana z Google Fonts.
-- **Znak „m” i grafiki kart** (wzór giloszowy, sylwetka auta) — własny projekt. Prototyp nie używa godła ani oficjalnego logo.
+- **Znak „m” i grafiki kart** (wzory giloszowe, ikony dokumentów, ilustrowane portrety osób, sylwetka auta, tablica rejestracyjna) — własny projekt. Prototyp nie używa godła, oficjalnego logo ani zdjęć prawdziwych osób.
 - Nazwa „mObywatel” odnosi się do aplikacji, której ten prototyp dotyczy. Prototyp nie jest produktem administracji publicznej.
