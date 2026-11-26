@@ -44,13 +44,11 @@ Warto też zapytać asystenta jako Halina: „Wytłumacz mi pismo” i „Czy te
 | `app.js` | ekrany, sprawy A, B, C, rozmowa z asystentem |
 | `asystent.js` | asystent: jedna sprawa = jeden wpis, rozpoznawanie w `rozpoznajSprawe(tekst)` |
 | `dane.js` | fikcyjne osoby, dokumenty, wiadomości i usługi |
-| `config.js` | ustawienia asystenta (adres modelu językowego — domyślnie pusty) |
-| `bielik/` | przygotowanie pod model Bielik: pośrednik (Cloudflare Worker) i instrukcja `INSTRUKCJA.md` |
 | `media/` | ikona i obrazek podglądu linku |
 | `SPECYFIKACJA.md`, `POSTEP.md` | specyfikacja i dziennik prac |
 | `warianty/` | dokumentacja procesu: wcześniejsze warianty wyglądu (nie są częścią aplikacji) |
 
-Asystent działa bez serwera, na wbudowanych scenariuszach. Model językowy (np. Bielik) można podłączyć później — wystarczy wpisać adres pośrednika w `config.js`.
+Asystent działa bez serwera i bez internetu, wyłącznie na wbudowanych scenariuszach z `asystent.js`.
 
 ## Licencja i źródła
 

@@ -909,30 +909,7 @@
   function zapytaj(tekst, dodatki) {
     tekst = String(tekst || '').trim();
     if (!tekst) return;
-    var A = window.ASYSTENT;
-    if (!A.modelWlaczony()) {
-      /* Bez modelu: odpowiedź od razu, ze scenariuszy (bez internetu) */
-      pokazOdpowiedz(dodajWymiane(tekst, A.odpowiedz(tekst, kontekstAsystenta(dodatki))), 2);
-      return;
-    }
-    /* Z modelem (config.js): najpierw „Chwileczkę…”, potem odpowiedź — najwyżej po 6 sekundach */
-    var czeka = dodajWymiane(tekst, { zdania: ['Chwileczkę…'], przyciski: [] });
-    pokazOdpowiedz(czeka, 2);
-    A.odpowiedzZModelem(tekst, kontekstAsystenta(dodatki)).catch(function () {
-      return A.odpowiedz(tekst, kontekstAsystenta(dodatki));
-    }).then(function (w) {
-      w.kto = 'asystent';
-      w.id = czeka.id;
-      var i = rozmowa.indexOf(czeka);
-      if (i < 0) return;
-      rozmowa[i] = w;
-      var el = document.getElementById('w-' + w.id);
-      if (el) {
-        el.outerHTML = wiadomoscHtml(w);
-        var ogl = document.getElementById('ogloszenia');
-        if (ogl) ogl.textContent = 'Asystent: ' + tekstWiadomosci(w);
-      }
-    });
+    pokazOdpowiedz(dodajWymiane(tekst, window.ASYSTENT.odpowiedz(tekst, kontekstAsystenta(dodatki))), 2);
   }
   /* Odpowiedź na pytanie z wyborem (np. „Co zginęło?”) */
   function odpowiedzNaWybor(idWyboru, idWiadomosci, wartosci) {
@@ -1649,7 +1626,7 @@
     var pisze = poleAsystenta.value.trim().length > 0;
     przyciskMow.innerHTML = sluchanie ? ikona('stop') + 'Stop' : pisze ? ikona('wyslij') + 'Wyślij' : ikona('mikrofon') + 'Powiedz';
     przyciskMow.setAttribute('aria-label', sluchanie ? 'Zatrzymaj słuchanie' : pisze ? 'Wyślij' : 'Powiedz, co chcesz załatwić');
-    poleAsystenta.placeholder = sluchanie ? 'Słucham… Mów teraz' : 'Co chcesz załatwić?';
+    poleAsystenta.placeholder = sluchanie ? 'Słucham…' : 'Co chcesz załatwić?';
   }
   function otworzPodpowiedzi() {
     if (pasek.getAttribute('data-tryb') !== 'z-podpowiedziami' || !podpowiedziPaska.hidden) return;
@@ -1669,18 +1646,31 @@
     sluchanie = null;
     s.onend = s.onresult = s.onerror = null;
     try { s.abort(); } catch (e) { /* nic */ }
+    if (statusMowy) statusMowy.hidden = true;
     ustawPrzyciskMow();
   }
+  /* „Powiedz” nigdy nie milczy: „Słucham…” podczas nagrywania, a przy każdym błędzie jasny komunikat */
+  var MOWA_MIKROFON = 'Zezwól na mikrofon w ustawieniach przeglądarki. Możesz też wpisać pytanie.';
+  var MOWA_BEZ_MIKROFONU = 'Nie znaleziono mikrofonu. Podłącz mikrofon albo wpisz pytanie.';
+  var MOWA_CISZA = 'Nic nie usłyszałam — spróbuj jeszcze raz.';
+  var MOWA_INNY = 'Nie udało się rozpoznać mowy. Spróbuj jeszcze raz albo wpisz pytanie.';
+  var statusMowy = document.getElementById('status-mowy');
+  function pokazStatusMowy(tekst) {
+    if (!statusMowy) return;
+    statusMowy.hidden = !tekst;
+    statusMowy.querySelector('span').textContent = tekst || '';
+  }
   function sluchaj() {
-    if (sluchanie) { try { sluchanie.stop(); } catch (e) { zatrzymajSluchanie(); } return; }
+    if (sluchanie) { sluchanie.zatrzymanoRecznie = true; try { sluchanie.stop(); } catch (e) { zatrzymajSluchanie(); } return; }
     /* Opera i Firefox nie obsługują mówienia (Opera ma przycisk, ale rozpoznawanie nie działa) */
     if (!Rozpoznawanie || /OPR\//.test(navigator.userAgent)) { oknoInformacja('Mówienie', MOWA_BRAK); return; }
     if (navigator.onLine === false) { oknoInformacja('Mówienie', MOWA_INTERNET); return; }
-    var r, uslyszane = '', blad = null;
-    try { r = new Rozpoznawanie(); } catch (e) { oknoInformacja('Mówienie', 'Mówienie nie działa teraz w tej przeglądarce. Napisz, co chcesz załatwić.'); return; }
+    var r, uslyszane = '', blad = null, ruszylo = false;
+    try { r = new Rozpoznawanie(); } catch (e) { oknoInformacja('Mówienie', MOWA_BRAK); return; }
     r.lang = 'pl-PL';
     r.interimResults = true;
     r.maxAlternatives = 1;
+    r.onstart = function () { ruszylo = true; pokazStatusMowy('Słucham… Powiedz, co chcesz załatwić.'); };
     r.onresult = function (e) {
       uslyszane = '';
       for (var i = 0; i < e.results.length; i++) uslyszane += e.results[i][0].transcript;
@@ -1688,18 +1678,35 @@
     };
     r.onerror = function (e) { blad = e.error; };
     r.onend = function () {
+      clearTimeout(straznik);
+      var recznie = r.zatrzymanoRecznie;
       sluchanie = null;
+      pokazStatusMowy('');
       var tekst = uslyszane.trim();
       poleAsystenta.value = '';
       ustawPrzyciskMow();
       if (tekst) { zapytaj(tekst); return; }
-      if (blad === 'not-allowed' || blad === 'service-not-allowed') oknoInformacja('Mówienie', 'Przeglądarka nie ma dostępu do mikrofonu. Zezwól na mikrofon albo napisz, co chcesz załatwić.');
+      if (blad === 'not-allowed' || blad === 'service-not-allowed') oknoInformacja('Mówienie', MOWA_MIKROFON);
+      else if (blad === 'audio-capture') oknoInformacja('Mówienie', MOWA_BEZ_MIKROFONU);
       else if (blad === 'network') oknoInformacja('Mówienie', navigator.onLine === false ? MOWA_INTERNET : MOWA_BRAK);
-      else if (blad && blad !== 'aborted') oknoInformacja('Mówienie', 'Nie udało się rozpoznać mowy. Spróbuj jeszcze raz albo napisz, co chcesz załatwić.');
+      else if (blad === 'language-not-supported') oknoInformacja('Mówienie', MOWA_BRAK);
+      else if (blad && blad !== 'no-speech' && blad !== 'aborted') oknoInformacja('Mówienie', MOWA_INNY);
+      else if (!recznie) oknoInformacja('Mówienie', MOWA_CISZA);
     };
+    /* Gdy przeglądarka w ogóle nie zacznie słuchać — też jasny komunikat, nigdy cisza */
+    var straznik = setTimeout(function () {
+      if (ruszylo || sluchanie !== r) return;
+      r.onend = r.onresult = r.onerror = null;
+      try { r.abort(); } catch (e) { /* nic */ }
+      sluchanie = null;
+      pokazStatusMowy('');
+      ustawPrzyciskMow();
+      oknoInformacja('Mówienie', navigator.onLine === false ? MOWA_INTERNET : MOWA_BRAK);
+    }, 5000);
     sluchanie = r;
     ustawPrzyciskMow();
-    try { r.start(); } catch (e) { sluchanie = null; ustawPrzyciskMow(); }
+    pokazStatusMowy('Uruchamiam mikrofon…');
+    try { r.start(); } catch (e) { clearTimeout(straznik); sluchanie = null; pokazStatusMowy(''); ustawPrzyciskMow(); oknoInformacja('Mówienie', MOWA_INNY); }
   }
   poleAsystenta.addEventListener('focus', otworzPodpowiedzi);
   poleAsystenta.addEventListener('click', otworzPodpowiedzi);

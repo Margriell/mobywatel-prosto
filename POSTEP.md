@@ -4,8 +4,8 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 
 ## Stan
 
-- Obowiązuje SPECYFIKACJA.md w wersji 2.4 (poprawki po teście, publikacja, przygotowanie pod Bielika).
-- Ukończone (26.11.2026): poprawki po teście autorki i przygotowanie do publikacji na GitHub Pages — z pełną Kontrolą (21 zestawów, 0 błędów). Szczegóły w dzienniku.
+- Obowiązuje SPECYFIKACJA.md w wersji 2.5 (asystent zna wszystkie usługi i język ludzi; bez modelu językowego).
+- Ukończone (26.11.2026): rozbudowa asystenta (wszystkie usługi, język ludzi, dwie sprawy w zdaniu), „Powiedz” zawsze z komunikatem, rezygnacja z Bielika. Test zrozumienia: 100% na 167 zdaniach, 92,5% na nowych zdaniach przed poprawkami, 0 ślepych zaułków. Kontrola: 21 zestawów, 0 błędów.
 - Wcześniej: etap 3 — asystent offline i sprawy A, B, C.
 - Następny krok: publikacja na GitHub Pages (robi autorka w GitHub Desktop), potem sprawdzenie adresu w podglądzie linku.
 - **Etap „Asystent i sprawy offline” (26.11.2026) — wszystkie kroki 1–6 ukończone:**
@@ -32,8 +32,252 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 - 25.11.2026: poprawki do etapu 2 — dokumenty mają odpowiadać prawdziwemu mObywatelowi (opis z aplikacji autorki), wpisane do SPECYFIKACJA.md (wersja 2.2): (1) dokumenty osób — Halina: mDowód, mLegitymacja emeryta-rencisty, Karta Dużej Rodziny; Tomasz: mDowód, mPrawo jazdy, Moje pojazdy; Ola: mDowód, mLegitymacja studencka; (2) dotknięcie karty z tyłu przesuwa ją na przód, szczegóły otwiera przycisk na przedniej karcie; (3) każda karta wygląda jak prawdziwy dokument — wspólny szablon, własny kolor, wzór giloszowy; (4) szczegóły dokumentu jak w mObywatelu; (5) „Zarządzaj”: kolejność, usuń, układ, dodaj; (6) „Wstecz” z tytułem przyklejone u góry podekranów; (7) czcionka Atkinson Hyperlegible z Google Fonts, zapasowo systemowa.
 
 - 26.11.2026: etap „Asystent i sprawy offline”, wpisany do SPECYFIKACJA.md (wersja 2.3): zasada „AI rozumie, aplikacja prowadzi”; każda sprawa to jeden wpis w `asystent.js`, rozpoznawanie w `rozpoznajSprawe(tekst)` (później Bielik); odpowiedzi najwyżej 2 zdania, zawsze z przyciskami; podpowiedzi dopasowane do osoby; sprawy A, B, C w pełni (C już nie opcjonalna); karta pilna Oli „Dokończ zameldowanie”; szybkie sprawy asystenta (pismo, SMS, dowód, ważność, punkty, mandat, wybory, zniżki, KDR, PESEL); wszystko działa bez internetu.
+- 26.11.2026: rezygnacja z modelu językowego Bielik — usunięte `bielik/`, `config.js` i kod łączenia z modelem; asystent działa wyłącznie na scenariuszach. Asystent zna wszystkie usługi, rozumie język ludzi i dwie sprawy w jednym zdaniu; „Powiedz” zawsze pokazuje komunikat (SPECYFIKACJA.md 2.5).
 
 ## Dziennik
+
+### 26.11.2026 Rozbudowa asystenta, „Powiedz”, rezygnacja z Bielika (SPECYFIKACJA.md 2.5)
+- Zrobione:
+  - **Bez modelu językowego:** usunięty folder `bielik/`, plik `config.js` i cały kod łączenia z modelem (zapytania, limit 6 s, „Chwileczkę…”). Asystent działa wyłącznie na scenariuszach w `asystent.js`; `rozpoznajSprawe(tekst)` zostaje. Wzmianki usunięte z README, aplikacji i specyfikacji.
+  - **„Powiedz” nigdy nie milczy:** nad polem „Uruchamiam mikrofon…”, potem „Słucham… Powiedz, co chcesz załatwić.” (migająca ikona mikrofonu, bez migania przy „ogranicz ruch”). Komunikaty: „Zezwól na mikrofon w ustawieniach przeglądarki…”, „Nic nie usłyszałam — spróbuj jeszcze raz.”, brak mikrofonu, brak internetu, przeglądarka bez obsługi mówienia. Gdy przeglądarka w ogóle nie zacznie słuchać w 5 sekund — też komunikat. Sprawdzone: przy zablokowanym mikrofonie pojawia się prośba o zezwolenie.
+  - **Asystent zna wszystkie usługi:** 19 nowych wpisów (wniosek o dowód, paszport, dane w PESEL, rejestracja i sprzedaż auta, wymeldowanie, ogrzewanie, wniosek o KDR, 800 plus, narodziny dziecka, odpis aktu, recepty, skierowania, ubezpieczenie zdrowotne, PIT, podatek od nieruchomości, zaświadczenie o niezaleganiu, ostrzeżenia, niebezpieczne miejsca). Każdy: synonimy, jedno ogólne zdanie, „Otwórz usługę” (niedziałające → okno „Niedostępne w prototypie”).
+  - **Język ludzi:** długie grzeczne zdania, potoczne słowa i zdrobnienia (dowodzik, portfelik, autko, legitka, ściema, zwinęli, „ubezpieczenie od auta”), literówki, brak polskich znaków, tekst „z mowy” (np. „o ce”). Szukanie w Usługach jest ostrożniejsze (nie łapie „pizzy” ani „przepisu na sernik”).
+  - **Dwie sprawy w jednym zdaniu:** zdanie jest dzielone po spójnikach („i”, „a”, „oraz”, „też”, „jeszcze”…). Asystent zaczyna od pilniejszej sprawy, a drugą daje od razu przyciskiem „Druga sprawa: …”.
+- Pliki: `asystent.js`, `app.js`, `index.html`, `style.css`, `README.md`, `SPECYFIKACJA.md`, `POSTEP.md`; usunięte: `config.js`, `bielik/`.
+- **Test zrozumienia** (ten sam kod co w aplikacji; zdanie → co asystent zrobił — tabela poniżej):
+  - Zestaw główny: 167 zdań (zwykłe 44, seniorskie 25, potoczne 25, z literówkami 25, „z mowy” 25, dwie sprawy 8, nie na temat 15) × 3 osoby = 501 odpowiedzi.
+  - Pierwszy przebieg: 94,1% zdań na temat rozpoznanych poprawnie, 33 z 45 odpowiedzi nie na temat dobrych, 0 ślepych zaułków. Po poprawkach: **100% (456 z 456)**, **45 z 45** zdań nie na temat dostało „Nie rozumiem jeszcze tej prośby” z przyciskami spraw, **0 ślepych zaułków**.
+  - Uczciwe sprawdzenie na **nowych zdaniach**, których wcześniej nie było (40 na temat + 5 nie na temat × 3 osoby): przed poprawkami **92,5%** (111 z 120) — wpadki: „nie mogę nigdzie znaleźć dowodu”, „ulgę na pociąg”, „co ty potrafisz”; po poprawkach ogólnych wzorców 100%. Wynik na zdaniach, pod które nic nie poprawiano (92,5%), lepiej mówi, jak asystent poradzi sobie z prawdziwymi ludźmi.
+  - Poprzednie testy (70 zdań i 29 ogólnych pytań) — nadal 0 problemów.
+- Kontrola (według sekcji „Kontrola” specyfikacji; automatycznie, 199 ekranów na zestaw — w tym rozmowa z asystentem, kroki spraw A, B, C z błędami, dolny pasek na dole, równe paski kart):
+  - 390 px (ramka telefonu): 12 zestawów (3 rozmiary tekstu × 3 motywy + 3 z trybem prostym), 2388 ekranów — 0 błędów.
+  - 320 px: 6 zestawów, 1194 ekrany — 0 błędów. Powiększenie 200% (640 × 360): 3 zestawy, 597 ekranów — 0 błędów.
+  - Razem 21 zestawów, 4179 ekranów. Najmniejszy tekst 16 px, najsłabszy kontrast 4,65:1. Działa z pliku bez internetu (Edge). Brak błędów w konsoli.
+- Do decyzji:
+  - „Nic nie usłyszałam” jest w formie żeńskiej (jak w poleceniu). Reszta asystenta mówi neutralnie.
+  - Fakty ogólne z poprzednich etapów (828 828 828, 8080, cofanie zastrzeżenia PESEL) nadal do sprawdzenia przed zgłoszeniem.
+
+#### Test zrozumienia — zestaw główny (167 zdań, ✗ = źle; po poprawkach brak)
+
+| Zdanie | Grupa | Halina | Tomasz | Ola |
+| --- | --- | --- | --- | --- |
+| Zgubiłam portfel | zwykłe | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Ukradli mi torebkę | zwykłe | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Zginął mi dowód osobisty | zwykłe | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Chcę zastrzec PESEL | zwykłe | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” |
+| Czy mój PESEL jest zastrzeżony? | zwykłe | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” |
+| Do kiedy mam OC? | zwykłe | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| Kiedy mam przegląd samochodu? | zwykłe | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „Badanie techniczne samochodu Skoda Octavia jest ważne do 14.05.2027.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| Ubezpieczenie samochodu | zwykłe | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| Chcę się zameldować | zwykłe | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| Przeprowadziłam się | zwykłe | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| Wytłumacz mi pismo | zwykłe | pismo: „To pismo z urzędu o podatku od nieruchomości na 2027 rok.” | pismo: „To przypomnienie z aplikacji mObywatel, nie rachunek.” | pismo: „W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.” |
+| Czy ten SMS to oszustwo? | zwykłe | sms: „Wklej treść SMS-a w pole na dole i wyślij.” | sms: „Wklej treść SMS-a w pole na dole i wyślij.” | sms: „Wklej treść SMS-a w pole na dole i wyślij.” |
+| Pokaż mój dowód | zwykłe | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” |
+| Pokaż kod QR | zwykłe | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” |
+| Kiedy traci ważność mój dowód? | zwykłe | waznosc: „Twój dowód osobisty jest ważny do 12.03.2031.” | waznosc: „Twój dowód osobisty jest ważny do 03.10.2030.” | waznosc: „Twój dowód osobisty jest ważny do 09.02.2032.” |
+| Ile mam punktów karnych? | zwykłe | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” | punkty: „Masz 4 punkty karne.” | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” |
+| Czy mam mandat do zapłaty? | zwykłe | mandat: „Nie masz mandatów do zapłaty.” | mandat: „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | mandat: „Nie masz mandatów do zapłaty.” |
+| Gdzie głosuję? | zwykłe | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 21, ul. Lipowa 20, Kraków.” | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 7, ul. Słoneczna 4, Warszawa.” | wybory: „Głosujesz w lokalu: Biblioteka Osiedlowa, ul. Polna 10, Gdańsk.” |
+| Jaką zniżkę daje legitymacja? | zwykłe | znizka: „Legitymacja emeryta-rencisty daje zniżki m.in. na kolej i komunikac…” | znizka: „Nie masz legitymacji w aplikacji.” | znizka: „Legitymacja studencka daje zniżki m.in. na kolej i komunikację miej…” |
+| Gdzie mogę użyć Karty Dużej Rodziny? | zwykłe | kdr: „Kartą Dużej Rodziny zapłacisz mniej m.in. w sklepach, na stacjach p…” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” |
+| Co mam do załatwienia? | zwykłe | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” | do-zalatwienia: „Czeka na Ciebie 2 sprawy.” | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” |
+| Jakie mam dokumenty? | zwykłe | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 2 dokumenty.” |
+| Mam nowe wiadomości? | zwykłe | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Nie masz nowych wiadomości.” |
+| Co umiesz? | zwykłe | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” |
+| Dzień dobry | zwykłe | powitanie: „Dzień dobry, Halino.” | powitanie: „Dzień dobry, Tomaszu.” | powitanie: „Dzień dobry, Olu.” |
+| Dziękuję | zwykłe | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” |
+| Chcę wyrobić nowy dowód | zwykłe | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” |
+| Czy mój paszport jest gotowy? | zwykłe | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” |
+| Jakie dane o mnie ma urząd? | zwykłe | usluga-dane-pesel: „Tu zobaczysz, jakie dane o Tobie są w rejestrze PESEL.” | usluga-dane-pesel: „Tu zobaczysz, jakie dane o Tobie są w rejestrze PESEL.” | usluga-dane-pesel: „Tu zobaczysz, jakie dane o Tobie są w rejestrze PESEL.” |
+| Chcę zarejestrować samochód | zwykłe | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” |
+| Sprzedałem samochód | zwykłe | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” |
+| Jak się wymeldować? | zwykłe | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” |
+| Muszę zgłosić piec | zwykłe | usluga-ogrzewanie: „Tu zgłosisz, czym ogrzewasz dom lub mieszkanie.” | usluga-ogrzewanie: „Tu zgłosisz, czym ogrzewasz dom lub mieszkanie.” | usluga-ogrzewanie: „Tu zgłosisz, czym ogrzewasz dom lub mieszkanie.” |
+| Jak złożyć wniosek o Kartę Dużej Rodziny? | zwykłe | usluga-wniosek-kdr: „Tu złożysz wniosek o Kartę Dużej Rodziny.” | usluga-wniosek-kdr: „Tu złożysz wniosek o Kartę Dużej Rodziny.” | usluga-wniosek-kdr: „Tu złożysz wniosek o Kartę Dużej Rodziny.” |
+| Wniosek o 800 plus | zwykłe | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” |
+| Urodziło mi się dziecko | zwykłe | usluga-narodziny: „Tu zgłosisz narodziny dziecka i nadasz mu numer PESEL.” | usluga-narodziny: „Tu zgłosisz narodziny dziecka i nadasz mu numer PESEL.” | usluga-narodziny: „Tu zgłosisz narodziny dziecka i nadasz mu numer PESEL.” |
+| Potrzebuję odpisu aktu urodzenia | zwykłe | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” |
+| Gdzie są moje recepty? | zwykłe | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” |
+| Mam skierowanie do specjalisty | zwykłe | usluga-skierowania: „Tu sprawdzisz swoje e-skierowania, np. do lekarza specjalisty.” | usluga-skierowania: „Tu sprawdzisz swoje e-skierowania, np. do lekarza specjalisty.” | usluga-skierowania: „Tu sprawdzisz swoje e-skierowania, np. do lekarza specjalisty.” |
+| Czy jestem ubezpieczona w NFZ? | zwykłe | usluga-ubezpieczenie-zdrowotne: „Tu sprawdzisz, czy masz ubezpieczenie zdrowotne.” | usluga-ubezpieczenie-zdrowotne: „Tu sprawdzisz, czy masz ubezpieczenie zdrowotne.” | usluga-ubezpieczenie-zdrowotne: „Tu sprawdzisz, czy masz ubezpieczenie zdrowotne.” |
+| Jak rozliczyć PIT? | zwykłe | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” |
+| Potrzebuję zaświadczenia o niezaleganiu | zwykłe | usluga-zaswiadczenie: „Tu pobierzesz zaświadczenie z urzędu skarbowego, że nie masz zaległ…” | usluga-zaswiadczenie: „Tu pobierzesz zaświadczenie z urzędu skarbowego, że nie masz zaległ…” | usluga-zaswiadczenie: „Tu pobierzesz zaświadczenie z urzędu skarbowego, że nie masz zaległ…” |
+| Chcę dostawać ostrzeżenia o burzach | zwykłe | usluga-alerty: „Tu włączysz ostrzeżenia o burzach i innych zagrożeniach.” | usluga-alerty: „Tu włączysz ostrzeżenia o burzach i innych zagrożeniach.” | usluga-alerty: „Tu włączysz ostrzeżenia o burzach i innych zagrożeniach.” |
+| Chcę zgłosić niebezpieczne miejsce | zwykłe | usluga-mapa-zagrozen: „Tu powiesz policji o niebezpiecznym miejscu w Twojej okolicy.” | usluga-mapa-zagrozen: „Tu powiesz policji o niebezpiecznym miejscu w Twojej okolicy.” | usluga-mapa-zagrozen: „Tu powiesz policji o niebezpiecznym miejscu w Twojej okolicy.” |
+| Dzień dobry, chciałabym zapytać, co mam zrobić, bo zgubiłam portfel z dokumentami | seniorskie | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Dzień dobry, proszę mi pomóc, wczoraj w autobusie ktoś ukradł mi torebkę | seniorskie | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Przepraszam bardzo, czy mógłby mi ktoś wytłumaczyć to pismo z urzędu, bo nic nie rozumiem | seniorskie | pismo: „To pismo z urzędu o podatku od nieruchomości na 2027 rok.” | pismo: „To przypomnienie z aplikacji mObywatel, nie rachunek.” | pismo: „W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.” |
+| Dostałam dziwnego SMS-a o paczce i nie wiem, czy to nie jest oszustwo | seniorskie | sms: „Wklej treść SMS-a w pole na dole i wyślij.” | sms: „Wklej treść SMS-a w pole na dole i wyślij.” | sms: „Wklej treść SMS-a w pole na dole i wyślij.” |
+| Chciałabym się dowiedzieć, do kiedy jest ważny mój dowód osobisty | seniorskie | waznosc: „Twój dowód osobisty jest ważny do 12.03.2031.” | waznosc: „Twój dowód osobisty jest ważny do 03.10.2030.” | waznosc: „Twój dowód osobisty jest ważny do 09.02.2032.” |
+| Dzień dobry, syn mi powiedział, że powinnam zastrzec swój numer PESEL, jak to zrobić? | seniorskie | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” |
+| Bardzo proszę o informację, czy mój PESEL jest już zastrzeżony | seniorskie | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” |
+| Chciałbym zapytać, kiedy kończy się ubezpieczenie mojego samochodu | seniorskie | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| Przeprowadziłam się do córki i nie wiem, jak się teraz zameldować | seniorskie | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| Chciałabym wiedzieć, gdzie mogę skorzystać z Karty Dużej Rodziny | seniorskie | kdr: „Kartą Dużej Rodziny zapłacisz mniej m.in. w sklepach, na stacjach p…” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” |
+| Czy jako emerytka mam jakieś zniżki z legitymacji? | seniorskie | znizka: „Legitymacja emeryta-rencisty daje zniżki m.in. na kolej i komunikac…” | znizka: „Nie masz legitymacji emeryta-rencisty w aplikacji.” | znizka: „Nie masz legitymacji emeryta-rencisty w aplikacji.” |
+| Proszę powiedzieć, w którym lokalu mam głosować w wyborach | seniorskie | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 21, ul. Lipowa 20, Kraków.” | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 7, ul. Słoneczna 4, Warszawa.” | wybory: „Głosujesz w lokalu: Biblioteka Osiedlowa, ul. Polna 10, Gdańsk.” |
+| Dzień dobry, czy coś na mnie czeka w tej aplikacji? | seniorskie | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” | do-zalatwienia: „Czeka na Ciebie 2 sprawy.” | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” |
+| Chciałabym zobaczyć, jakie mam dokumenty w telefonie | seniorskie | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 2 dokumenty.” |
+| Czy przyszło do mnie jakieś nowe pismo? | seniorskie | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Nie masz nowych wiadomości.” |
+| Przepraszam, nie wiem, jak to działa, w czym mi pani pomoże? | seniorskie | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” |
+| Bardzo dziękuję za pomoc, do widzenia | seniorskie | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” |
+| Chciałabym zapytać, ile muszę zapłacić podatku od mieszkania | seniorskie | pismo: „To pismo z urzędu o podatku od nieruchomości na 2027 rok.” | pismo: „W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.” | pismo: „W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.” |
+| Wnuczka mówiła, że w telefonie są recepty, gdzie je znajdę? | seniorskie | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” |
+| Czy mogę sprawdzić, czy jestem ubezpieczona w NFZ? | seniorskie | usluga-ubezpieczenie-zdrowotne: „Tu sprawdzisz, czy masz ubezpieczenie zdrowotne.” | usluga-ubezpieczenie-zdrowotne: „Tu sprawdzisz, czy masz ubezpieczenie zdrowotne.” | usluga-ubezpieczenie-zdrowotne: „Tu sprawdzisz, czy masz ubezpieczenie zdrowotne.” |
+| Muszę zamówić akt zgonu męża, gdzie to zrobić? | seniorskie | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” |
+| Mąż sprzedał nasze auto, czy trzeba to gdzieś zgłosić? | seniorskie | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” |
+| Kończy mi się dowód, chciałabym złożyć wniosek o nowy | seniorskie | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” |
+| Dzień dobry, proszę pokazać mój dowód osobisty | seniorskie | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” |
+| Czy mam do zapłacenia jakiś mandat? | seniorskie | mandat: „Nie masz mandatów do zapłaty.” | mandat: „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | mandat: „Nie masz mandatów do zapłaty.” |
+| zgubiłam portfelik | potoczne | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| gdzieś mi się podział dowodzik | potoczne | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| zwinęli mi plecak, a w nim dokumenty | potoczne | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| ktoś mi zabrał torebkę | potoczne | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| kieszonkowiec w tramwaju, nie ma portfela | potoczne | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| ubezpieczenie od auta | potoczne | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| do kiedy mam OC na autko | potoczne | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| kiedy przegląd w aucie | potoczne | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „Badanie techniczne samochodu Skoda Octavia jest ważne do 14.05.2027.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| meldunek | potoczne | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| przeprowadzka | potoczne | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| nowe mieszkanie, co z meldunkiem | potoczne | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| ile mam punktów | potoczne | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” | punkty: „Masz 4 punkty karne.” | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” |
+| jakieś mandaty na mnie wiszą? | potoczne | mandat: „Nie masz mandatów do zapłaty.” | mandat: „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | mandat: „Nie masz mandatów do zapłaty.” |
+| gdzie idę głosować | potoczne | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 21, ul. Lipowa 20, Kraków.” | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 7, ul. Słoneczna 4, Warszawa.” | wybory: „Głosujesz w lokalu: Biblioteka Osiedlowa, ul. Polna 10, Gdańsk.” |
+| legitka daje jakieś zniżki? | potoczne | znizka: „Legitymacja emeryta-rencisty daje zniżki m.in. na kolej i komunikac…” | znizka: „Nie masz legitymacji w aplikacji.” | znizka: „Legitymacja studencka daje zniżki m.in. na kolej i komunikację miej…” |
+| pokaż legitkę | potoczne | pokaz: „Proszę, oto mLegitymacja emeryta-rencisty.” | pokaz: „Nie masz legitymacji w aplikacji.” | pokaz: „Proszę, oto mLegitymacja studencka.” |
+| dawaj kod qr | potoczne | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” |
+| co tam w skrzynce | potoczne | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Nie masz nowych wiadomości.” |
+| siema | potoczne | powitanie: „Dzień dobry, Halino.” | powitanie: „Dzień dobry, Tomaszu.” | powitanie: „Dzień dobry, Olu.” |
+| dzięki wielkie | potoczne | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” |
+| ten sms o dopłacie to ściema? | potoczne | sms: „Wklej treść SMS-a w pole na dole i wyślij.” | sms: „Wklej treść SMS-a w pole na dole i wyślij.” | sms: „Wklej treść SMS-a w pole na dole i wyślij.” |
+| kupiłem nowe autko | potoczne | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” |
+| co z 800+ | potoczne | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” |
+| e-pit | potoczne | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” |
+| potrzebuję leków, gdzie recepta | potoczne | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” |
+| zgubilam portfle | literówki | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| zgbiłam dowud | literówki | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| ukradli mi torebke | literówki | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| zastzec pesl | literówki | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” |
+| czy moj pesel jest zastrzezony | literówki | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” |
+| do kiedy mam oc | literówki | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| ubespieczenie samochodu | literówki | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| przeglond auta | literówki | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „Badanie techniczne samochodu Skoda Octavia jest ważne do 14.05.2027.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| zameldowac sie | literówki | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| przeprowdzka | literówki | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| wytlumacz pismo | literówki | pismo: „To pismo z urzędu o podatku od nieruchomości na 2027 rok.” | pismo: „To przypomnienie z aplikacji mObywatel, nie rachunek.” | pismo: „W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.” |
+| czy ten sms to oszustwo | literówki | sms: „Wklej treść SMS-a w pole na dole i wyślij.” | sms: „Wklej treść SMS-a w pole na dole i wyślij.” | sms: „Wklej treść SMS-a w pole na dole i wyślij.” |
+| pokaz dowod | literówki | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” |
+| waznosc prawa jazdy | literówki | waznosc: „Nie masz prawa jazdy w aplikacji.” | waznosc: „Twoje prawo jazdy jest ważne do 22.06.2031.” | waznosc: „Nie masz prawa jazdy w aplikacji.” |
+| ile mam punktow karnych | literówki | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” | punkty: „Masz 4 punkty karne.” | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” |
+| madnat do zaplaty | literówki | mandat: „Nie masz mandatów do zapłaty.” | mandat: „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | mandat: „Nie masz mandatów do zapłaty.” |
+| gdzie glosuje | literówki | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 21, ul. Lipowa 20, Kraków.” | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 7, ul. Słoneczna 4, Warszawa.” | wybory: „Głosujesz w lokalu: Biblioteka Osiedlowa, ul. Polna 10, Gdańsk.” |
+| znizki legitymacja | literówki | znizka: „Legitymacja emeryta-rencisty daje zniżki m.in. na kolej i komunikac…” | znizka: „Nie masz legitymacji w aplikacji.” | znizka: „Legitymacja studencka daje zniżki m.in. na kolej i komunikację miej…” |
+| karta duzej rodizny | literówki | kdr: „Kartą Dużej Rodziny zapłacisz mniej m.in. w sklepach, na stacjach p…” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” |
+| co mam do zalatwienia | literówki | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” | do-zalatwienia: „Czeka na Ciebie 2 sprawy.” | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” |
+| jakie mam dokumnety | literówki | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 2 dokumenty.” |
+| paszpot | literówki | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” |
+| wymeldowac sie | literówki | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” |
+| recepty | literówki | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” |
+| dziekuje | literówki | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” |
+| zgubiłam portfel co teraz | z mowy | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| ukradli mi dowód osobisty w sklepie co mam robić | z mowy | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| do kiedy mam o ce | z mowy | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| do kiedy mam oce na samochód | z mowy | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| kiedy mam badanie techniczne auta | z mowy | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „Badanie techniczne samochodu Skoda Octavia jest ważne do 14.05.2027.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| chcę się zameldować w nowym mieszkaniu | z mowy | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| wytłumacz mi to pismo z urzędu | z mowy | pismo: „To pismo z urzędu o podatku od nieruchomości na 2027 rok.” | pismo: „To przypomnienie z aplikacji mObywatel, nie rachunek.” | pismo: „W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.” |
+| czy mój pesel jest zastrzeżony | z mowy | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” |
+| zastrzeż mój numer pesel | z mowy | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” |
+| pokaż mój dowód osobisty | z mowy | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” |
+| ile mam punktów karnych na prawie jazdy | z mowy | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” | punkty: „Masz 4 punkty karne.” | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” |
+| czy mam jakiś mandat | z mowy | mandat: „Nie masz mandatów do zapłaty.” | mandat: „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | mandat: „Nie masz mandatów do zapłaty.” |
+| gdzie mam głosować w wyborach | z mowy | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 21, ul. Lipowa 20, Kraków.” | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 7, ul. Słoneczna 4, Warszawa.” | wybory: „Głosujesz w lokalu: Biblioteka Osiedlowa, ul. Polna 10, Gdańsk.” |
+| jaka zniżka na legitymację studencką | z mowy | znizka: „Legitymacja emeryta-rencisty daje zniżki m.in. na kolej i komunikac…” | znizka: „Nie masz legitymacji studenckiej w aplikacji.” | znizka: „Legitymacja studencka daje zniżki m.in. na kolej i komunikację miej…” |
+| gdzie mogę użyć karty dużej rodziny | z mowy | kdr: „Kartą Dużej Rodziny zapłacisz mniej m.in. w sklepach, na stacjach p…” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” |
+| co mam dzisiaj do załatwienia | z mowy | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” | do-zalatwienia: „Czeka na Ciebie 2 sprawy.” | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” |
+| jakie dokumenty mam w aplikacji | z mowy | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 2 dokumenty.” |
+| czy mam nowe wiadomości | z mowy | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Nie masz nowych wiadomości.” |
+| w czym możesz mi pomóc | z mowy | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” |
+| dzień dobry | z mowy | powitanie: „Dzień dobry, Halino.” | powitanie: „Dzień dobry, Tomaszu.” | powitanie: „Dzień dobry, Olu.” |
+| kiedy traci ważność moje prawo jazdy | z mowy | waznosc: „Nie masz prawa jazdy w aplikacji.” | waznosc: „Twoje prawo jazdy jest ważne do 22.06.2031.” | waznosc: „Nie masz prawa jazdy w aplikacji.” |
+| chcę rozliczyć pit | z mowy | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” |
+| jak zarejestrować samochód po zakupie | z mowy | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” | usluga-rejestracja: „Tu zarejestrujesz samochód, np. po zakupie.” |
+| jak zgłosić narodziny dziecka | z mowy | usluga-narodziny: „Tu zgłosisz narodziny dziecka i nadasz mu numer PESEL.” | usluga-narodziny: „Tu zgłosisz narodziny dziecka i nadasz mu numer PESEL.” | usluga-narodziny: „Tu zgłosisz narodziny dziecka i nadasz mu numer PESEL.” |
+| pokaż kod qr | z mowy | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” | kod-qr: „Kod QR otworzysz w zakładce Kod QR.” |
+| zgubiłam portfel i nie wiem co z OC | dwie sprawy | zgubione + samochod: „Przykro mi.” | zgubione + samochod: „Przykro mi.” | zgubione + samochod: „Przykro mi.” |
+| do kiedy mam OC i zgubiłem prawo jazdy | dwie sprawy | zgubione + samochod: „Przykro mi.” | zgubione + samochod: „Przykro mi.” | zgubione + samochod: „Przykro mi.” |
+| przeprowadziłam się a jeszcze ukradli mi dowód | dwie sprawy | zgubione + zameldowanie: „Przykro mi.” | zgubione + zameldowanie: „Przykro mi.” | zgubione + zameldowanie: „Przykro mi.” |
+| wytłumacz pismo i czy mam mandat | dwie sprawy | mandat + pismo: „Nie masz mandatów do zapłaty.” | mandat + pismo: „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | mandat + pismo: „Nie masz mandatów do zapłaty.” |
+| chcę się zameldować i sprawdzić OC | dwie sprawy | samochod + zameldowanie: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod + zameldowanie: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod + zameldowanie: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| zastrzeż PESEL oraz gdzie głosuję | dwie sprawy | zastrzez-pesel + wybory: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel + wybory: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel + wybory: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” |
+| ile mam punktów karnych i do kiedy OC | dwie sprawy | samochod + punkty: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod + punkty: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod + punkty: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| czy ten sms to oszustwo i jakie mam dokumenty | dwie sprawy | sms + dokumenty-lista: „Wklej treść SMS-a w pole na dole i wyślij.” | sms + dokumenty-lista: „Wklej treść SMS-a w pole na dole i wyślij.” | sms + dokumenty-lista: „Wklej treść SMS-a w pole na dole i wyślij.” |
+| Jaka jest pogoda? | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Opowiedz kawał | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| asdfgh | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Kocham pierogi | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Ile kosztuje bilet do Zakopanego? | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Kto wygrał mecz? | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Podaj przepis na sernik | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Jaka jest stolica Francji? | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Lubisz koty? | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Zagraj muzykę | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Która godzina? | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Ile to jest dwa plus dwa? | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Napisz wiersz o jesieni | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Zamów mi pizzę | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Jak schudnąć? | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+
+#### Test zrozumienia — nowe zdania (45)
+
+| Zdanie | Grupa | Halina | Tomasz | Ola |
+| --- | --- | --- | --- | --- |
+| Pomocy, nie mogę nigdzie znaleźć dowodu | nowe | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Zgubiłem prawko na wycieczce | nowe | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Ukradziono mi telefon i portfel | nowe | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Wypadł mi portfel z kieszeni w tramwaju | nowe | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Mam skradziony dowód, co robić | nowe | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” | zgubione: „Przykro mi.” |
+| Jak zablokować numer PESEL | nowe | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” | zastrzez-pesel: „Zastrzeżenie PESEL chroni Cię przed kredytem na Twoje dane.” |
+| Sprawdź czy pesel mam zastrzeżony | nowe | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” | pesel-status: „Twój PESEL nie jest zastrzeżony.” |
+| Czy moja polisa jeszcze działa | nowe | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| Kiedy muszę zrobić przegląd techniczny | nowe | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „Badanie techniczne samochodu Skoda Octavia jest ważne do 14.05.2027.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| przypomnij mi o oc | nowe | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” | samochod: „OC samochodu Skoda Octavia jest ważne do 08.12.2026.” | samochod: „Nie masz zarejestrowanego pojazdu w aplikacji.” |
+| Zmieniłam adres zamieszkania | nowe | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| Jak się przemeldować do Gdańska | nowe | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Pomogę Ci zameldować się na pobyt stały.” | zameldowanie: „Masz zaczęte zameldowanie: ul. Klonowa 8 m. 5, 80-180 Gdańsk.” |
+| Dostałam list z urzędu miasta, co to znaczy | nowe | pismo: „To pismo z urzędu o podatku od nieruchomości na 2027 rok.” | pismo: „To przypomnienie z aplikacji mObywatel, nie rachunek.” | pismo: „W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.” |
+| Ktoś pisze że wygrałam nagrodę i mam kliknąć link | nowe | sms: „To wygląda na oszustwo. Nie klikaj w link.” | sms: „To wygląda na oszustwo. Nie klikaj w link.” | sms: „To wygląda na oszustwo. Nie klikaj w link.” |
+| Pokaż mi prawo jazdy | nowe | pokaz: „Nie masz prawa jazdy w aplikacji.” | pokaz: „Proszę, oto mPrawo jazdy.” | pokaz: „Nie masz prawa jazdy w aplikacji.” |
+| Otwórz mój dowód | nowe | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” | pokaz: „Proszę, oto mDowód.” |
+| Kiedy wygasa legitymacja | nowe | waznosc: „Twoja mLegitymacja emeryta-rencisty jest ważna bezterminowo.” | waznosc: „Nie masz legitymacji w aplikacji.” | waznosc: „Twoja mLegitymacja studencka jest ważna.” |
+| Ile punktów mam na koncie | nowe | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” | punkty: „Masz 4 punkty karne.” | punkty: „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” |
+| Czy dostałem mandat | nowe | mandat: „Nie masz mandatów do zapłaty.” | mandat: „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | mandat: „Nie masz mandatów do zapłaty.” |
+| W której szkole głosuję | nowe | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 21, ul. Lipowa 20, Kraków.” | wybory: „Głosujesz w lokalu: Szkoła Podstawowa nr 7, ul. Słoneczna 4, Warszawa.” | wybory: „Głosujesz w lokalu: Biblioteka Osiedlowa, ul. Polna 10, Gdańsk.” |
+| Czy mam ulgę na pociąg | nowe | znizka: „Legitymacja emeryta-rencisty daje zniżki m.in. na kolej i komunikac…” | znizka: „Nie masz w aplikacji legitymacji ani Karty Dużej Rodziny.” | znizka: „Legitymacja studencka daje zniżki m.in. na kolej i komunikację miej…” |
+| Na co mi Karta Dużej Rodziny | nowe | kdr: „Kartą Dużej Rodziny zapłacisz mniej m.in. w sklepach, na stacjach p…” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” | kdr: „Nie masz Karty Dużej Rodziny w aplikacji.” |
+| Czy coś pilnego czeka na mnie | nowe | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” | do-zalatwienia: „Czeka na Ciebie 2 sprawy.” | do-zalatwienia: „Czeka na Ciebie 1 sprawa.” |
+| Ile mam dokumentów w aplikacji | nowe | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 3 dokumenty.” | dokumenty-lista: „Masz w aplikacji 2 dokumenty.” |
+| Czy przyszła jakaś wiadomość | nowe | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Masz 1 nową wiadomość.” | skrzynka: „Nie masz nowych wiadomości.” |
+| Co ty potrafisz | nowe | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” | co-umiesz: „Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.” |
+| Witam serdecznie | nowe | powitanie: „Dzień dobry, Halino.” | powitanie: „Dzień dobry, Tomaszu.” | powitanie: „Dzień dobry, Olu.” |
+| Dzięki, to wszystko | nowe | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” | podziekowanie: „Proszę bardzo.” |
+| Jak odebrać nowy dowód | nowe | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” | usluga-wniosek-dowod: „Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważnoś…” |
+| Wyrabiam paszport dla dziecka | nowe | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” | usluga-paszport: „Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.” |
+| Chcę sprzedać auto | nowe | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” | usluga-sprzedaz: „Tu powiadomisz urząd, że sprzedajesz samochód.” |
+| Wyprowadzam się, jak się wymeldować | nowe | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” | usluga-wymeldowanie: „Tu wymeldujesz się, gdy się wyprowadzasz.” |
+| Muszę złożyć deklarację o piecu | nowe | usluga-ogrzewanie: „Tu zgłosisz, czym ogrzewasz dom lub mieszkanie.” | usluga-ogrzewanie: „Tu zgłosisz, czym ogrzewasz dom lub mieszkanie.” | usluga-ogrzewanie: „Tu zgłosisz, czym ogrzewasz dom lub mieszkanie.” |
+| Pieniądze na dziecko 800 plus | nowe | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” | usluga-800plus: „Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.” |
+| Gdzie zamówić akt ślubu | nowe | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” | usluga-odpis: „Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.” |
+| Gdzie są moje e-recepty | nowe | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” | usluga-recepty: „Tu zobaczysz swoje e-recepty i kod do apteki.” |
+| Czy mam e-skierowanie | nowe | usluga-skierowania: „Tu sprawdzisz swoje e-skierowania, np. do lekarza specjalisty.” | usluga-skierowania: „Tu sprawdzisz swoje e-skierowania, np. do lekarza specjalisty.” | usluga-skierowania: „Tu sprawdzisz swoje e-skierowania, np. do lekarza specjalisty.” |
+| Zwrot podatku | nowe | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” | usluga-pit: „Tu sprawdzisz i rozliczysz swój PIT.” |
+| Ostrzeżenia przed powodzią | nowe | usluga-alerty: „Tu włączysz ostrzeżenia o burzach i innych zagrożeniach.” | usluga-alerty: „Tu włączysz ostrzeżenia o burzach i innych zagrożeniach.” | usluga-alerty: „Tu włączysz ostrzeżenia o burzach i innych zagrożeniach.” |
+| zgubiłam portfel a w ogóle kiedy mam przegląd | nowe | zgubione + samochod: „Przykro mi.” | zgubione + samochod: „Przykro mi.” | zgubione + samochod: „Przykro mi.” |
+| Jak ugotować rosół | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Kim był Kopernik | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Polecisz jakiś film | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Jaki jest kurs euro | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
+| Zadzwoń do mamy | nie na temat | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” | nieznane: „Nie rozumiem jeszcze tej prośby.” |
 
 ### 26.11.2026 Poprawki po teście autorki i przygotowanie do publikacji (SPECYFIKACJA.md 2.4)
 - Zrobione:

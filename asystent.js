@@ -9,9 +9,8 @@
 
    - Każda sprawa to JEDEN wpis w tablicy SPRAWY: słowa kluczowe,
      odpowiedź, przyciski i to, dokąd prowadzi.
-   - Rozpoznawanie: rozpoznajSprawe(tekst). Gdy w config.js jest adres modelu
-     (np. Bielik), najpierw pyta model; bez adresu albo gdy model nie odpowie
-     w 6 sekund — działają scenariusze z rozpoznajScenariuszem(tekst).
+   - Całe rozpoznawanie jest w jednej funkcji rozpoznajSprawe(tekst),
+     wyłącznie na scenariuszach z tego pliku (bez internetu i bez serwera).
    - Tekst porównujemy małymi literami, bez polskich znaków,
      z tolerancją literówek.
    ===================================================================== */
@@ -130,16 +129,17 @@
   /* ======================= USŁUGI (gdy żadna sprawa nie pasuje) ======================= */
   var POMIJANE = ['jak', 'co', 'czy', 'mam', 'mi', 'sie', 'do', 'na', 'w', 'z', 'i', 'o', 'po', 'od', 'moj', 'moja', 'moje', 'chce', 'chcialbym',
     'chcialabym', 'gdzie', 'kiedy', 'jest', 'mnie', 'to', 'ze', 'za', 'nie', 'a', 'ja', 'ten', 'ta', 'te', 'prosze', 'musze', 'trzeba', 'mozna', 'sprawa', 'sprawe',
-    'nowy', 'nowa', 'nowe', 'nowego', 'nowej', 'zalatwic', 'zrobic', 'potrzebuje'];
+    'nowy', 'nowa', 'nowe', 'nowego', 'nowej', 'zalatwic', 'zrobic', 'potrzebuje', 'zamow', 'zamowic', 'podaj', 'powiedz', 'plus', 'minus', 'prosze'];
   function szukajUslug(tok) {
     var slowa = tok.filter(function (s) { return s.length >= 3 && POMIJANE.indexOf(s) < 0; });
     if (!slowa.length) return [];
     var najlepsze = 0, wyniki = [];
     D.kategorie.forEach(function (k) {
       k.uslugi.forEach(function (u) {
-        var stog = tokeny(u.nazwa + ' ' + u.opis + ' ' + (u.slowa || ''));
+        var stog = tokeny(u.nazwa + ' ' + (u.slowa || ''));
         var trafienia = slowa.filter(function (s) {
-          return s.length >= 4 && stog.some(function (w) { return pasujeSlowo(w, s.slice(0, Math.max(4, s.length - 2))); });
+          var rdzen = s.slice(0, Math.max(6, s.length - 2));
+          return s.length >= 5 && stog.some(function (w) { return w.indexOf(rdzen) === 0; });
         }).length;
         if (!trafienia) return;
         if (trafienia > najlepsze) { najlepsze = trafienia; wyniki = []; }
@@ -207,6 +207,65 @@
     return rodzaj;
   }
 
+  /* ======================= USŁUGI W ASYSTENCIE =======================
+     [id usługi z dane.js, grupy słów (synonimy, potoczne słowa), jedno zdanie, priorytet, wykluczenia].
+     Zdania są ogólne — bez kwot i terminów. Przycisk „Otwórz usługę” prowadzi do usługi
+     (niedziałające w prototypie otwierają okno „Niedostępne w prototypie”). */
+  var USLUGI_ASYSTENTA = [
+    ['wniosek-dowod', [['nowy dowod', 'nowego dowodu', 'wyrobic dowod', 'wyrobienie dowodu', 'wymiana dowodu', 'wymienic dowod', 'wniosek o dowod', 'wniosek dowod', 'odebrac dowod', 'odbior dowodu']],
+      'Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważność starego.', 3, null,
+      [['wniosek', 'wyrobic', 'zlozyc', 'nowy', 'nowego', 'wymienic'], ['dowod', 'dowodu', 'dowodzik']]],
+    ['paszport', [['paszport', 'paszportu', 'paszporty']], 'Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.', 2],
+    ['dane-pesel', [['rejestr pesel', 'rejestrze pesel', 'dane w pesel', 'moje dane osobowe', 'dane osobowe', 'jakie dane ma urzad', 'jakie dane o mnie']],
+      'Tu zobaczysz, jakie dane o Tobie są w rejestrze PESEL.', 2],
+    ['rejestracja', [['zarejestrowac', 'zarejestruj', 'rejestracja auta', 'rejestracja samochodu', 'rejestracja pojazdu', 'rejestracji auta', 'tablice rejestracyjne',
+      'kupil samochod', 'kupil auto', 'kupila samochod', 'kupila auto', 'kupno auta', 'kupno samochodu', 'przerejestrowac']],
+      'Tu zarejestrujesz samochód, np. po zakupie.', 3, null,
+      [['kupil', 'kupila', 'kupno', 'zakup', 'zakupie'], ['=auto', '=autko', '=auta', 'samochod', 'pojazd']]],
+    ['sprzedaz', [['sprzedal', 'sprzedala', 'sprzedaz', 'sprzedac', 'sprzedaje', 'zbycie']], 'Tu powiadomisz urząd, że sprzedajesz samochód.', 3],
+    ['wymeldowanie', [['wymeld', 'wymelduj', 'wymeldowac', 'wymeldowanie']], 'Tu wymeldujesz się, gdy się wyprowadzasz.', 3],
+    ['ogrzewanie', [['ogrzewan', 'ogrzewam', '=piec', '=pieca', '=piecu', 'kociol', 'kotla', 'ceeb', 'kopciuch', 'czym grzeje', 'deklaracja o zrodle', 'zrodlo ciepla']],
+      'Tu zgłosisz, czym ogrzewasz dom lub mieszkanie.', 2],
+    ['wniosek-kdr', [['wniosek', 'wyrobic', 'wyrobienie', 'dostac', 'zalozyc', 'zlozyc', 'uzyskac', 'starac'],
+      ['karte duzej rodziny', 'karty duzej rodziny', 'karta duzej rodziny', 'kdr', 'duzej rodziny', 'duza rodzina']],
+      'Tu złożysz wniosek o Kartę Dużej Rodziny.', 3],
+    ['800plus', [['800', '800+', 'osiemset', 'swiadczenie na dziecko', 'swiadczenia na dziecko', 'zasilek na dziecko', 'pieniadze na dziecko', 'wychowawcze', 'rodzina 800']],
+      'Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.', 2],
+    ['narodziny', [['urodzil', 'urodzila', 'urodzilo', 'urodzenie dziecka', 'narodzin', 'noworodek', 'noworodka', 'pesel dla dziecka', 'pesel dziecka',
+      'zglosic dziecko', 'zameldowac dziecko', 'mam dziecko', 'urodzi mi sie']],
+      'Tu zgłosisz narodziny dziecka i nadasz mu numer PESEL.', 3],
+    ['odpis', [['odpis', 'akt urodzenia', 'aktu urodzenia', 'akt malzenstwa', 'aktu malzenstwa', 'akt slubu', 'aktu slubu', 'akt zgonu', 'aktu zgonu', 'metryk', 'swiadectwo slubu']],
+      'Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.', 3],
+    ['recepty', [['recept', 'erecept', 'lekarstw', '=leki', '=lekow', 'apteka', 'apteki', 'aptece', 'kod do apteki']],
+      'Tu zobaczysz swoje e-recepty i kod do apteki.', 2],
+    ['skierowania', [['skierowan', 'eskierowan', 'do specjalisty', 'do lekarza', 'do szpitala', 'na badania']],
+      'Tu sprawdzisz swoje e-skierowania, np. do lekarza specjalisty.', 2, ['techniczn', 'auta', 'samochod']],
+    ['ubezpieczenie-zdrowotne', [['zdrowotn', 'nfz', 'ewus', 'czy jestem ubezpieczon', 'czy mam ubezpieczenie zdrowotne', 'ubezpieczenie w nfz']],
+      'Tu sprawdzisz, czy masz ubezpieczenie zdrowotne.', 4],
+    ['pit', [['=pit', '=pita', '=pitu', 'epit', 'e pit', 'zeznanie podatkowe', 'rozliczenie roczne', 'rozliczyc podatek', 'rozliczyc sie z urzedem', 'rozliczenie podatku',
+      'zwrot podatku', 'skarbowk', 'urzad skarbowy', 'urzedu skarbowego']],
+      'Tu sprawdzisz i rozliczysz swój PIT.', 2, ['niezalegan', 'zaswiadcz']],
+    ['podatek-nieruchomosci', [['podatek od nieruchomosci', 'podatku od nieruchomosci', 'podatek od domu', 'podatek od mieszkania', 'podatek od dzialki', 'podatek gruntowy']],
+      'Tu sprawdzisz, ile i do kiedy zapłacić podatek od nieruchomości.', 1],
+    ['zaswiadczenie', [['niezalegani', 'zaswiadczenie z urzedu skarbowego', 'zaswiadczenie skarbowe', 'zaswiadczenie o niezaleganiu', 'zaleglosci podatkow']],
+      'Tu pobierzesz zaświadczenie z urzędu skarbowego, że nie masz zaległości w podatkach.', 3],
+    ['alerty', [['alert', 'ostrzezen', 'rcb', 'burza', 'burzy', 'burze', 'powodz', 'wichur', 'nawalnic', 'klesk']],
+      'Tu włączysz ostrzeżenia o burzach i innych zagrożeniach.', 2],
+    ['mapa-zagrozen', [['niebezpieczne miejsce', 'niebezpiecznym miejscu', 'zglosic policji', 'powiedziec policji', 'mapa zagrozen', 'mapie zagrozen', 'zglosic zagrozenie',
+      'dziura w drodze', 'pijany kierowca', 'nielegalne wysypisko', 'niebezpieczne skrzyzowanie', 'zagrozenie w okolicy']],
+      'Tu powiesz policji o niebezpiecznym miejscu w Twojej okolicy.', 3]
+  ];
+  function znajdzUsluge(id) {
+    var u = null;
+    D.kategorie.forEach(function (k) { k.uslugi.forEach(function (x) { if (x.id === id) u = x; }); });
+    return u;
+  }
+  function odpowiedzUslugi(id, zdanie) {
+    var u = znajdzUsluge(id);
+    var otworz = u && u.href ? link('Otwórz usługę', u.href, 'dalej') : niedostepne('Otwórz usługę', u ? u.nazwa : 'Usługa', 'dalej');
+    return { zdania: [zdanie], przyciski: [otworz, uslugi()] };
+  }
+
   /* ======================= SPRAWY ASYSTENTA (jeden wpis = jedna sprawa) =======================
      slowa: grupy słów — w tekście musi być słowo z KAŻDEJ grupy. lub: drugi zestaw grup (alternatywa).
      dodatkowe: słowa, które wzmacniają dopasowanie. wykluczenia: słowa, przy których wpis nie pasuje.
@@ -215,7 +274,7 @@
 
     /* --- „Czy ten SMS to oszustwo?” --- */
     { id: 'sms', opis: 'Sprawdzenie SMS-a (oszustwo)', priorytet: 6,
-      slowa: [['oszust', 'oszuk', 'podejrzan', 'wyludz', 'phishing', 'scam', 'falszyw', 'dziwny sms', 'dziwnego sms', 'naciag']],
+      slowa: [['oszust', 'oszuk', 'podejrzan', 'wyludz', 'phishing', 'scam', 'falszyw', 'dziwny sms', 'dziwnego sms', 'naciag', '=sciema', '=sciemy', '=sciemka', '=sciema?', 'przekret', 'oszukuj', 'lipny', 'lewy sms']],
       dodatkowe: ['sms', 'esemes', 'wiadomosc', 'link'],
       odpowiedz: function (k, r) {
         var znaki = r.sms;
@@ -261,7 +320,8 @@
     /* --- SPRAWA A: zgubione lub skradzione dokumenty --- */
     { id: 'zgubione', opis: 'Sprawa A: zgubione dokumenty', priorytet: 4,
       slowa: [['zgubi', 'zgub', 'zgin', 'zginal', 'zginel', 'ukradl', 'ukradzi', 'ukradz', 'kradziez', 'kradz', 'skradzi', 'okradl', 'okradzi',
-        'stracil', 'zagin', 'wypadl', 'nie moge znalezc', 'nie mam portfel', 'zostawil', 'zgubion', 'utrat', 'zapodzial']],
+        'stracil', 'zagin', 'wypadl', 'nie moge znalezc', 'nie moge znalesc', 'nie mam portfel', 'zostawil', 'zgubion', 'utrat', 'zapodzial', 'skradl', 'wyrwal', 'wyrwala',
+        'kieszonkow', 'okradzion', 'przepadl', 'przepadla', 'gdzies mi sie podzial', 'nie ma portfel', 'nie ma dowodu', 'zabral', 'zabrala', 'zabrali', 'nigdzie', 'zwinel', 'zwineli', 'gwizdnel']],
       dodatkowe: ['portfel', 'torebk', 'dowod', 'dokument', 'plecak', 'karta', 'karty', 'prawo jazdy'],
       odpowiedz: function (k, r) {
         var opcje = dokumentyDoZaznaczenia(k.dokumenty).map(function (rodzaj) {
@@ -291,7 +351,7 @@
 
     /* --- „Wytłumacz mi to pismo” --- */
     { id: 'pismo', opis: 'Wytłumaczenie pisma ze Skrzynki', priorytet: 4,
-      slowa: [['pism', 'wytlumacz', 'wyjasnij', 'objasnij', 'co to znaczy', 'co znaczy', 'list z urzedu', 'decyzj', 'wezwani', 'prostym jezykiem']],
+      slowa: [['pism', 'wytlumacz', 'wyjasnij', 'objasnij', 'co to znaczy', 'co znaczy', 'list z urzedu', 'decyzj', 'wezwani', 'prostym jezykiem', 'nie rozumiem tego listu', 'z urzedu przyszl']],
       lub: [['podatek', 'podatk'], ['ile', 'zaplac', 'termin', 'do kiedy', 'rata', 'raty', 'nieruchomosc']],
       wykluczenia: ['przyszl', 'nowe pism', 'nowe wiadomosc', 'jakies pismo', 'jakis list'],
       dodatkowe: ['urzad', 'podatek', 'nieruchomosc'],
@@ -301,6 +361,7 @@
         if (k.pismo) w = listy.filter(function (x) { return x.id === k.pismo; })[0] || null;
         if (!w) w = listy.filter(function (x) { return x.slowa && ileTrafien(r.tokeny, tokeny(x.slowa).filter(function (s) { return s.length >= 4; })) > 0; })[0] || null;
         if (!w && !r.podatek) w = listy[0] || null;
+        if (!w && gdzie(r.tokeny, 'nieruchomosc')) return SPRAWA('usluga-podatek-nieruchomosci').odpowiedz(k, r);
         if (!w) {
           return { zdania: ['W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.', 'Gdy przyjdzie, pomogę je zrozumieć.'],
             przyciski: [link('Otwórz Skrzynkę', '#/skrzynka', 'list'), r.podatek ? link('Usługi: Podatki', '#/uslugi/podatki', 'paragon') : dokumenty()] };
@@ -313,8 +374,8 @@
     /* --- SPRAWA B: OC i badanie techniczne --- */
     { id: 'samochod', opis: 'Sprawa B: OC i badanie techniczne', priorytet: 3,
       slowa: [['oc', 'ubezpiecz', 'polis', 'przeglad', 'badanie techniczne', 'badania technicznego', 'badanie auta', 'badanie samochodu',
-        'samochod', '=auto', '=auta', '=autem', 'pojazd', 'skoda', 'octavi']],
-      wykluczenia: ['sprzeda', 'kupil', 'kupic', 'zarejestrowac', 'rejestracj', 'punkt', 'mandat', 'prawo jazdy', 'prawa jazdy', 'prawko',
+        'samochod', '=auto', '=auta', '=autem', '=autko', '=autka', '=autem', 'pojazd', 'skoda', 'octavi', 'o c', 'o ce', '=oce', '=ocu', 'technicznego', 'przeglad techniczny', 'samochodu']],
+      wykluczenia: ['sprzeda', 'kupil', 'kupic', 'zarejestrowac', 'rejestracj', 'punkt', 'mandat', 'prawo jazdy', 'prawa jazdy', 'prawko', 'zdrowotn',
         'zdrowot', 'nfz', 'zgubi', 'zgin', 'ukradl', 'ukradzi', 'kradz'],
       odpowiedz: function (k, r) {
         var d = dok(k, 'pojazdy');
@@ -336,7 +397,7 @@
     /* --- SPRAWA C: zameldowanie na pobyt stały --- */
     { id: 'zameldowanie', opis: 'Sprawa C: zameldowanie', priorytet: 3,
       slowa: [['zameld', 'zamelduj', 'meldun', 'meldowa', 'przemeldow', 'przeprowadz', 'nowy adres', 'nowym adresem', 'zmiana adresu',
-        'zmienic adres', 'pobyt staly', 'pobyt stal']],
+        'zmienic adres', 'pobyt staly', 'pobyt stal', 'nowe mieszkanie', 'nowym mieszkaniu', 'przeprowadzil', 'przeprowadzam', 'meldowanie', 'zameldowanie']],
       wykluczenia: ['wymeld'],
       odpowiedz: function (k) {
         var wynik = k.wyniki.zameldowanie;
@@ -397,7 +458,7 @@
 
     /* --- Jaką zniżkę daje legitymacja --- */
     { id: 'znizka', opis: 'Zniżki z legitymacji', priorytet: 2,
-      slowa: [['znizk', 'znizek', 'zniszk', 'ulg', 'ulgow', 'taniej', 'tansz', 'rabat']],
+      slowa: [['znizk', 'znizek', 'zniszk', '=ulga', '=ulgi', '=ulge', '=ulg', 'ulgow', 'taniej', 'tansz', 'rabat']],
       odpowiedz: function (k, r) {
         var rodzaj = ktoryDokument(k, r, ['legitymacja', 'emeryt', 'kdr']);
         if (rodzaj === 'kdr') return SPRAWA('kdr').odpowiedz(k, r);
@@ -519,9 +580,15 @@
             .concat([link('Otwórz Skrzynkę', '#/skrzynka', 'list'), dokumenty()]) };
       } },
 
+    /* --- USŁUGI z zakładki Usługi: jedno zdanie, czym jest usługa (ogólnie), i „Otwórz usługę” ---
+       Usługi działające w prototypie (sprawy A, B, C) mają własne wpisy wyżej. */
+  ].concat(USLUGI_ASYSTENTA.map(function (u) {
+    return { id: 'usluga-' + u[0], opis: 'Usługa: ' + u[0], priorytet: u[3] || 1, slowa: u[1], wykluczenia: u[4] || undefined, lub: u[5],
+      odpowiedz: function () { return odpowiedzUslugi(u[0], u[2]); } };
+  })).concat([
     /* --- Co umiesz? / Pomoc --- */
     { id: 'co-umiesz', opis: 'Co umiesz / pomoc', slaby: true,
-      slowa: [['co umiesz', 'co potrafisz', 'pomoc', 'pomocy', 'w czym pomozesz', 'czym mi pomozesz', 'w czym mi', 'jak mi pomozesz', 'jak dzialasz', 'co mozesz', 'kim jestes', 'jak to dziala', 'help', 'pomoz']],
+      slowa: [['co umiesz', 'co potrafisz', 'potrafisz', 'umiesz', 'pomoc', 'pomocy', 'w czym pomozesz', 'czym mi pomozesz', 'w czym mi', 'jak mi pomozesz', 'jak dzialasz', 'co mozesz', 'kim jestes', 'jak to dziala', 'help', 'pomoz']],
       odpowiedz: function (k) {
         return { zdania: ['Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.', 'Nic nie wyślę bez Twojej zgody.'],
           przyciski: D.dzialajace.map(function (s) { return link(s.nazwa, s.href, s.ikona); })
@@ -530,15 +597,15 @@
 
     /* --- Powitanie --- */
     { id: 'powitanie', opis: 'Powitanie', slaby: true,
-      slowa: [['czesc', 'dzien dobry', 'dobry wieczor', 'hej', 'witam', 'witaj', 'siema', 'halo', 'dzien dobr']],
+      slowa: [['czesc', 'dzien dobry', 'dobry wieczor', 'hej', 'witam', 'witaj', '=siema', 'halo', 'dzien dobr']],
       odpowiedz: function (k) {
         return { zdania: ['Dzień dobry, ' + k.osoba.wolacz + '.', 'W czym mogę pomóc?'],
           przyciski: podpowiedziJakoPrzyciski(k, 4).concat([uslugi()]) };
       } },
 
     /* --- Podziękowanie --- */
-    { id: 'podziekowanie', opis: 'Podziękowanie', slaby: true,
-      slowa: [['dzieki', 'dziekuj', 'dzieku', 'super', 'swietnie', 'dobrze', 'okej', '=ok']],
+    { id: 'podziekowanie', opis: 'Podziękowanie', slaby: true, priorytet: 1,
+      slowa: [['dzieki', 'dziekuj', 'dzieku', 'super', 'swietnie', 'dobrze', 'okej', '=ok', 'do widzenia', 'dowidzenia']],
       odpowiedz: function (k) {
         return { zdania: ['Proszę bardzo.', 'Czy mogę pomóc w czymś jeszcze?'],
           przyciski: podpowiedziJakoPrzyciski(k, 3).concat([uslugi()]) };
@@ -557,13 +624,13 @@
         return { zdania: ['Nie rozumiem jeszcze tej prośby.', 'Mogę pomóc w tych sprawach:'],
           przyciski: D.dzialajace.map(function (s) { return link(s.nazwa, s.href, s.ikona); }).concat([uslugi()]) };
       } }
-  ];
+  ]);
   function SPRAWA(id) {
     for (var i = 0; i < SPRAWY.length; i++) if (SPRAWY[i].id === id) return SPRAWY[i];
     return null;
   }
 
-  /* ======================= ROZPOZNAWANIE NA SCENARIUSZACH (bez internetu) ======================= */
+  /* ======================= ROZPOZNAWANIE (scenariusze, bez internetu) ======================= */
   function grupyPasuja(tok, grupy) {
     var n = 0;
     for (var i = 0; i < grupy.length; i++) {
@@ -573,7 +640,7 @@
     }
     return n;
   }
-  function rozpoznajScenariuszem(tekst) {
+  function rozpoznajJedno(tekst) {
     var tok = tokeny(tekst);
     var wynik = {
       sprawa: 'nieznane', tokeny: tok, dokumenty: dokumentyWTekscie(tok), sms: znakiOszustwa(tekst),
@@ -604,81 +671,61 @@
     return wynik;
   }
 
-  /* ======================= MODEL JĘZYKOWY (np. Bielik) — NIEOBOWIĄZKOWY =======================
-     Ustawienia w config.js. Model dostaje listę naszych spraw i ma zwrócić TYLKO identyfikator
-     sprawy (albo „nie wiem”) i jedno krótkie, życzliwe zdanie. Nie układa kroków, nie podaje
-     faktów: zdanie z liczbami, datami albo adresami stron odrzucamy. Gdy adres jest pusty,
-     model milczy albo nie zdąży w limicie czasu — działają scenariusze i osoba nic nie zauważa. */
-  function ustawieniaModelu() { return (global.KONFIGURACJA && global.KONFIGURACJA.model) || {}; }
-  function modelWlaczony() { return !!(ustawieniaModelu().adres && typeof fetch === 'function'); }
-  function sprawyDlaModelu() {
-    return SPRAWY.filter(function (s) { return !s.wewnetrzny; });
+  /* Dwie sprawy w jednym zdaniu („zgubiłam portfel i nie wiem co z OC”): dzielimy zdanie
+     na części po spójnikach i rozpoznajemy każdą. Najpierw pilniejsza sprawa, druga jako przycisk. */
+  var SPOJNIKI = ['i', 'oraz', 'a', 'ale', 'tez', 'takze', 'jeszcze', 'plus', 'poza tym', 'a takze', 'no i'];
+  var RODZINY = { 'zastrzez-pesel': 'A', 'pesel-status': 'A', zgubione: 'A' };
+  var PILNOSC = { zgubione: 10, 'zastrzez-pesel': 9, sms: 9, samochod: 7, mandat: 6, pismo: 5, zameldowanie: 4 };
+  var KROTKO = { zgubione: 'zgubione dokumenty', 'zastrzez-pesel': 'zastrzeżenie PESEL', 'pesel-status': 'zastrzeżenie PESEL', sms: 'sprawdzenie SMS-a',
+    samochod: 'OC i badanie auta', zameldowanie: 'zameldowanie', pismo: 'wyjaśnienie pisma', punkty: 'punkty karne', mandat: 'mandat',
+    wybory: 'lokal wyborczy', znizka: 'zniżki', kdr: 'Karta Dużej Rodziny', waznosc: 'ważność dokumentu', 'kod-qr': 'kod QR', 'dokumenty-lista': 'Twoje dokumenty' };
+  function nazwaSprawy(s) {
+    if (KROTKO[s.id]) return KROTKO[s.id];
+    var u = s.id.indexOf('usluga-') === 0 ? znajdzUsluge(s.id.slice(7)) : null;
+    return u ? u.nazwa : s.opis;
   }
-  function promptModelu() {
-    return 'Jesteś modułem rozpoznawania spraw w aplikacji mObywatel. Przypisz wiadomość osoby do JEDNEJ sprawy z listy. ' +
-      'Odpowiedz wyłącznie obiektem JSON: {"sprawa": "<identyfikator z listy albo nie wiem>", "zdanie": "<jedno krótkie, życzliwe zdanie po polsku, na Ty, ' +
-      'bez liczb, dat, kwot, adresów i porad prawnych>"}. Nie dodawaj nic więcej.\nLista spraw:\n' +
-      sprawyDlaModelu().map(function (s) { return '- ' + s.id + ': ' + s.opis; }).join('\n');
+  function czesciZdania(tok) {
+    var czesci = [[]];
+    for (var i = 0; i < tok.length; i++) {
+      var dwa = tok[i] + ' ' + (tok[i + 1] || '');
+      if (SPOJNIKI.indexOf(dwa) >= 0) { czesci.push([]); i++; continue; }
+      if (SPOJNIKI.indexOf(tok[i]) >= 0) { czesci.push([]); continue; }
+      czesci[czesci.length - 1].push(tok[i]);
+    }
+    return czesci.filter(function (c) { return c.length; });
   }
-  function oczyscZdanie(z) {
-    z = String(z || '').replace(/\s+/g, ' ').trim();
-    var koniec = z.search(/[.!?…](\s|$)/);
-    if (koniec >= 0) z = z.slice(0, koniec + 1);
-    if (!z || z.length > 140 || /\d|https?:|www\.|@/.test(z)) return null;
-    return z;
-  }
-  function zapytajModel(tekst) {
-    var u = ustawieniaModelu();
-    var kontroler = typeof AbortController === 'function' ? new AbortController() : null;
-    var zegar = setTimeout(function () { if (kontroler) kontroler.abort(); }, u.limitCzasu || 6000);
-    var limit = new Promise(function (ok) { setTimeout(function () { ok(null); }, (u.limitCzasu || 6000) + 50); });
-    var pytanie = fetch(u.adres, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: kontroler ? kontroler.signal : undefined,
-      body: JSON.stringify({ model: u.nazwa || 'bielik', temperature: 0, max_tokens: 120,
-        messages: [{ role: 'system', content: promptModelu() }, { role: 'user', content: String(tekst).slice(0, 500) }] })
-    }).then(function (odp) { return odp.ok ? odp.json() : null; }).then(function (dane) {
-      var tresc = dane && dane.choices && dane.choices[0] && dane.choices[0].message && dane.choices[0].message.content;
-      var json = tresc && String(tresc).match(/\{[\s\S]*\}/);
-      if (!json) return null;
-      var w = JSON.parse(json[0]);
-      var id = String(w.sprawa || '').trim();
-      var znane = sprawyDlaModelu().some(function (s) { return s.id === id; });
-      return { sprawa: znane ? id : 'nie wiem', zdanie: oczyscZdanie(w.zdanie) };
-    }).catch(function () { return null; });
-    return Promise.race([pytanie, limit]).then(function (w) { clearTimeout(zegar); return w; });
-  }
-  /* rozpoznajSprawe(tekst): najpierw model (gdy jest ustawiony), potem nasze scenariusze.
-     Zwraca obietnicę (Promise) z tym samym wynikiem co rozpoznajScenariuszem. */
   function rozpoznajSprawe(tekst) {
-    var r = rozpoznajScenariuszem(tekst);
-    if (!modelWlaczony()) return Promise.resolve(r);
-    return zapytajModel(tekst).then(function (m) {
-      if (m && m.sprawa !== 'nie wiem') {
-        r.sprawa = m.sprawa;
-        r.zModelu = true;
-        r.zdanieModelu = m.zdanie;
-      }
-      return r;
+    var wynik = rozpoznajJedno(tekst);
+    var czesci = czesciZdania(wynik.tokeny);
+    if (czesci.length < 2) return wynik;
+    var znalezione = [], rodziny = [];
+    czesci.forEach(function (c) {
+      var r = rozpoznajJedno(c.join(' '));
+      var s = SPRAWA(r.sprawa);
+      if (!s || s.slaby || s.wewnetrzny || (s.priorytet || 0) < 2 || s.id === 'pokaz' || s.id === 'do-zalatwienia') return;
+      var rodzina = RODZINY[s.id] || s.id;
+      if (rodziny.indexOf(rodzina) >= 0) return;
+      rodziny.push(rodzina);
+      znalezione.push({ s: s, tekst: c.join(' ') });
     });
-  }
-  /* Odpowiedź z modelem: zdanie modelu zastępuje tylko pierwsze, ogólne zdanie przy sprawach
-     z kartą albo pytaniem (np. „Przykro mi.”). Dane (daty, kwoty) zawsze pochodzą od nas. */
-  function odpowiedzZModelem(tekst, kontekst) {
-    return rozpoznajSprawe(tekst).then(function (r) {
-      var w = SPRAWA(r.sprawa).odpowiedz(kontekst, r);
-      if (r.zdanieModelu && (w.karta || w.wybor) && w.zdania && w.zdania.length) w.zdania = [r.zdanieModelu].concat(w.zdania.slice(1));
-      w.sprawa = r.sprawa;
-      return w;
-    });
+    if (znalezione.length < 2) return wynik;
+    znalezione.sort(function (a, b) { return (PILNOSC[b.s.id] || b.s.priorytet) - (PILNOSC[a.s.id] || a.s.priorytet); });
+    wynik.sprawa = znalezione[0].s.id;
+    wynik.druga = { sprawa: znalezione[1].s.id, nazwa: nazwaSprawy(znalezione[1].s), tekst: znalezione[1].tekst };
+    return wynik;
   }
 
   /* ======================= ODPOWIEDŹ ======================= */
   /* kontekst: { osoba, dokumenty, wyniki, wiadomosci, nowe (nieprzeczytane), liczbaNowych, uwaga (karta „Wymaga Twojej uwagi”), pismo } */
-  /* Odpowiedź na scenariuszach — od razu, bez internetu */
   function odpowiedz(tekst, kontekst) {
-    var r = rozpoznajScenariuszem(tekst);
+    var r = rozpoznajSprawe(tekst);
     var w = SPRAWA(r.sprawa).odpowiedz(kontekst, r);
     w.sprawa = r.sprawa;
+    /* Druga sprawa z tego samego zdania — od razu przycisk, żeby nic nie umknęło */
+    if (r.druga) {
+      w.druga = r.druga.sprawa;
+      w.przyciski = [pytaj('Druga sprawa: ' + r.druga.nazwa, r.druga.tekst)].concat(w.przyciski || []);
+    }
     return w;
   }
   /* Odpowiedź na wybór w wiadomości (np. „Co zginęło?”) */
@@ -693,11 +740,7 @@
   global.ASYSTENT = {
     normalizuj: normalizuj,
     rozpoznajSprawe: rozpoznajSprawe,
-    rozpoznajScenariuszem: rozpoznajScenariuszem,
     odpowiedz: odpowiedz,
-    odpowiedzZModelem: odpowiedzZModelem,
-    modelWlaczony: modelWlaczony,
-    promptModelu: promptModelu,
     dalej: dalej,
     sprawy: SPRAWY,
     nazwy: NAZWY,
