@@ -1,6 +1,6 @@
 # Specyfikacja prototypu „mObywatel dla każdego”
 
-Wersja 2.2 · 25.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu)
+Wersja 2.3 · 26.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu; 2.3: asystent offline i sprawy A, B, C)
 
 Klikalny prototyp aplikacji mObywatel na konkurs mObywatel Challenge (termin zgłoszenia: 26.11 wieczorem). Konkurs ma pierwszeństwo: prototyp ma być lepszy od prototypu referencyjnego Janusza Cieszyńskiego (mobywatel.ai), mieć na to dowody i wyróżniać się.
 
@@ -39,10 +39,10 @@ Zostaje z oficjalnej aplikacji: dokumenty na starcie, dolny pasek (Dokumenty, Us
 
 1. ~~Warianty ekranu startowego~~ — zakończony. **Wzór wyglądu i układu: `warianty/makieta-dokumenty.html`** (zatwierdzony przez autorkę; zastępuje kierunek B1) — kolory, czcionka, karty, nagłówek, dolny pasek, odstępy.
 2. **Szkielet całej aplikacji:** wybór osoby, „Dopasuj do siebie”, motywy, ekran Dokumenty, Usługi, Asystent (pusty stan), Kod QR, Więcej/Ustawienia, Skrzynka, okno „Niedostępne w prototypie”.
-3. **Sprawa A — zgubione dokumenty** w pełni, dostępna trzema drogami (Usługi, asystent, szczegóły dowodu), razem z asystentem dla tej sprawy.
-4. **Sprawa B — samochód: OC i badanie techniczne.**
+3. **Asystent offline i sprawy A, B, C** (jeden etap): szkielet asystenta, sprawa A — zgubione dokumenty, sprawa B — samochód: OC i badanie techniczne, sprawa C — zameldowanie na pobyt stały, szybkie sprawy asystenta, test zdań. Każda sprawa dostępna kilkoma drogami (Usługi, asystent, szczegóły dokumentu, karta pilna).
+4. ~~Sprawa B~~ — w etapie 3.
 5. **Kontrola jakości i publikacja** (GitHub Pages).
-6. Opcjonalnie, jeśli zostanie czas: sprawa C — zameldowanie.
+6. ~~Sprawa C~~ — w etapie 3 (już nie opcjonalna).
 
 Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 
@@ -81,7 +81,14 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 | --- | --- | --- | --- |
 | Halina, 71 lat, emerytka, pierwszy raz w aplikacji | Duży tekst, tryb prosty, jasny motyw | mDowód, mLegitymacja emeryta-rencisty (ZUS), Karta Dużej Rodziny (rodzic, ważna bezterminowo). Nie ma prawa jazdy ani pojazdów | Nowe pismo z Urzędu Miasta o podatku od nieruchomości (kolor akcentu, etykieta „Nowe”, bez czerwieni) → Skrzynka |
 | Tomasz, 38 lat, kierowca | Standardowy tekst, jasny motyw | mDowód, mPrawo jazdy, Moje pojazdy | OC kończy się za 12 dni (czerwień; data = dziś + 12 dni) → sprawa B |
-| Ola, 24 lata, studentka | Standardowy tekst, ciemny motyw | mDowód, mLegitymacja studencka | Brak pilnych spraw („Wszystko w porządku”) |
+| Ola, 24 lata, studentka | Standardowy tekst, ciemny motyw | mDowód, mLegitymacja studencka | „Dokończ zameldowanie” — zaczęta sprawa C, nowy adres już wpisany (kolor akcentu, bez czerwieni) → sprawa C. Po wysłaniu: „Wniosek o zameldowanie wysłany” |
+
+Dane fikcyjne potrzebne asystentowi: adres zameldowania i lokal wyborczy każdej osoby; Tomasz — 4 punkty karne i 1 mandat (200 zł za przekroczenie prędkości); telefon do SMS-ów pokazany częściowo (np. +48 ••• ••• 412).
+
+Gotowe pytania asystenta (3 pierwsze pod polem asystenta, 4 na pustym ekranie Asystenta), dopasowane do osoby:
+- Halina: „Wytłumacz mi pismo”, „Czy ten SMS to oszustwo?” (wysyła przykładowy fałszywy SMS o dopłacie do paczki), „Gdzie użyć Karty Dużej Rodziny?”, „Zginął mi portfel”.
+- Tomasz: „Do kiedy mam OC?”, „Ile mam punktów karnych?”, „Czy mam mandat do zapłaty?”, „Zginął mi portfel”.
+- Ola: „Dokończ zameldowanie”, „Jaką zniżkę daje legitymacja?”, „Gdzie głosuję?”, „Czy mój PESEL jest zastrzeżony?”.
 
 ## Mapa aplikacji
 
@@ -89,7 +96,7 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 - **Pasek telefonu:** na górze ekranu godzina i bateria, żeby prototyp wyglądał jak prawdziwa aplikacja.
 - **Nagłówek:** ikona + „mObywatel”, po prawej „Dostosuj” (ikona suwaków z podpisem; otwiera panel „Wygląd i dostępność”, ten sam co w Więcej) i „Skrzynka” (ikona z podpisem i licznikiem).
 - **Podekrany:** górny pasek z „Wstecz” i tytułem, przyklejony u góry ekranu.
-- **Pole asystenta** przypięte nad dolnym paskiem: pole „Co chcesz załatwić?” + przycisk „Powiedz” (jak u Cieszyńskiego). Po dotknięciu pola pokazują się 3 gotowe pytania.
+- **Pole asystenta** przypięte nad dolnym paskiem: pole „Co chcesz załatwić?” + przycisk „Powiedz” (jak u Cieszyńskiego). Po dotknięciu pola pokazują się 3 gotowe pytania dopasowane do osoby. Pytanie z pola przenosi do rozmowy na zakładce Asystent.
 - **Dolny pasek:** Dokumenty (ekran startowy) · Usługi · Asystent · Kod QR · Więcej.
 - **Do każdej sprawy prowadzą trzy drogi:** Usługi, asystent (pole przypięte na ekranie Dokumenty i zakładka), szczegóły dokumentu.
 - **Każda sprawa kończy się tak samo:** Potwierdzenie → Gotowe → wiadomość w Skrzynce.
@@ -138,13 +145,13 @@ Przy tekście Standardowym na 390 × 844 bez przewijania widać mDowód, kartę 
 
 **6. Usługi.** Wyszukiwarka u góry („Szukaj usługi, np. PESEL”; działa bez polskich znaków i po synonimach). Potem „Najczęstsze” (3–4 usługi), potem wszystkie usługi według sytuacji życiowych: Dokumenty i tożsamość, Samochód, Mieszkanie, Rodzina, Zdrowie, Podatki, Bezpieczeństwo — w każdej 3–5 usług z jednozdaniowym opisem, np. „Zastrzeż PESEL — nikt nie weźmie kredytu na Twoje dane”. Usługi działające w prototypie mają etykietę „Działa w prototypie”. W trybie prostym: tylko kategorie jako duże przyciski, usługi po wejściu w kategorię.
 
-**7. Asystent.** Góra: „Asystent · nic nie wyśle bez Twojej zgody”. Pusty stan: „W czym mogę pomóc?”, 4 podpowiedzi, link „Zobacz wszystkie usługi”. Zachowanie — sekcja Asystent.
+**7. Asystent.** Góra: „Asystent · nic nie wyśle bez Twojej zgody”. Pusty stan: „W czym mogę pomóc?”, 4 podpowiedzi osoby, link „Zobacz wszystkie usługi”. Rozmowa: dymki „Ty” i „Asystent”; przy każdej odpowiedzi „Przeczytaj na głos”; na dole „Nowa rozmowa”. Rozmowa trwa do końca wizyty (zmiana osoby zaczyna nową). Zachowanie — sekcja Asystent.
 
 **8. Kod QR.** Dwa duże przyciski: „Pokaż swój kod” i „Zeskanuj kod” — oba otwierają okno „Niedostępne w prototypie”.
 
 **9. Więcej.** Wygląd i dostępność (te same ustawienia co ekran 2), Zmień osobę, Pokaż wprowadzenie ponownie, O prototypie („Prototyp konkursowy, dane fikcyjne” + 3 wyróżniki w trzech zdaniach).
 
-**10. Skrzynka.** Lista wiadomości; nowe oznaczone słowem „Nowa” i pogrubieniem. Po zakończeniu sprawy pojawia się potwierdzenie.
+**10. Skrzynka.** Lista wiadomości; nowe oznaczone słowem „Nowa” i pogrubieniem. Po zakończeniu sprawy pojawia się potwierdzenie. Pismo, które asystent umie wyjaśnić, ma przycisk „Wytłumacz prostym językiem”.
 
 **11. Potwierdzenie** (wspólne). „Sprawdź, zanim wyślemy”: „Co zrobimy” i „Twoje dane”. „Potwierdzam i wysyłam” / „Wróć i popraw”. Potem „Potwierdź odciskiem palca lub PIN-em” z przyciskiem „Potwierdź (w prototypie wystarczy kliknąć)”.
 
@@ -154,31 +161,43 @@ Przy tekście Standardowym na 390 × 844 bez przewijania widać mDowód, kartę 
 
 ## Sprawy
 
-**A. Zgubione dokumenty**
-1. **Co zginęło?** Pola wyboru: Dowód osobisty, Prawo jazdy, Karty płatnicze, Inne dokumenty. Krok 1 z 4.
-2. **Co zrobimy.** Lista działań z przełącznikiem i jednym zdaniem wyjaśnienia: unieważnimy dowód; zastrzeżemy PESEL (nikt nie weźmie kredytu na Twoje dane); zgłosimy utratę prawa jazdy; karty płatnicze — tego nie zrobimy za Ciebie: przycisk „Zadzwoń i zastrzeż karty: 828 828 828”.
+Wszystkie sprawy: „Krok X z N” z paskiem postępu, „Wstecz” na każdym kroku, dolny pasek ukryty w krokach. Gdy kroki otwiera asystent, odpowiedzi z rozmowy są już zaznaczone i widać dopisek „Zaznaczyliśmy odpowiedzi z rozmowy z asystentem. Sprawdź je.” Na ekranie Gotowe „Wstecz” prowadzi do Dokumentów.
+
+**A. Zgubione dokumenty** (4 kroki). Drogi: Usługi („Zgłoś utratę lub kradzież dokumentów”, „Zastrzeż PESEL”), szczegóły mDowodu („Zgłoś utratę dowodu”, „Zastrzeż PESEL”), asystent.
+1. **Co zginęło?** Pola wyboru: dokumenty z portfela danej osoby (Dowód osobisty, Prawo jazdy, legitymacje, Karta Dużej Rodziny), Karty płatnicze, Inne dokumenty. Pod spodem „Nic nie zginęło? Zastrzeż tylko PESEL” (od razu krok 2).
+2. **Co zrobimy.** Lista działań z przełącznikiem i jednym zdaniem wyjaśnienia: unieważnimy dowód; zastrzeżemy PESEL (nikt nie weźmie kredytu na Twoje dane); zgłosimy utratę prawa jazdy. „Tego nie zrobimy za Ciebie”: karty płatnicze — przycisk „Zadzwoń i zastrzeż karty: 828 828 828”; legitymacje i Karta Dużej Rodziny — gdzie zgłosić utratę (uczelnia, ZUS, urząd, który wydał kartę).
 3. **Potwierdzenie.**
-4. **Gotowe.** „Twój dowód jest unieważniony, a PESEL zastrzeżony.” Co dalej: wniosek o nowy dowód, jak cofnąć zastrzeżenie PESEL.
+4. **Gotowe.** „Twój dowód jest unieważniony, a PESEL zastrzeżony.” Co dalej: wniosek o nowy dowód, jak cofnąć zastrzeżenie PESEL, zastrzeżenie kart. Skutki: mDowód ma status „Unieważniony”, asystent wie, że PESEL jest zastrzeżony.
 
-**B. Mój samochód: OC i badanie techniczne**
+**B. Mój samochód: OC i badanie techniczne** (3 kroki). Drogi: karta pilna Tomasza, Moje pojazdy, Usługi, asystent. Sprawa nic nie wysyła do urzędu, więc nie ma kroku potwierdzenia.
 1. **Mój samochód.** Marka, numer rejestracyjny. „OC ważne do [dziś + 12 dni] — zostało 12 dni” (ostrzeżenie), „Badanie techniczne ważne do 14.05.2027” (w porządku).
-2. **Przypomnienie.** „Przypomnij mi 7 dni przed terminem” → powiadomienie w aplikacji lub SMS.
-3. **Gotowe.** „Przypomnienie ustawione”, wiadomość w Skrzynce.
+2. **Przypomnienie.** „Przypomnij mi 7 dni przed terminem”: o czym (koniec OC, badanie techniczne) i jak (powiadomienie w aplikacji lub SMS).
+3. **Gotowe.** „Przypomnienie ustawione”, daty przypomnień, wiadomość w Skrzynce.
+Osoba bez auta: „Nie masz zarejestrowanego pojazdu w aplikacji” + link do Usług (Samochód).
 
-**C. Zameldowanie** (opcjonalnie): adres → od kiedy → podstawa (właściciel / wynajem) → Potwierdzenie → Gotowe. Błędy przy polu, z podpowiedzią, nigdy tylko czerwona ramka.
+**C. Zameldowanie na pobyt stały** (5 kroków). Drogi: karta pilna Oli „Dokończ zameldowanie”, Usługi, asystent.
+1. **Adres:** ulica i numer domu, numer mieszkania (jeśli jest), kod pocztowy, miejscowość. U Oli adres jest już wpisany.
+2. **Od kiedy:** „Od dziś” albo „Od innego dnia” + data.
+3. **Podstawa:** właściciel lub współwłaściciel / wynajem (w prototypie bez załączania umowy).
+4. **Potwierdzenie** — przy każdej odpowiedzi „Zmień”.
+5. **Gotowe:** „Wysłaliśmy wniosek o zameldowanie do urzędu gminy.” Co dalej: urząd sprawdzi wniosek, odpowiedź w Skrzynce.
+Błędy przy polu, z ikoną i podpowiedzią, jak poprawić — nigdy tylko czerwona ramka (np. ulica bez numeru, kod pocztowy bez 5 cyfr, data nieistniejąca albo z przyszłości).
 
 ## Asystent
 
+**Zasada: „AI rozumie, aplikacja prowadzi”.** Asystent rozpoznaje sprawę i odpowiada krótko, po ludzku. Działania (wysłanie, zastrzeżenie, zgłoszenie) zawsze idą przez widoczne kroki z potwierdzeniem — te same co z Usług. Asystent nie wymyśla faktów prawnych, kwot ani zniżek, jeśli nie ma pewności: mówi ogólnie. Konkretne dane (kwoty, terminy, numery) mają tylko fikcyjne osoby.
+
 Rozpoznaje sprawę, zadaje najwyżej 1–2 pytania i przekazuje do tych samych widocznych kroków co Usługi, z wypełnionymi odpowiedziami. Obok zawsze „Wolę przejść krok po kroku sam(a)”.
 
-- Rozmowy ze scenariusza, bez serwera. Całe rozpoznawanie w jednej funkcji `rozpoznajSprawe(tekst)` w `asystent.js` (później podmieniana na model Bielik).
-- Tekst bez polskich znaków i małymi literami; szerokie listy słów: A — zgubić, ukradli, kradzież, portfel, torebka, dowód, zastrzec, PESEL, karta; B — OC, ubezpieczenie, przegląd, badanie, samochód, auto; C — meldunek, zameldować, przeprowadzka, adres. Dodatkowo: „pokaż dowód”, „skrzynka”, „pomoc”, „co umiesz”.
+- Działa bez internetu i bez serwera. Każda sprawa to jeden wpis w jednym miejscu w `asystent.js`: słowa kluczowe, odpowiedź, przyciski, dokąd prowadzi. Całe rozpoznawanie w jednej funkcji `rozpoznajSprawe(tekst)` (później podmieniana na model Bielik).
+- Tekst bez polskich znaków i małymi literami, z tolerancją literówek (1 literówka w słowach od 5 liter, 2 od 8 liter); szerokie listy słów: A — zgubić, ukradli, kradzież, portfel, torebka, dowód, zastrzec, PESEL, karta; B — OC, ubezpieczenie, przegląd, badanie, samochód, auto; C — meldunek, zameldować, przeprowadzka, nowy adres. Gdy żadna sprawa nie pasuje, asystent szuka w liście Usług.
 - Gdy nie rozumie: „Nie rozumiem jeszcze tej prośby. Mogę pomóc w tych sprawach:” + przyciski działających spraw + „Zobacz wszystkie usługi”. Nigdy „tego nie załatwię”.
-- Najwyżej 2 krótkie zdania na wiadomość, jedno pytanie naraz, każda wiadomość kończy się przyciskami następnego kroku. Wybór wielu opcji jako pola wyboru. Przy odpowiedziach „Przeczytaj na głos”. Wpisywanie głosem przez Web Speech API, gdy dostępne.
+- Najwyżej 2 krótkie zdania na wiadomość, jedno pytanie naraz, każda wiadomość kończy się przyciskami następnego kroku albo kartą sprawy („Zacznij” / „Wolę przejść krok po kroku sam(a)”). Wybór wielu opcji jako pola wyboru. Przy każdej odpowiedzi „Przeczytaj na głos” (głosy systemu — działa bez internetu). „Powiedz” używa rozpoznawania mowy w przeglądarce, gdy jest dostępne; jeśli nie działa (brak mikrofonu, brak internetu w przeglądarce, która go wymaga), asystent prosi o wpisanie pytania.
+- Szybkie sprawy (odpowiedź 1–2 zdania + przycisk do właściwego ekranu lub danych): wytłumacz pismo (od kogo, ile, do kiedy, co zrobić; „Pokaż pismo”, „Jak zapłacić?”), czy ten SMS to oszustwo (3 znaki rozpoznawcze, czego nie robić, przekazanie SMS-a na 8080), pokaż dowód / kod QR, ważność dokumentu, punkty karne, mandat do zapłaty, gdzie głosuję, zniżki z legitymacji (ogólnie, bez liczb), gdzie użyć Karty Dużej Rodziny (ogólnie), czy PESEL jest zastrzeżony (+ „Zastrzeż PESEL”). Gdy osoba nie ma dokumentu, o który pyta — uprzejma informacja i co może zrobić.
 
 ## Technika
 
-- Zwykłe HTML, CSS, JavaScript, bez frameworków i budowania. **Wszystko działa po otwarciu `index.html` dwuklikiem (bez serwera) i na GitHub Pages** — bez iframe i bez wczytywania lokalnych plików przez fetch.
+- Zwykłe HTML, CSS, JavaScript, bez frameworków i budowania. **Wszystko działa po otwarciu `index.html` dwuklikiem (bez serwera) i na GitHub Pages** — bez iframe i bez wczytywania lokalnych plików przez fetch. **Wszystko działa bez internetu** (z internetu korzysta tylko czcionka — bez niego jest systemowa — oraz, w niektórych przeglądarkach, rozpoznawanie mowy „Powiedz”).
 - Pliki: `index.html`, `style.css`, `app.js`, `dane.js`, `asystent.js`.
 - Każdy ekran ma własny adres (`#/dokumenty`, `#/uslugi`, `#/sprawa/zgubione/krok-2`). Parametry: `?osoba=halina`, `?reset=1`.
 - Ustawienia zapamiętywane w localStorage (w try/catch); aplikacja działa także bez niego.
@@ -192,7 +211,8 @@ Sprawdź w trzech rozmiarach tekstu, trzech motywach i przy 320 px:
 - wszystkie elementy klikalne min. 48 px;
 - nic się nie nakłada i nie wychodzi poza ekran, także przy powiększeniu 200%;
 - każdy przycisk coś robi (nie ma martwych kliknięć);
-- działa po otwarciu dwuklikiem.
+- działa po otwarciu dwuklikiem;
+- asystent: co najmniej 60 różnych zdań dla wszystkich trzech osób, żadne nie kończy się ślepym zaułkiem; każda sprawa przejdzona każdą drogą.
 
 ## Mierzalne cele (porównanie z prototypem Cieszyńskiego)
 

@@ -586,6 +586,114 @@ a.uwaga:hover { border-color: var(--akcent); }
 .pusty-stan .ilustracja svg { width: 32px; height: 32px; }
 .pusty-stan .podpowiedzi { margin: 14px 0 10px; }
 
+/* ---------- Kroki spraw A, B, C ---------- */
+.krok-licznik { margin-bottom: 14px; }
+.krok-licznik p { color: var(--tekst-2); line-height: 1.4; }
+.krok-licznik b { color: var(--tekst); }
+.postep { display: flex; gap: 6px; margin-top: 8px; }
+.postep span { flex: 1; height: 8px; border-radius: 4px; background: var(--linia); }
+.postep span.zrobiony { background: var(--akcent); }
+.z-asystenta {
+  display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px; padding: 10px 14px; line-height: 1.4;
+  border-radius: 12px; background: var(--akcent-jasny); color: var(--tekst);
+}
+.z-asystenta svg { width: 22px; height: 22px; color: var(--akcent); margin-top: .1em; }
+.blad-pola { display: flex; align-items: flex-start; gap: 6px; margin: 0 0 8px; color: var(--pilne); font-weight: 700; line-height: 1.4; }
+.blad-pola[hidden] { display: none; }
+.blad-pola svg { width: 20px; height: 20px; margin-top: .15em; }
+.pole-formularza { margin-bottom: 16px; }
+.pole-etykieta { display: block; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+.pole-podpowiedz { display: block; color: var(--tekst-2); font-size: max(16px, .9rem); margin-bottom: 6px; line-height: 1.4; }
+.pole-tekst {
+  width: 100%; min-height: 52px; padding: 8px 14px; border-radius: 12px; border: 2px solid var(--pole-ramka);
+  background: var(--powierzchnia); color: var(--tekst); font-size: 1rem;
+}
+.pole-tekst:focus-visible { outline: 3px solid var(--fokus); outline-offset: 2px; }
+.z-bledem .pole-tekst, .pole-tekst[aria-invalid="true"] { border-color: var(--pilne); border-width: 3px; }
+fieldset.z-bledem .opcja { border-color: var(--pilne); }
+.dzialania { display: flex; flex-direction: column; }
+.info-lista { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.info-lista li { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 12px; padding: 12px 14px; line-height: 1.45; }
+.info-lista .btn { margin-top: 10px; }
+.lista-zrobimy { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.lista-zrobimy li { display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+.lista-zrobimy svg { width: 22px; height: 22px; color: var(--sukces); margin-top: .1em; }
+.dane .z-edycja { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 8px; }
+.dane .z-edycja dt { flex-basis: 100%; }
+.dane .z-edycja dd { flex: 1 1 10em; min-width: 0; }
+.zmien { flex: none; text-decoration: none; }
+.statusy { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.status-wiersz {
+  display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 12px; line-height: 1.4;
+  background: var(--powierzchnia); border: 1px solid var(--linia);
+}
+.status-wiersz svg { width: 24px; height: 24px; flex: none; }
+.status-wiersz.pilne { border: 2px solid var(--pilne); }
+.status-wiersz.pilne svg { color: var(--pilne); }
+.status-wiersz.ok svg { color: var(--sukces); }
+.komunikat-ok.statyczny { margin: 0 0 14px; }
+.gotowe { display: flex; flex-direction: column; align-items: center; text-align: center; margin: 4px 0 18px; }
+.ilustracja.sukces { background: var(--sukces-jasny); color: var(--sukces); margin: 4px 0 12px; }
+.gotowe-zdanie { font-size: 1.15rem; font-weight: 700; line-height: 1.4; }
+.link-skrzynka {
+  display: flex; align-items: center; gap: 10px; min-height: 56px; margin-top: 16px; padding: 10px 14px; line-height: 1.35;
+  border: 1px solid var(--sukces); border-radius: 12px; background: var(--sukces-jasny); color: var(--tekst); font-weight: 700; text-decoration: none;
+}
+.link-skrzynka > svg:first-child { width: 22px; height: 22px; color: var(--sukces); }
+.link-skrzynka span { flex: 1; }
+.komunikat-dokumentu.alarm { border-color: var(--pilne); background: var(--pilne-jasne); }
+.komunikat-dokumentu.alarm svg { color: var(--pilne); }
+
+/* ---------- Rozmowa z asystentem ---------- */
+.rozmowa { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.wiad { display: flex; }
+.wiad.ty { justify-content: flex-end; }
+.wiad.ty .dymek {
+  max-width: 88%; padding: 10px 14px; border-radius: 18px 18px 4px 18px; line-height: 1.4; overflow-wrap: anywhere;
+  background: var(--akcent); color: var(--powierzchnia);
+}
+.wiad.asystent .dymek {
+  width: 100%; padding: 12px 14px 14px; border-radius: 4px 18px 18px 18px; line-height: 1.45;
+  background: var(--powierzchnia); border: 1px solid var(--linia);
+}
+.wiad.asystent:focus { outline: none; }
+.wiad.asystent:focus-visible .dymek { outline: 3px solid var(--fokus); outline-offset: 2px; }
+.wiad-autor { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 16px; font-weight: 700; color: var(--akcent); }
+.wiad-autor svg { width: 20px; height: 20px; }
+.wiad.ostrzezenie .dymek { border: 2px solid var(--pilne); }
+.wiad.ostrzezenie .wiad-autor { color: var(--pilne); }
+.dymek > p + p { margin-top: 4px; }
+.fakty { margin: 10px 0 0; border-top: 1px solid var(--linia); }
+.fakty > div { padding: 8px 0; border-bottom: 1px solid var(--linia); }
+.fakty dt { font-size: max(16px, .9rem); color: var(--tekst-2); line-height: 1.4; }
+.fakty dd { margin: 0; font-weight: 700; line-height: 1.4; }
+.porady { margin-top: 10px; }
+.porady-tytul { font-weight: 700; }
+.porady ul { list-style: disc; padding-left: 1.3em; }
+.porady li + li { margin-top: 2px; }
+.karta-sprawy { margin-top: 12px; padding: 14px; border-radius: 14px; border: 2px solid var(--akcent); background: var(--akcent-jasny); }
+.karta-sprawy-tytul { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; line-height: 1.3; }
+.karta-sprawy-tytul svg { width: 24px; height: 24px; color: var(--akcent); }
+.karta-sprawy .opis { margin-top: 4px; }
+.karta-sprawy-punkty { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.karta-sprawy-punkty li { display: flex; align-items: flex-start; gap: 6px; font-weight: 700; line-height: 1.4; }
+.karta-sprawy-punkty svg { width: 20px; height: 20px; color: var(--sukces); margin-top: .1em; }
+.karta-sprawy .przyciski-pion { margin-top: 12px; }
+.wybor { margin-top: 12px; border: 0; padding: 0; min-width: 0; }
+.wybor fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.wybor legend { padding: 0; margin-bottom: 6px; font-weight: 700; font-size: 1.05rem; line-height: 1.3; }
+.wybor .opis { display: block; margin-bottom: 8px; }
+.wybor .opcje { margin-bottom: 12px; }
+.odpowiedziano { margin-top: 10px; display: flex; align-items: flex-start; gap: 6px; font-weight: 700; color: var(--sukces); }
+.odpowiedziano svg { width: 20px; height: 20px; margin-top: .15em; }
+.odp-pytania { margin-top: 12px; }
+.odp-akcje { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.odp-akcje .btn { min-height: 52px; }
+.btn-czytaj-odp { margin-top: 12px; }
+.rozmowa-stopka { margin-top: 12px; display: flex; justify-content: center; }
+.btn-tekst { display: inline-flex; align-items: center; gap: 6px; }
+.btn-tekst svg { width: 20px; height: 20px; }
+
 /* ---------- Kod QR ---------- */
 .kafle { display: flex; flex-direction: column; gap: 12px; }
 .kafel {
@@ -655,6 +763,13 @@ a.uwaga:hover { border-color: var(--akcent); }
 [data-motyw="kontrast"] .btn-zarzadzaj, [data-motyw="kontrast"] .rozwijane, [data-motyw="kontrast"] .kolejnosc-wiersz,
 [data-motyw="kontrast"] .komunikat-ok, [data-motyw="kontrast"] .ogloszenie:not(:empty), [data-motyw="kontrast"] .komunikat-dokumentu { border: 2px solid #fff; }
 [data-motyw="kontrast"] .btn:disabled { border-color: #fff; color: #fff; }
+[data-motyw="kontrast"] .wiad.asystent .dymek, [data-motyw="kontrast"] .karta-sprawy, [data-motyw="kontrast"] .wiad.ty .dymek { border: 2px solid #fff; }
+[data-motyw="kontrast"] .wiad.ostrzezenie .dymek { border-color: var(--pilne); }
+[data-motyw="kontrast"] .z-asystenta, [data-motyw="kontrast"] .info-lista li, [data-motyw="kontrast"] .status-wiersz,
+[data-motyw="kontrast"] .link-skrzynka { border: 2px solid #fff; }
+[data-motyw="kontrast"] .status-wiersz.pilne, [data-motyw="kontrast"] .komunikat-dokumentu.alarm { border-color: var(--pilne); }
+[data-motyw="kontrast"] .postep span { background: #000; border: 1px solid #fff; }
+[data-motyw="kontrast"] .postep span.zrobiony { background: #FFE500; }
 [data-motyw="kontrast"] .karta :focus-visible, [data-motyw="kontrast"] .karta .btn-pokaz:focus-visible { outline-color: #FFE500; }
 [data-motyw="kontrast"] .podpowiedz, [data-motyw="kontrast"] .btn-czytaj, [data-motyw="kontrast"] .etykieta-dziala,
 [data-motyw="kontrast"] .ikona-kolo, [data-motyw="kontrast"] .awatar, [data-motyw="kontrast"] .ilustracja { border: 2px solid #fff; }

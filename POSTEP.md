@@ -4,9 +4,16 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 
 ## Stan
 
-- Obowiązuje SPECYFIKACJA.md w wersji 2.2 (wzór wyglądu: `warianty/makieta-dokumenty.html`; dokumenty jak w prawdziwym mObywatelu).
-- Ukończony etap: 2 — szkielet całej aplikacji (`index.html`, `style.css`, `app.js`, `dane.js`), z poprawkami dokumentów.
-- Następny etap: 3 — sprawa A „Zgubione dokumenty” z asystentem (wtedy powstanie `asystent.js`).
+- Obowiązuje SPECYFIKACJA.md w wersji 2.3 (wzór wyglądu: `warianty/makieta-dokumenty.html`; dokumenty jak w prawdziwym mObywatelu; asystent offline i sprawy A, B, C).
+- Ukończony etap: 3 — asystent offline i sprawy A, B, C (`asystent.js` + zmiany w `app.js`, `dane.js`, `style.css`, `index.html`). Szczegóły w dzienniku.
+- Następny etap: 5 — kontrola jakości i publikacja (GitHub Pages) — gdy autorka poprosi.
+- **Etap „Asystent i sprawy offline” (26.11.2026) — wszystkie kroki 1–6 ukończone:**
+  - [x] Krok 1 — szkielet asystenta: `asystent.js` (jeden wpis na sprawę, `rozpoznajSprawe(tekst)`, tolerancja literówek), rozmowa na zakładce Asystent, podpowiedzi dla każdej osoby, „Przeczytaj na głos” przy każdej odpowiedzi, „Powiedz” (rozpoznawanie mowy w przeglądarce), „Nie rozumiem jeszcze tej prośby…” z przyciskami spraw.
+  - [x] Krok 2 — sprawa A „Zgubione dokumenty”: Co zginęło? (dokumenty z portfela osoby + karty płatnicze + inne) → Co zrobimy (przełączniki; karty: „Zadzwoń i zastrzeż karty: 828 828 828”) → Sprawdź, zanim wyślemy (+ odcisk palca/PIN) → Gotowe, wiadomość w Skrzynce. Po wysłaniu mDowód ma status „Unieważniony”, a PESEL jest zastrzeżony. Drogi: Usługi, szczegóły mDowodu (Zgłoś utratę / Zastrzeż PESEL), asystent.
+  - [x] Krok 3 — sprawa B „Mój samochód: OC i badanie techniczne”: ekran pojazdu ze statusami (OC — ostrzeżenie, badanie — w porządku) → „Przypomnij mi 7 dni przed terminem” (OC / badanie; powiadomienie w aplikacji albo SMS) → Gotowe, wiadomość w Skrzynce. Drogi: karta pilna Tomasza, Moje pojazdy, Usługi, asystent. Osoba bez auta dostaje uprzejmą informację i link do Usług.
+  - [x] Krok 4 — sprawa C „Zameldowanie na pobyt stały”: Adres → Od kiedy → Podstawa (właściciel / wynajem) → Sprawdź, zanim wyślemy (z „Zmień” przy każdej odpowiedzi) → Gotowe, wiadomość w Skrzynce. Błędy przy polu z podpowiedzią, jak poprawić (ulica bez numeru, zły kod pocztowy, data nieistniejąca lub z przyszłości, brak wyboru). Drogi: karta pilna Oli „Dokończ zameldowanie” (adres już wpisany), Usługi, asystent. Po wysłaniu karta Oli zmienia się na „Wniosek o zameldowanie wysłany”.
+  - [x] Krok 5 — szybkie sprawy asystenta: wytłumaczenie pisma (też z pisma w Skrzynce: „Wytłumacz prostym językiem”), „Czy ten SMS to oszustwo?” (z przykładem jako podpowiedź Haliny), pokaż dowód / kod QR, ważność dokumentów, punkty karne, mandaty, lokal wyborczy, zniżki z legitymacji, Karta Dużej Rodziny, status PESEL. Gdy osoba nie ma dokumentu — uprzejma informacja i co może zrobić.
+  - [x] Krok 6 — test 70 zdań × 3 osoby (210 odpowiedzi, 0 ślepych zaułków; tabela w dzienniku), sprawy A, B, C przejdzone każdą drogą, Kontrola: 21 zestawów, 4116 ekranów, 0 błędów.
 
 ## Decyzje autorki
 
@@ -23,7 +30,123 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 
 - 25.11.2026: poprawki do etapu 2 — dokumenty mają odpowiadać prawdziwemu mObywatelowi (opis z aplikacji autorki), wpisane do SPECYFIKACJA.md (wersja 2.2): (1) dokumenty osób — Halina: mDowód, mLegitymacja emeryta-rencisty, Karta Dużej Rodziny; Tomasz: mDowód, mPrawo jazdy, Moje pojazdy; Ola: mDowód, mLegitymacja studencka; (2) dotknięcie karty z tyłu przesuwa ją na przód, szczegóły otwiera przycisk na przedniej karcie; (3) każda karta wygląda jak prawdziwy dokument — wspólny szablon, własny kolor, wzór giloszowy; (4) szczegóły dokumentu jak w mObywatelu; (5) „Zarządzaj”: kolejność, usuń, układ, dodaj; (6) „Wstecz” z tytułem przyklejone u góry podekranów; (7) czcionka Atkinson Hyperlegible z Google Fonts, zapasowo systemowa.
 
+- 26.11.2026: etap „Asystent i sprawy offline”, wpisany do SPECYFIKACJA.md (wersja 2.3): zasada „AI rozumie, aplikacja prowadzi”; każda sprawa to jeden wpis w `asystent.js`, rozpoznawanie w `rozpoznajSprawe(tekst)` (później Bielik); odpowiedzi najwyżej 2 zdania, zawsze z przyciskami; podpowiedzi dopasowane do osoby; sprawy A, B, C w pełni (C już nie opcjonalna); karta pilna Oli „Dokończ zameldowanie”; szybkie sprawy asystenta (pismo, SMS, dowód, ważność, punkty, mandat, wybory, zniżki, KDR, PESEL); wszystko działa bez internetu.
+
 ## Dziennik
+
+### 26.11.2026 Etap 3 — asystent offline i sprawy A, B, C
+- Zasada całego etapu: „AI rozumie, aplikacja prowadzi”. Asystent rozpoznaje sprawę i odpowiada krótko; wysłanie, zastrzeżenie i zgłoszenie idą zawsze przez widoczne kroki z potwierdzeniem — te same co z Usług. Wszystko działa bez internetu i bez serwera.
+- Zrobione:
+  - **Krok 1 — szkielet asystenta.** Nowy plik `asystent.js`: każda sprawa to jeden wpis (słowa kluczowe, odpowiedź, przyciski, dokąd prowadzi), całe rozpoznawanie w funkcji `rozpoznajSprawe(tekst)` — do podmiany na model Bielik. Tekst porównywany małymi literami, bez polskich znaków, z tolerancją literówek. Gdy żadna sprawa nie pasuje, asystent szuka w liście Usług, a dopiero potem mówi „Nie rozumiem jeszcze tej prośby. Mogę pomóc w tych sprawach:” z przyciskami spraw i „Zobacz wszystkie usługi”. Rozmowa na zakładce Asystent (dymki, karta sprawy z „Zacznij” i „Wolę przejść krok po kroku sam(a)”, pola wyboru, „Przeczytaj na głos” przy każdej odpowiedzi, „Nowa rozmowa”). Pytanie z pola na ekranie Dokumenty przenosi do rozmowy. Podpowiedzi dopasowane do osoby (3 pod polem, 4 w pustym stanie). „Powiedz” używa rozpoznawania mowy w przeglądarce; gdy nie działa, prosi o wpisanie pytania.
+  - **Krok 2 — sprawa A „Zgubione dokumenty”** (4 kroki): Co zginęło? (dokumenty z portfela osoby, karty płatnicze, inne) → Co zrobimy (przełączniki: unieważnić dowód, zastrzec PESEL, zgłosić utratę prawa jazdy; karty — „Zadzwoń i zastrzeż karty: 828 828 828”; legitymacje i KDR — gdzie zgłosić) → Sprawdź, zanim wyślemy (+ odcisk palca / PIN) → Gotowe. Wiadomość w Skrzynce; mDowód dostaje status „Unieważniony”, PESEL jest zastrzeżony.
+  - **Krok 3 — sprawa B „Mój samochód: OC i badanie techniczne”** (3 kroki): pojazd ze statusami → przypomnienie 7 dni przed terminem (OC, badanie; powiadomienie w aplikacji albo SMS) → Gotowe, wiadomość w Skrzynce. Osoba bez auta dostaje uprzejmą informację i link do Usług.
+  - **Krok 4 — sprawa C „Zameldowanie na pobyt stały”** (5 kroków): adres → od kiedy → podstawa (właściciel / wynajem) → Sprawdź, zanim wyślemy („Zmień” przy każdej odpowiedzi) → Gotowe, wiadomość w Skrzynce. Błędy przy polu z ikoną i podpowiedzią, jak poprawić. Ola ma kartę pilną „Dokończ zameldowanie” z wpisanym adresem; po wysłaniu karta zmienia się na „Wniosek o zameldowanie wysłany”.
+  - **Krok 5 — szybkie sprawy asystenta:** wytłumaczenie pisma (najważniejsze: pismo Haliny o podatku — od kogo, ile, do kiedy, co zrobić; „Pokaż pismo”, „Jak zapłacić?”; także przyciskiem „Wytłumacz prostym językiem” w samym piśmie), „Czy ten SMS to oszustwo?” (przykład fałszywego SMS-a o dopłacie do paczki jako podpowiedź Haliny), pokaż dowód / kod QR, ważność dokumentów, punkty karne, mandat, lokal wyborczy, zniżki z legitymacji (ogólnie), Karta Dużej Rodziny (ogólnie), status PESEL. Gdy osoba nie ma dokumentu — uprzejma informacja i co może zrobić.
+  - SPECYFIKACJA.md: wersja 2.3 (zasada etapu, asystent, sprawy A, B, C, podpowiedzi osób, karta Oli, dane fikcyjne).
+- Pliki: `asystent.js` (nowy), `app.js`, `dane.js`, `style.css`, `index.html`, `SPECYFIKACJA.md`, `POSTEP.md`.
+- Jak sprawdzić (dwuklik na `index.html`; szybkie wejście `?osoba=halina|tomasz|ola`, od nowa `?reset=1`):
+  - **Asystent:** dotknij pola „Co chcesz załatwić?” na Dokumentach i wybierz gotowe pytanie albo wpisz własne (np. „zgubilam portfle”). Odpowiedź pojawia się na zakładce Asystent.
+  - **Sprawa A:** u Tomasza mDowód → „Zgłoś utratę dowodu” albo w asystencie „ukradli mi torebkę”. Po wysłaniu mDowód ma status „Unieważniony”, a w Skrzynce jest potwierdzenie.
+  - **Sprawa B:** u Tomasza czerwona karta „Kończy się OC” → „Przypomnij mi 7 dni przed terminem”. U Haliny pytanie „do kiedy mam OC” kończy się uprzejmą informacją o braku auta.
+  - **Sprawa C:** u Oli karta „Dokończ zameldowanie” — adres jest już wpisany. Spróbuj złego kodu pocztowego albo daty z przyszłości, żeby zobaczyć podpowiedź przy polu.
+  - **Pismo i SMS:** u Haliny podpowiedzi „Wytłumacz mi pismo” i „Czy ten SMS to oszustwo?”.
+- Test asystenta (automatycznie, ten sam kod co w aplikacji): 70 różnych zdań × 3 osoby = 210 odpowiedzi. Każda kończy się przyciskami następnego kroku, kartą sprawy albo pytaniem z wyborem — 0 ślepych zaułków. Każda ma najwyżej 2 zdania, zdania do 15 słów, wszystkie przyciski prowadzą do istniejących ekranów. Sprawdzony też każdy wybór w rozmowie (także pusty). „Nie rozumiem jeszcze tej prośby” tylko dla zdań nie na temat (pogoda, kawał, „asdfgh”, pierogi, bilet do Zakopanego) — zawsze z przyciskami spraw.
+
+| Zdanie | Halina | Tomasz | Ola |
+| --- | --- | --- | --- |
+| zgubiłam portfel | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” |
+| Zginął mi portfel | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” |
+| ukradli mi torebkę | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” |
+| zginął mi dowód | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: dowód osobisty) | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: dowód osobisty) | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: dowód osobisty) |
+| zgubilem dowod osobisty | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: dowód osobisty) | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: dowód osobisty) | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: dowód osobisty) |
+| skradziono mi plecak z dokumentami | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” |
+| nie mogę znaleźć prawa jazdy | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: prawo jazdy) | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” |
+| zgubiłam kartę płatniczą | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: karty płatnicze) | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: karty płatnicze) | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” (zaznacza: karty płatnicze) |
+| zgbiłam portfel | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” | Sprawa A: „Przykro mi…”, pyta „Co zginęło?” |
+| zastrzec PESEL | Sprawa A: karta „Zastrzeż PESEL” → krok 2 | Sprawa A: karta „Zastrzeż PESEL” → krok 2 | Sprawa A: karta „Zastrzeż PESEL” → krok 2 |
+| jak zastrzec pesel | Sprawa A: karta „Zastrzeż PESEL” → krok 2 | Sprawa A: karta „Zastrzeż PESEL” → krok 2 | Sprawa A: karta „Zastrzeż PESEL” → krok 2 |
+| chce zastrzec numer pesl | Sprawa A: karta „Zastrzeż PESEL” → krok 2 | Sprawa A: karta „Zastrzeż PESEL” → krok 2 | Sprawa A: karta „Zastrzeż PESEL” → krok 2 |
+| czy mój PESEL jest zastrzeżony | PESEL nie jest zastrzeżony + „Zastrzeż PESEL” | PESEL nie jest zastrzeżony + „Zastrzeż PESEL” | PESEL nie jest zastrzeżony + „Zastrzeż PESEL” |
+| czy mam zastrzezony pesel | PESEL nie jest zastrzeżony + „Zastrzeż PESEL” | PESEL nie jest zastrzeżony + „Zastrzeż PESEL” | PESEL nie jest zastrzeżony + „Zastrzeż PESEL” |
+| do kiedy mam OC | Nie ma auta → „Usługi: Samochód” | OC ważne do … (12 dni) + karta przypomnienia (sprawa B) | Nie ma auta → „Usługi: Samochód” |
+| kiedy kończy się ubezpieczenie samochodu | Nie ma auta → „Usługi: Samochód” | OC ważne do … (12 dni) + karta przypomnienia (sprawa B) | Nie ma auta → „Usługi: Samochód” |
+| przegląd auta | Nie ma auta → „Usługi: Samochód” | Badanie ważne do 14.05.2027 + karta przypomnienia (sprawa B) | Nie ma auta → „Usługi: Samochód” |
+| kiedy mam badanie techniczne | Nie ma auta → „Usługi: Samochód” | Badanie ważne do 14.05.2027 + karta przypomnienia (sprawa B) | Nie ma auta → „Usługi: Samochód” |
+| ubezpieczenie samochodu | Nie ma auta → „Usługi: Samochód” | OC ważne do … (12 dni) + karta przypomnienia (sprawa B) | Nie ma auta → „Usługi: Samochód” |
+| OC | Nie ma auta → „Usługi: Samochód” | OC ważne do … (12 dni) + karta przypomnienia (sprawa B) | Nie ma auta → „Usługi: Samochód” |
+| chcę się zameldować | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: przypomina wpisany adres, pyta: właściciel czy wynajem |
+| jak się zameldować | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: przypomina wpisany adres, pyta: właściciel czy wynajem |
+| przeprowadzka | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: przypomina wpisany adres, pyta: właściciel czy wynajem |
+| meldunek | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: przypomina wpisany adres, pyta: właściciel czy wynajem |
+| zameldowac sie na pobyt staly | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: przypomina wpisany adres, pyta: właściciel czy wynajem |
+| Dokończ zameldowanie | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: pyta: właściciel czy wynajem | Sprawa C: przypomina wpisany adres, pyta: właściciel czy wynajem |
+| Wytłumacz mi pismo | Wyjaśnia pismo: Urząd Miasta Krakowa, 412 zł + „Pokaż pismo” | Wyjaśnia pismo: mObywatel, OC samochodu Skoda Octavia (WX 4821K) + „Pokaż pismo” | Brak pisma do wyjaśnienia → „Otwórz Skrzynkę” |
+| wytlumacz mi to pismo z urzedu | Wyjaśnia pismo: Urząd Miasta Krakowa, 412 zł + „Pokaż pismo” | Wyjaśnia pismo: mObywatel, OC samochodu Skoda Octavia (WX 4821K) + „Pokaż pismo” | Brak pisma do wyjaśnienia → „Otwórz Skrzynkę” |
+| nie rozumiem pisma | Wyjaśnia pismo: Urząd Miasta Krakowa, 412 zł + „Pokaż pismo” | Wyjaśnia pismo: mObywatel, OC samochodu Skoda Octavia (WX 4821K) + „Pokaż pismo” | Brak pisma do wyjaśnienia → „Otwórz Skrzynkę” |
+| ile mam zapłacić podatku | Wyjaśnia pismo: Urząd Miasta Krakowa, 412 zł + „Pokaż pismo” | Brak pisma do wyjaśnienia → „Otwórz Skrzynkę” | Brak pisma do wyjaśnienia → „Otwórz Skrzynkę” |
+| Czy ten SMS to oszustwo? | Prosi o wklejenie SMS-a + przykład | Prosi o wklejenie SMS-a + przykład | Prosi o wklejenie SMS-a + przykład |
+| Czy ten SMS to oszustwo? „Twoja paczka jest wstrzymana. Dopłać 1,89 zł w ciągu 24 h: paczka-dostawa24.xyz/oplata” | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 |
+| Dostałam SMS: Twoje konto zostanie zablokowane, kliknij bank-weryfikacja.top | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 |
+| Czy ten SMS to oszustwo? „Cześć mamo, to mój nowy numer, odezwij się” | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 | Ostrzega: oszustwo, 3 znaki, czego nie robić, 8080 |
+| Czy ten SMS to oszustwo? „Przypominamy o wizycie u lekarza jutro o 10:00” | Nie widzi znaków oszustwa, ale radzi ostrożność | Nie widzi znaków oszustwa, ale radzi ostrożność | Nie widzi znaków oszustwa, ale radzi ostrożność |
+| pokaż mój dowód | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR |
+| pokaz dowod | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR |
+| pokaż prawo jazdy | Nie ma dokumentu → co zrobić | „Proszę, oto mPrawo jazdy.” + przycisk dokumentu i kodu QR | Nie ma dokumentu → co zrobić |
+| kod qr | Kod QR → „Otwórz Kod QR” | Kod QR → „Otwórz Kod QR” | Kod QR → „Otwórz Kod QR” |
+| jak zeskanować kod | Kod QR → „Otwórz Kod QR” | Kod QR → „Otwórz Kod QR” | Kod QR → „Otwórz Kod QR” |
+| kiedy traci ważność mój dowód | „Twój dowód osobisty jest ważny do 12.03.2031.” | „Twój dowód osobisty jest ważny do 03.10.2030.” | „Twój dowód osobisty jest ważny do 09.02.2032.” |
+| kiedy wygasa prawo jazdy | „Nie masz prawa jazdy w aplikacji.” | „Twoje prawo jazdy jest ważne do 22.06.2031.” | „Nie masz prawa jazdy w aplikacji.” |
+| do kiedy ważna legitymacja | „Twoja mLegitymacja emeryta-rencisty jest ważna bezterminowo.” | „Nie masz legitymacji w aplikacji.” | „Twoja mLegitymacja studencka jest ważna.” |
+| ważność dokumentu | Pyta: który dokument? (przyciski dokumentów) | Pyta: który dokument? (przyciski dokumentów) | Pyta: który dokument? (przyciski dokumentów) |
+| ile mam punktów karnych | „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” | „Masz 4 punkty karne.” | „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” |
+| punkty karne | „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” | „Masz 4 punkty karne.” | „Nie masz prawa jazdy w aplikacji, więc nie ma tu punktów karnych.” |
+| czy mam mandat do zapłaty | „Nie masz mandatów do zapłaty.” | „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | „Nie masz mandatów do zapłaty.” |
+| mandaty | „Nie masz mandatów do zapłaty.” | „Masz 1 mandat do zapłaty: 200 zł za przekroczenie prędkości.” | „Nie masz mandatów do zapłaty.” |
+| gdzie głosuję | „Głosujesz w lokalu: Szkoła Podstawowa nr 21, ul. Lipowa 20, Kraków.” | „Głosujesz w lokalu: Szkoła Podstawowa nr 7, ul. Słoneczna 4, Warszawa.” | „Głosujesz w lokalu: Biblioteka Osiedlowa, ul. Polna 10, Gdańsk.” |
+| gdzie glosuje w wyborach | „Głosujesz w lokalu: Szkoła Podstawowa nr 21, ul. Lipowa 20, Kraków.” | „Głosujesz w lokalu: Szkoła Podstawowa nr 7, ul. Słoneczna 4, Warszawa.” | „Głosujesz w lokalu: Biblioteka Osiedlowa, ul. Polna 10, Gdańsk.” |
+| jaką zniżkę daje legitymacja | „Legitymacja emeryta-rencisty daje zniżki m.in. na kolej i komunikację miejską.” | „Nie masz legitymacji w aplikacji.” | „Legitymacja studencka daje zniżki m.in. na kolej i komunikację miejską.” |
+| jakie mam zniżki | „Legitymacja emeryta-rencisty daje zniżki m.in. na kolej i komunikację miejską.” | „Nie masz w aplikacji legitymacji ani Karty Dużej Rodziny.” | „Legitymacja studencka daje zniżki m.in. na kolej i komunikację miejską.” |
+| gdzie użyć karty dużej rodziny | „Kartą Dużej Rodziny zapłacisz mniej m.in. w sklepach, na stacjach paliw i w muzeach.” | „Nie masz Karty Dużej Rodziny w aplikacji.” | „Nie masz Karty Dużej Rodziny w aplikacji.” |
+| karta duzej rodziny gdzie znizki | „Kartą Dużej Rodziny zapłacisz mniej m.in. w sklepach, na stacjach paliw i w muzeach.” | „Nie masz Karty Dużej Rodziny w aplikacji.” | „Nie masz Karty Dużej Rodziny w aplikacji.” |
+| skrzynka | „Masz 1 nową wiadomość.” + „Otwórz Skrzynkę” | „Masz 1 nową wiadomość.” + „Otwórz Skrzynkę” | „Nie masz nowych wiadomości.” + „Otwórz Skrzynkę” |
+| mam nowe wiadomości? | „Masz 1 nową wiadomość.” + „Otwórz Skrzynkę” | „Masz 1 nową wiadomość.” + „Otwórz Skrzynkę” | „Nie masz nowych wiadomości.” + „Otwórz Skrzynkę” |
+| co umiesz | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw |
+| pomoc | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw |
+| dzień dobry | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi |
+| dziękuję | „Proszę bardzo” + podpowiedzi | „Proszę bardzo” + podpowiedzi | „Proszę bardzo” + podpowiedzi |
+| wymeldować się | Usługa z listy: Wymeldowanie | Usługa z listy: Wymeldowanie | Usługa z listy: Wymeldowanie |
+| chcę nowy paszport | Usługa z listy: Paszport | Usługa z listy: Paszport | Usługa z listy: Paszport |
+| rozliczenie PIT | Usługa z listy: Rozlicz PIT | Usługa z listy: Rozlicz PIT | Usługa z listy: Rozlicz PIT |
+| recepta na leki | Usługa z listy: Recepty | Usługa z listy: Recepty | Usługa z listy: Recepty |
+| jaka jest pogoda | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi |
+| opowiedz kawał | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi |
+| asdfgh | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi |
+| kocham pierogi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi |
+| ile kosztuje bilet do Zakopanego | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi | „Nie rozumiem jeszcze tej prośby” + 3 sprawy + Usługi |
+| dowód | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR | „Proszę, oto mDowód.” + przycisk dokumentu i kodu QR |
+
+- Drogi spraw (przejdzone w przeglądarce, do ekranu Gotowe i wiadomości w Skrzynce):
+  - A: Usługi („Zgłoś utratę lub kradzież dokumentów”, „Zastrzeż PESEL”), szczegóły mDowodu („Zgłoś utratę dowodu”, „Zastrzeż PESEL”), asystent („ukradli mi torebkę z dowodem” → pytanie z zaznaczonym dowodem → „Zacznij” → kroki z zaznaczonymi odpowiedziami).
+  - B: karta pilna Tomasza, Moje pojazdy → „OC i badanie techniczne”, Usługi, asystent („do kiedy mam ubezpieczenie auta” → „Zacznij” → przypomnienie z zaznaczonym OC). Halina i Ola: informacja o braku auta.
+  - C: karta pilna Oli (adres wpisany), Usługi, asystent („chcę się zameldować” → „Wynajmuję” → „Zacznij” → kroki z zaznaczoną podstawą).
+- Kontrola (według sekcji „Kontrola” specyfikacji; automatycznie, w przeglądarce opartej na Chrome, z włączonym czytaniem na głos):
+  - 196 ekranów na zestaw: wszystkie ekrany trzech osób jak w poprzednim etapie, a do tego rozmowa z asystentem (7 pytań różnego rodzaju i 2 wybory w rozmowie), każdy krok spraw A, B i C razem z ekranami błędów, okno potwierdzenia, ekrany Gotowe, Skrzynka z potwierdzeniami.
+  - Szerokość 390 px (ramka telefonu): 3 rozmiary tekstu × 3 motywy + 3 zestawy z trybem prostym. Szerokość 320 px: 6 zestawów. Powiększenie 200% (640 × 360 px): 3 zestawy. Razem 21 zestawów, 4116 ekranów — 0 błędów. Po ostatnich poprawkach powtórzone 5 zestawów (390 px i 200%) — 0 błędów.
+  - Najmniejszy tekst: 16 px. Najsłabszy kontrast: 4,65:1 (to samo miejsce co wcześniej — skrzyżowanie linii wzoru na zielonej karcie legitymacji). Wszystkie elementy klikalne co najmniej 48 × 48 px, odstępy co najmniej 8 px, nic nie wychodzi poza ekran i nic się nie nakłada. Każdy przycisk coś robi.
+  - Po błędzie w formularzu komunikat i pole są widoczne pod paskiem „Wstecz”; po „W górę”/„W dół” przycisk z fokusem jest w całości widoczny.
+  - Bez przewijania (390 × 844, tekst Standardowy): mDowód, karta „Wymaga Twojej uwagi” i pole asystenta widać u wszystkich — zapas: Halina 8 px, Tomasz 35 px, Ola 86 px.
+  - Działa po otwarciu z pliku (bez serwera) i przy zablokowanym internecie: sprawdzone w Edge (rozmowa z asystentem, sprawa C z wpisanym adresem) i w Chrome (wyjaśnienie pisma). Brak błędów w konsoli.
+- Znane problemy / do decyzji:
+  - **„Powiedz” a internet i prywatność:** rozpoznawanie mowy w Chrome i Edge działa przez serwery Google/Microsoft — potrzebuje internetu, a nagranie głosu wychodzi poza telefon. Bez internetu asystent pokazuje okno „…rozpoznawanie mowy potrzebuje internetu. Napisz, co chcesz załatwić”. Do decyzji: zostawić tak, czy ukrywać „Powiedz”, gdy nie ma internetu. Czytanie na głos działa bez internetu (głosy systemu).
+  - **Fakty podane ogólnie — warto sprawdzić przed zgłoszeniem:** zastrzeganie kart pod numerem 828 828 828 (ze specyfikacji); przekazywanie podejrzanych SMS-ów na numer 8080 (CERT Polska); „zastrzeżenie PESEL cofniesz w aplikacji mObywatel albo w urzędzie gminy”; „zgłoszenie utraty prawa jazdy trafi do urzędu, który je wydał”; „wniosek o zameldowanie trafia do urzędu gminy”; zniżki z legitymacji „m.in. na kolej i komunikację miejską, wysokość zależy od przewoźnika i miasta”; Karta Dużej Rodziny „m.in. w sklepach, na stacjach paliw i w muzeach”. Bez kwot i procentów.
+  - **Sprawa B bez kroku „Potwierdzenie”:** ustawienie przypomnienia nic nie wysyła do urzędu, więc kroki są: pojazd → przypomnienie → Gotowe (jak w poleceniu). Wpisane do specyfikacji.
+  - **„Zastrzeż PESEL” bez zgubienia** otwiera od razu krok 2 z 4 sprawy A (tylko przełącznik PESEL). „Wstecz” prowadzi do kroku 1.
+  - **Moje pojazdy** nie są na liście „Co zginęło?” — to nie jest dokument, który można zgubić.
+  - **Unieważniony mDowód** zostaje w portfelu ze statusem „Unieważniony” (czerwony) i komunikatem w szczegółach. Wszystko wraca do początku po ponownym wybraniu osoby.
+  - **Rozmowa z asystentem** trwa do końca wizyty (po odświeżeniu strony zaczyna się od nowa). „Nowa rozmowa” czyści ją ręcznie.
+  - **Kod kreskowy, zdjęcia, dane** — nadal fikcyjne. Nowe fikcyjne dane: adresy i lokale wyborcze osób, 4 punkty karne i mandat 200 zł Tomasza (termin: dziś + 10 dni), adres nowego mieszkania Oli (ul. Klonowa 8 m. 5, 80-180 Gdańsk), częściowo ukryte numery telefonów, adres strony w przykładowym SMS-ie (paczka-dostawa24.xyz).
+  - **Karta pilna Oli** zmieniona z „Wszystko w porządku” na „Dokończ zameldowanie” (zgodnie z poleceniem; wpisane do specyfikacji).
+  - **Poprawione w trakcie:** „opowiedz kawał” przypadkiem trafiało w usługę (za luźne literówki — teraz pierwsza litera musi się zgadzać); „chcę nowy paszport” podsuwało też dowód i zameldowanie; SMS „Cześć mamo, to mój nowy numer” nie był rozpoznawany jako oszustwo; przy 320 px po „W dół” przycisk z fokusem zostawał pod krawędzią ekranu; przy powiększeniu 200% komunikat o błędzie w formularzu mógł schować się pod paskiem „Wstecz”.
 
 ### 25.11.2026 Etap 2, poprawki — dokumenty jak w mObywatelu
 - Zrobione:

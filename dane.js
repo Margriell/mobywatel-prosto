@@ -19,6 +19,9 @@
   var DZIS = formatuj(dataZaDni(0));
   var KONIEC_OC_TOMASZA = formatuj(dataZaDni(12));
 
+  /* Przykładowy fałszywy SMS (podpowiedź „Czy ten SMS to oszustwo?”) — adres strony wymyślony */
+  var SMS_OSZUSTWO = 'Twoja paczka jest wstrzymana. Dopłać 1,89 zł w ciągu 24 h: paczka-dostawa24.xyz/oplata';
+
   /* Wiadomość powitalna — ta sama dla każdej osoby */
   function powitanie() {
     return {
@@ -39,6 +42,18 @@
       opis: 'Emerytka, pierwszy raz korzysta z aplikacji.',
       ustawienia: { tekst: 'duzy', motyw: 'jasny', prosty: true, czytanie: false },
       ustawieniaOpis: 'Duży tekst, tryb prosty',
+      adres: 'ul. Lipowa 14 m. 3, 30-001 Kraków',
+      lokalWyborczy: { nazwa: 'Szkoła Podstawowa nr 21', adres: 'ul. Lipowa 20, Kraków', obwod: '112' },
+      telefon: '+48 ••• ••• 271',
+      punktyKarne: null,
+      mandaty: [],
+      /* Gotowe pytania: 3 pierwsze pod polem asystenta, wszystkie 4 na pustym ekranie Asystenta */
+      podpowiedzi: [
+        { tekst: 'Wytłumacz mi pismo' },
+        { tekst: 'Czy ten SMS to oszustwo?', pytanie: 'Czy ten SMS to oszustwo? „' + SMS_OSZUSTWO + '”' },
+        { tekst: 'Gdzie użyć Karty Dużej Rodziny?' },
+        { tekst: 'Zginął mi portfel' }
+      ],
       dokumenty: [
         { id: 'kdr', rodzaj: 'kdr', nazwa: 'Karta Dużej Rodziny', kolor: 'kdr', status: 'Ważna', ikonaStatusu: 'ok',
           pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Numer karty', '12/2014/000184'], ['Ważność', 'bezterminowo']],
@@ -58,7 +73,15 @@
       wiadomosci: [
         { id: 'podatek', nowa: true, nadawca: 'Urząd Miasta Krakowa', tytul: 'Podatek od nieruchomości na 2027 rok', data: DZIS,
           tresc: ['Masz do zapłaty 412 zł podatku od nieruchomości.', 'Możesz zapłacić od razu albo w czterech ratach.', 'Pierwsza rata: do 15 marca 2027.'],
-          akcja: { tekst: 'Zapłać podatek', ikona: 'portfel', niedostepne: 'Płatność podatku' } },
+          akcja: { tekst: 'Zapłać podatek', ikona: 'portfel', niedostepne: 'Płatność podatku' },
+          slowa: 'podatek nieruchomosci urzad miasta 412 zl rata raty zaplacic',
+          wyjasnienie: {
+            wstep: 'To pismo z urzędu o podatku od nieruchomości na 2027 rok.',
+            fakty: [['Od kogo', 'Urząd Miasta Krakowa'], ['Ile', '412 zł'],
+              ['Do kiedy', 'Całość albo pierwsza rata do 15 marca 2027'],
+              ['Co zrobić', 'Zapłać całość albo w 4 ratach. Pierwszą ratę zapłać do 15 marca 2027.']],
+            platnosc: 'Płatność podatku'
+          } },
         powitanie()
       ]
     },
@@ -68,8 +91,21 @@
       opis: 'Kierowca, za 12 dni kończy mu się OC.',
       ustawienia: { tekst: 'standardowy', motyw: 'jasny', prosty: false, czytanie: false },
       ustawieniaOpis: 'Standardowy tekst, jasny motyw',
+      adres: 'ul. Słoneczna 21 m. 8, 02-495 Warszawa',
+      lokalWyborczy: { nazwa: 'Szkoła Podstawowa nr 7', adres: 'ul. Słoneczna 4, Warszawa', obwod: '54' },
+      telefon: '+48 ••• ••• 412',
+      punktyKarne: 4,
+      mandaty: [{ kwota: '200 zł', za: 'przekroczenie prędkości', termin: formatuj(dataZaDni(10)) }],
+      podpowiedzi: [
+        { tekst: 'Do kiedy mam OC?' },
+        { tekst: 'Ile mam punktów karnych?' },
+        { tekst: 'Czy mam mandat do zapłaty?' },
+        { tekst: 'Zginął mi portfel' }
+      ],
       dokumenty: [
         { id: 'pojazdy', rodzaj: 'pojazdy', nazwa: 'Moje pojazdy', kolor: 'pojazdy', status: 'OC: 12 dni', ikonaStatusu: 'uwaga', alarm: true,
+          pojazd: { marka: 'Skoda Octavia', numer: 'WX 4821K', oc: KONIEC_OC_TOMASZA, ocDni: 12, badanie: '14.05.2027',
+            przypomnienieOc: formatuj(dataZaDni(5)), przypomnienieBadanie: '07.05.2027' },
           pola: [['Marka i model', 'Skoda Octavia'], ['Numer rejestracyjny', 'WX 4821K'],
             ['OC ważne do', KONIEC_OC_TOMASZA + ' — zostało 12 dni', 'alarm dlugie'], ['Badanie techniczne do', '14.05.2027', 'dlugie']],
           dane: [['Marka i model', 'Skoda Octavia'], ['Numer rejestracyjny', 'WX 4821K'],
@@ -89,7 +125,14 @@
       wiadomosci: [
         { id: 'oc', nowa: true, nadawca: 'mObywatel', tytul: 'Kończy się OC Twojego samochodu', data: DZIS,
           tresc: ['OC samochodu Skoda Octavia (WX 4821K) jest ważne do ' + KONIEC_OC_TOMASZA + '.', 'Kup nowe OC albo przedłuż obecne, żeby uniknąć kary.'],
-          akcja: { tekst: 'Sprawdź OC i badanie', ikona: 'auto', href: '#/sprawa/samochod' } },
+          akcja: { tekst: 'Sprawdź OC i badanie', ikona: 'auto', href: '#/sprawa/samochod' },
+          slowa: 'oc ubezpieczenie przypomnienie skoda',
+          wyjasnienie: {
+            wstep: 'To przypomnienie z aplikacji mObywatel, nie rachunek.',
+            fakty: [['Od kogo', 'mObywatel'], ['Czego dotyczy', 'OC samochodu Skoda Octavia (WX 4821K)'],
+              ['Do kiedy', 'OC jest ważne do ' + KONIEC_OC_TOMASZA],
+              ['Co zrobić', 'Kup nowe OC albo przedłuż obecne przed tą datą.']]
+          } },
         powitanie()
       ]
     },
@@ -99,6 +142,19 @@
       opis: 'Studentka, lubi ciemny motyw.',
       ustawienia: { tekst: 'standardowy', motyw: 'ciemny', prosty: false, czytanie: false },
       ustawieniaOpis: 'Standardowy tekst, ciemny motyw',
+      adres: 'ul. Polna 2 m. 7, 80-001 Gdańsk',
+      lokalWyborczy: { nazwa: 'Biblioteka Osiedlowa', adres: 'ul. Polna 10, Gdańsk', obwod: '23' },
+      telefon: '+48 ••• ••• 538',
+      punktyKarne: null,
+      mandaty: [],
+      /* Zaczęte zameldowanie: adres nowego mieszkania jest już wpisany */
+      szkicMeldunku: { ulica: 'ul. Klonowa 8', mieszkanie: '5', kod: '80-180', miejscowosc: 'Gdańsk' },
+      podpowiedzi: [
+        { tekst: 'Dokończ zameldowanie' },
+        { tekst: 'Jaką zniżkę daje legitymacja?' },
+        { tekst: 'Gdzie głosuję?' },
+        { tekst: 'Czy mój PESEL jest zastrzeżony?' }
+      ],
       dokumenty: [
         { id: 'legitymacja', rodzaj: 'legitymacja', nazwa: 'mLegitymacja studencka', kolor: 'legitymacja', status: 'Ważna', ikonaStatusu: 'ok',
           pola: [['Imię', 'Aleksandra'], ['Nazwisko', 'Nowak'], ['Data urodzenia', '09.02.2002'], ['PESEL', '02220912346'],
@@ -114,7 +170,7 @@
           dodatkowe: [['Nazwisko rodowe', 'Nowak'], ['Miejsce urodzenia', 'Gdańsk'], ['Obywatelstwo', 'polskie']],
           aktualizacja: aktualizacja(2, '08:12') }
       ],
-      uwaga: { styl: 'ok', ikona: 'ok', etykieta: 'Wszystko w porządku', opis: 'Nie masz spraw, które czekają.' },
+      uwaga: { styl: 'nowe', ikona: 'dom', etykieta: 'Dokończ zameldowanie', opis: 'Nowy adres jest już wpisany. Sprawdź go i wyślij.', href: '#/sprawa/zameldowanie' },
       wiadomosci: [
         { id: 'legitymacja', nowa: false, nadawca: 'Uniwersytet Gdański', tytul: 'mLegitymacja jest gotowa', data: formatuj(dataZaDni(-3)),
           tresc: ['Twoja mLegitymacja studencka jest już w aplikacji.', 'Znajdziesz ją w zakładce Dokumenty.'],
@@ -133,8 +189,8 @@
         { tekst: 'Dane dowodu osobistego', ikona: 'dowod', niedostepne: 'Dane dowodu osobistego' }
       ],
       skroty: [
-        { tekst: 'Zastrzeż PESEL', ikona: 'tarcza', href: '#/sprawa/zgubione' },
-        { tekst: 'Zgłoś utratę dowodu', ikona: 'uwaga', href: '#/sprawa/zgubione?dokument=dowod' },
+        { tekst: 'Zastrzeż PESEL', ikona: 'tarcza', href: '#/sprawa/zgubione/krok-2?tylko=pesel' },
+        { tekst: 'Zgłoś utratę dowodu', ikona: 'uwaga', href: '#/sprawa/zgubione?zginelo=dowod' },
         { tekst: 'Mandaty', ikona: 'paragon', niedostepne: 'Mandaty' },
         { tekst: 'Wybory', ikona: 'wybory', niedostepne: 'Wybory' }
       ]
@@ -168,27 +224,28 @@
   /* Sprawy, które działają w prototypie (pokazywane w oknie „Niedostępne w prototypie”) */
   var DZIALAJACE = [
     { id: 'zgubione', nazwa: 'Zgubione dokumenty', ikona: 'dowod', href: '#/sprawa/zgubione' },
-    { id: 'samochod', nazwa: 'Samochód: OC i badanie', ikona: 'auto', href: '#/sprawa/samochod' }
+    { id: 'samochod', nazwa: 'Samochód: OC i badanie', ikona: 'auto', href: '#/sprawa/samochod' },
+    { id: 'zameldowanie', nazwa: 'Zameldowanie na pobyt stały', ikona: 'dom', href: '#/sprawa/zameldowanie' }
   ];
 
   /* Usługi według sytuacji życiowych. „slowa” = synonimy dla wyszukiwarki (bez polskich znaków) */
   var KATEGORIE = [
     { id: 'dokumenty', nazwa: 'Dokumenty i tożsamość', ikona: 'dowod', uslugi: [
-      { id: 'utrata', nazwa: 'Zgłoś utratę lub kradzież dokumentów', opis: 'Unieważnij dowód i zastrzeż PESEL w jednym miejscu.', sprawa: 'zgubione',
+      { id: 'utrata', nazwa: 'Zgłoś utratę lub kradzież dokumentów', opis: 'Unieważnij dowód i zastrzeż PESEL w jednym miejscu.', sprawa: 'zgubione', href: '#/sprawa/zgubione',
         slowa: 'zgubic zgubilem zgubilam zgubiony zgubione zginal zginela zginelo zginely ukradli ukradziony kradziez portfel torebka utrata stracilem stracilam uniewaznic dowod osobisty zastrzec' },
       { id: 'wniosek-dowod', nazwa: 'Wniosek o dowód osobisty', opis: 'Złóż wniosek o nowy dowód, np. gdy kończy się ważność.', slowa: 'nowy dowod wymiana dowodu wyrobic dowod osobisty' },
       { id: 'paszport', nazwa: 'Paszport', opis: 'Sprawdź, czy Twój paszport jest gotowy do odbioru.', slowa: 'paszport wyjazd zagranica podroz' },
       { id: 'dane-pesel', nazwa: 'Twoje dane w rejestrze PESEL', opis: 'Zobacz, jakie dane o Tobie ma urząd.', slowa: 'pesel rejestr dane osobowe adres' }
     ] },
     { id: 'samochod', nazwa: 'Samochód', ikona: 'auto', uslugi: [
-      { id: 'oc-badanie', nazwa: 'OC i badanie techniczne', opis: 'Sprawdź, do kiedy masz OC i przegląd. Ustaw przypomnienie.', sprawa: 'samochod',
+      { id: 'oc-badanie', nazwa: 'OC i badanie techniczne', opis: 'Sprawdź, do kiedy masz OC i przegląd. Ustaw przypomnienie.', sprawa: 'samochod', href: '#/sprawa/samochod',
         slowa: 'oc ubezpieczenie polisa przeglad badanie techniczne samochod auto pojazd przypomnienie' },
       { id: 'punkty', nazwa: 'Punkty karne', opis: 'Sprawdź, ile masz punktów karnych.', slowa: 'punkty karne mandat prawo jazdy' },
       { id: 'rejestracja', nazwa: 'Zarejestruj pojazd', opis: 'Zarejestruj samochód po zakupie.', slowa: 'rejestracja rejestrowac kupno zakup auta samochodu tablice' },
       { id: 'sprzedaz', nazwa: 'Zgłoś sprzedaż pojazdu', opis: 'Powiadom urząd, że sprzedajesz samochód.', slowa: 'sprzedaz sprzedac zbycie auta samochodu' }
     ] },
     { id: 'mieszkanie', nazwa: 'Mieszkanie', ikona: 'dom', uslugi: [
-      { id: 'zameldowanie', nazwa: 'Zameldowanie', opis: 'Zamelduj się pod nowym adresem.', slowa: 'meldunek zameldowac zamelduj przeprowadzka nowy adres mieszkanie' },
+      { id: 'zameldowanie', nazwa: 'Zameldowanie na pobyt stały', opis: 'Zamelduj się pod nowym adresem.', sprawa: 'zameldowanie', href: '#/sprawa/zameldowanie', slowa: 'meldunek zameldowac zamelduj przeprowadzka nowy adres mieszkanie' },
       { id: 'wymeldowanie', nazwa: 'Wymeldowanie', opis: 'Wymelduj się, gdy się wyprowadzasz.', slowa: 'wymeldowac wymelduj wyprowadzka meldunek' },
       { id: 'ogrzewanie', nazwa: 'Zgłoś źródło ogrzewania', opis: 'Wpisz, czym ogrzewasz dom lub mieszkanie.', slowa: 'piec kociol ogrzewanie ceeb deklaracja' }
     ] },
@@ -209,7 +266,7 @@
       { id: 'zaswiadczenie', nazwa: 'Zaświadczenie o niezaleganiu', opis: 'Pobierz zaświadczenie z urzędu skarbowego.', slowa: 'zaswiadczenie niezaleganie urzad skarbowy podatki' }
     ] },
     { id: 'bezpieczenstwo', nazwa: 'Bezpieczeństwo', ikona: 'tarcza', uslugi: [
-      { id: 'zastrzez-pesel', nazwa: 'Zastrzeż PESEL', opis: 'Nikt nie weźmie kredytu na Twoje dane.', sprawa: 'zgubione',
+      { id: 'zastrzez-pesel', nazwa: 'Zastrzeż PESEL', opis: 'Nikt nie weźmie kredytu na Twoje dane.', sprawa: 'zgubione', href: '#/sprawa/zgubione/krok-2?tylko=pesel',
         slowa: 'zastrzec zastrzezenie pesel kredyt wyludzenie oszustwo kradziez tozsamosci' },
       { id: 'alerty', nazwa: 'Ostrzeżenia o zagrożeniach', opis: 'Dostawaj ostrzeżenia o burzach i innych zagrożeniach.', slowa: 'alert rcb ostrzezenie burza powodz zagrozenie' },
       { id: 'mapa-zagrozen', nazwa: 'Zgłoś niebezpieczne miejsce', opis: 'Powiedz policji o zagrożeniu w Twojej okolicy.', slowa: 'policja zgloszenie mapa zagrozen niebezpieczne' }
@@ -220,13 +277,13 @@
     osoby: OSOBY,
     kolejnoscOsob: ['halina', 'tomasz', 'ola'],
     kategorie: KATEGORIE,
-    najczestsze: ['utrata', 'oc-badanie', 'pit', 'recepty'],
+    najczestsze: ['utrata', 'oc-badanie', 'zameldowanie', 'pit'],
     dzialajace: DZIALAJACE,
     akcje: AKCJE,
     doDodania: DO_DODANIA,
-    /* Gotowe pytania: 3 pod polem asystenta, 4 na pustym ekranie Asystenta */
-    pytania: ['Zginął mi portfel', 'Do kiedy mam OC?', 'Jak zastrzec PESEL?'],
-    podpowiedziAsystenta: ['Zginął mi portfel', 'Do kiedy mam OC?', 'Jak zastrzec PESEL?', 'Co umiesz?'],
+    smsPrzyklad: SMS_OSZUSTWO,
+    formatuj: formatuj,
+    dataZaDni: dataZaDni,
     nazwyDokumentow: { dowod: 'Dowód osobisty', prawko: 'Prawo jazdy', kdr: 'Karta Dużej Rodziny', legitymacja: 'Legitymacja studencka', emeryt: 'Legitymacja emeryta-rencisty' },
     dzis: DZIS
   };
