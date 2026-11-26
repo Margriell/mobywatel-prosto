@@ -4,9 +4,10 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 
 ## Stan
 
-- Obowiązuje SPECYFIKACJA.md w wersji 2.3 (wzór wyglądu: `warianty/makieta-dokumenty.html`; dokumenty jak w prawdziwym mObywatelu; asystent offline i sprawy A, B, C).
-- Ukończony etap: 3 — asystent offline i sprawy A, B, C (`asystent.js` + zmiany w `app.js`, `dane.js`, `style.css`, `index.html`). Szczegóły w dzienniku.
-- Następny etap: 5 — kontrola jakości i publikacja (GitHub Pages) — gdy autorka poprosi.
+- Obowiązuje SPECYFIKACJA.md w wersji 2.4 (poprawki po teście, publikacja, przygotowanie pod Bielika).
+- Ukończone (26.11.2026): poprawki po teście autorki i przygotowanie do publikacji na GitHub Pages — z pełną Kontrolą (21 zestawów, 0 błędów). Szczegóły w dzienniku.
+- Wcześniej: etap 3 — asystent offline i sprawy A, B, C.
+- Następny krok: publikacja na GitHub Pages (robi autorka w GitHub Desktop), potem sprawdzenie adresu w podglądzie linku.
 - **Etap „Asystent i sprawy offline” (26.11.2026) — wszystkie kroki 1–6 ukończone:**
   - [x] Krok 1 — szkielet asystenta: `asystent.js` (jeden wpis na sprawę, `rozpoznajSprawe(tekst)`, tolerancja literówek), rozmowa na zakładce Asystent, podpowiedzi dla każdej osoby, „Przeczytaj na głos” przy każdej odpowiedzi, „Powiedz” (rozpoznawanie mowy w przeglądarce), „Nie rozumiem jeszcze tej prośby…” z przyciskami spraw.
   - [x] Krok 2 — sprawa A „Zgubione dokumenty”: Co zginęło? (dokumenty z portfela osoby + karty płatnicze + inne) → Co zrobimy (przełączniki; karty: „Zadzwoń i zastrzeż karty: 828 828 828”) → Sprawdź, zanim wyślemy (+ odcisk palca/PIN) → Gotowe, wiadomość w Skrzynce. Po wysłaniu mDowód ma status „Unieważniony”, a PESEL jest zastrzeżony. Drogi: Usługi, szczegóły mDowodu (Zgłoś utratę / Zastrzeż PESEL), asystent.
@@ -33,6 +34,60 @@ Ten plik prowadzi AI. Po każdym etapie dopisz wpis do dziennika i zaktualizuj s
 - 26.11.2026: etap „Asystent i sprawy offline”, wpisany do SPECYFIKACJA.md (wersja 2.3): zasada „AI rozumie, aplikacja prowadzi”; każda sprawa to jeden wpis w `asystent.js`, rozpoznawanie w `rozpoznajSprawe(tekst)` (później Bielik); odpowiedzi najwyżej 2 zdania, zawsze z przyciskami; podpowiedzi dopasowane do osoby; sprawy A, B, C w pełni (C już nie opcjonalna); karta pilna Oli „Dokończ zameldowanie”; szybkie sprawy asystenta (pismo, SMS, dowód, ważność, punkty, mandat, wybory, zniżki, KDR, PESEL); wszystko działa bez internetu.
 
 ## Dziennik
+
+### 26.11.2026 Poprawki po teście autorki i przygotowanie do publikacji (SPECYFIKACJA.md 2.4)
+- Zrobione:
+  - **Portfel:** z przodu zawsze pierwszy dokument z kolejności w „Zarządzaj” (domyślnie mDowód). Dotknięcie karty z tyłu pokazuje ją z przodu tylko chwilowo — po wyjściu z Dokumentów i po ponownym otwarciu wraca pierwszy dokument. Kolejność decyduje też o „Małe karty” i „Lista”. W „Zarządzaj” dopisek „Pierwszy dokument z listy będzie zawsze na przodzie”. Zapis w przeglądarce ma nowy klucz, więc stare kolejności zaczynają od nowa.
+  - **Długie nazwy:** paski kart z tyłu mają zawsze równą wysokość (wyrównywane po każdym rysowaniu i zmianie tekstu); na karcie krótsza nazwa „mLegitymacja emeryta”, pełna w szczegółach.
+  - **Dolny pasek:** przewijanie rozmowy przesuwało całą ramkę telefonu. Teraz przewija się tylko treść; ramka nie da się przewinąć. Pasek zawsze na samym dole.
+  - **„Powiedz”:** Opera i Firefox — „Ta przeglądarka nie obsługuje mówienia. Wpisz pytanie albo otwórz aplikację w Chrome lub Edge.”; bez internetu — „Mówienie wymaga internetu…”.
+  - **Ogólne pytania asystenta:** „Co mam do załatwienia?” (karta uwagi + nieprzeczytane wiadomości), „Jakie mam dokumenty?”, „Mam nowe wiadomości?” (lista wiadomości z przyciskami), rozszerzone „W czym mi pomożesz?”. Wyniki — tabela poniżej (29 sformułowań × 3 osoby, 0 problemów). Stary test 70 zdań nadal: 0 problemów.
+  - **Bielik (bez podłączania):** `config.js` (adres pusty), `rozpoznajSprawe(tekst)` najpierw pyta model, gdy adres jest ustawiony; limit 6 s, potem scenariusze; zdanie modelu z liczbami/datami/adresami odrzucane. Sprawdzone z udawanym modelem (odpowiedź, zdanie z liczbą, brak odpowiedzi → scenariusz po 6,2 s). `bielik/worker.js` (Cloudflare Worker, format API OpenAI, ukrywa klucz), `bielik/INSTRUKCJA.md`, `bielik/test.html`. Nic nie wdrożone.
+  - **Publikacja:** tytuł „mObywatel dla każdego — prototyp konkursowy”, opis, ikona `media/ikona.svg` + `media/ikona-180.png`, Open Graph z obrazkiem `media/podglad.png` (1200 × 630), `.nojekyll`, `README.md` po polsku. Aplikacja nie linkuje do `warianty/`.
+- Kontrola (według sekcji „Kontrola” specyfikacji; automatycznie, 199 ekranów na zestaw, z nowymi sprawdzeniami: dolny pasek na samym dole, ramka telefonu nieprzewinięta, równe paski kart z tyłu, z przodu pierwszy dokument z kolejności):
+  - 390 px (ramka telefonu): 12 zestawów (3 rozmiary tekstu × 3 motywy + 3 z trybem prostym), 2388 ekranów — 0 błędów.
+  - 320 px: 6 zestawów, 1194 ekrany — 0 błędów.
+  - Powiększenie 200% (640 × 360): 3 zestawy, 597 ekranów — 0 błędów (po poprawce poniżej).
+  - Razem 21 zestawów, 4179 ekranów. Najmniejszy tekst 16 px, najsłabszy kontrast 4,65:1. Działa z pliku bez internetu (Edge).
+  - Poprawione w trakcie: przy 200% w jednym przebiegu komunikat o błędzie w sprawie A znalazł się nad ekranem — płynne przewijanie rozmowy z asystentem mogło jeszcze trwać przy przejściu do sprawy. Przy dużym powiększeniu (przewija się cała strona) przewijanie jest teraz natychmiastowe; płynne zostaje tylko w ramce telefonu.
+- Do decyzji:
+  - **Adres strony w podglądzie linku** wpisany jako `https://margriell.github.io/mobywatel-prosto/` — sprawdzić po publikacji (repozytorium nie ma jeszcze ustawionego adresu GitHub).
+  - **Licencja kodu** w README: „© 2026 autorka, do oceny w konkursie” — do decyzji (np. MIT).
+  - Fakty z poprzedniego etapu (828 828 828, 8080, cofanie zastrzeżenia PESEL) — nadal do sprawdzenia.
+
+#### Ogólne pytania do asystenta (test)
+
+| Zdanie | Halina | Tomasz | Ola |
+| --- | --- | --- | --- |
+| Co mam do załatwienia? | „Czeka na Ciebie 1 sprawa.” → Nowe pismo: Urząd Miasta: podatek od nieruchomości | „Czeka na Ciebie 2 sprawy.” → Kończy się OC: OC samochodu kończy się za 12 dni (08.12.2026); Pismo: Kończy się OC Twojego samochodu | „Czeka na Ciebie 1 sprawa.” → Dokończ zameldowanie: Nowy adres jest już wpisany. Sprawdź go i wyślij. |
+| Jakie mam sprawy? | „Czeka na Ciebie 1 sprawa.” → Nowe pismo: Urząd Miasta: podatek od nieruchomości | „Czeka na Ciebie 2 sprawy.” → Kończy się OC: OC samochodu kończy się za 12 dni (08.12.2026); Pismo: Kończy się OC Twojego samochodu | „Czeka na Ciebie 1 sprawa.” → Dokończ zameldowanie: Nowy adres jest już wpisany. Sprawdź go i wyślij. |
+| Czy coś na mnie czeka? | „Czeka na Ciebie 1 sprawa.” → Nowe pismo: Urząd Miasta: podatek od nieruchomości | „Czeka na Ciebie 2 sprawy.” → Kończy się OC: OC samochodu kończy się za 12 dni (08.12.2026); Pismo: Kończy się OC Twojego samochodu | „Czeka na Ciebie 1 sprawa.” → Dokończ zameldowanie: Nowy adres jest już wpisany. Sprawdź go i wyślij. |
+| co muszę zrobić | „Czeka na Ciebie 1 sprawa.” → Nowe pismo: Urząd Miasta: podatek od nieruchomości | „Czeka na Ciebie 2 sprawy.” → Kończy się OC: OC samochodu kończy się za 12 dni (08.12.2026); Pismo: Kończy się OC Twojego samochodu | „Czeka na Ciebie 1 sprawa.” → Dokończ zameldowanie: Nowy adres jest już wpisany. Sprawdź go i wyślij. |
+| mam coś do zrobienia? | „Czeka na Ciebie 1 sprawa.” → Nowe pismo: Urząd Miasta: podatek od nieruchomości | „Czeka na Ciebie 2 sprawy.” → Kończy się OC: OC samochodu kończy się za 12 dni (08.12.2026); Pismo: Kończy się OC Twojego samochodu | „Czeka na Ciebie 1 sprawa.” → Dokończ zameldowanie: Nowy adres jest już wpisany. Sprawdź go i wyślij. |
+| czy czeka na mnie coś pilnego | „Czeka na Ciebie 1 sprawa.” → Nowe pismo: Urząd Miasta: podatek od nieruchomości | „Czeka na Ciebie 2 sprawy.” → Kończy się OC: OC samochodu kończy się za 12 dni (08.12.2026); Pismo: Kończy się OC Twojego samochodu | „Czeka na Ciebie 1 sprawa.” → Dokończ zameldowanie: Nowy adres jest już wpisany. Sprawdź go i wyślij. |
+| Jakie mam dokumenty? | „Masz w aplikacji 3 dokumenty.” → mDowód, mLegitymacja emeryta-rencisty, Karta Dużej Rodziny | „Masz w aplikacji 3 dokumenty.” → mDowód, mPrawo jazdy, Moje pojazdy | „Masz w aplikacji 2 dokumenty.” → mDowód, mLegitymacja studencka |
+| pokaż moje dokumenty | „Masz w aplikacji 3 dokumenty.” → mDowód, mLegitymacja emeryta-rencisty, Karta Dużej Rodziny | „Masz w aplikacji 3 dokumenty.” → mDowód, mPrawo jazdy, Moje pojazdy | „Masz w aplikacji 2 dokumenty.” → mDowód, mLegitymacja studencka |
+| co mam w portfelu | „Masz w aplikacji 3 dokumenty.” → mDowód, mLegitymacja emeryta-rencisty, Karta Dużej Rodziny | „Masz w aplikacji 3 dokumenty.” → mDowód, mPrawo jazdy, Moje pojazdy | „Masz w aplikacji 2 dokumenty.” → mDowód, mLegitymacja studencka |
+| lista dokumentów | „Masz w aplikacji 3 dokumenty.” → mDowód, mLegitymacja emeryta-rencisty, Karta Dużej Rodziny | „Masz w aplikacji 3 dokumenty.” → mDowód, mPrawo jazdy, Moje pojazdy | „Masz w aplikacji 2 dokumenty.” → mDowód, mLegitymacja studencka |
+| ile mam dokumentów | „Masz w aplikacji 3 dokumenty.” → mDowód, mLegitymacja emeryta-rencisty, Karta Dużej Rodziny | „Masz w aplikacji 3 dokumenty.” → mDowód, mPrawo jazdy, Moje pojazdy | „Masz w aplikacji 2 dokumenty.” → mDowód, mLegitymacja studencka |
+| Co umiesz? | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw |
+| W czym mi pomożesz? | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw |
+| Pomoc | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw |
+| jak działasz | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw |
+| co potrafisz | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw |
+| potrzebuję pomocy | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw | Mówi, co umie + przyciski spraw |
+| Mam nowe wiadomości? | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Nie masz nowych wiadomości.” + „Otwórz Skrzynkę” |
+| czy przyszło jakieś pismo | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Nie masz nowych wiadomości.” + „Otwórz Skrzynkę” |
+| co w skrzynce | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Nie masz nowych wiadomości.” + „Otwórz Skrzynkę” |
+| nowe wiadomości | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Nie masz nowych wiadomości.” + „Otwórz Skrzynkę” |
+| czy mam pocztę | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Masz 1 nową wiadomość.” + przyciski wiadomości + „Otwórz Skrzynkę” | „Nie masz nowych wiadomości.” + „Otwórz Skrzynkę” |
+| Dziękuję | „Proszę bardzo” + podpowiedzi | „Proszę bardzo” + podpowiedzi | „Proszę bardzo” + podpowiedzi |
+| dzięki | „Proszę bardzo” + podpowiedzi | „Proszę bardzo” + podpowiedzi | „Proszę bardzo” + podpowiedzi |
+| Dzień dobry | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi |
+| cześć | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi |
+| witam | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi |
+| dobry wieczór | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi | Wita po imieniu + podpowiedzi |
+| super, dzięki | „Proszę bardzo” + podpowiedzi | „Proszę bardzo” + podpowiedzi | „Proszę bardzo” + podpowiedzi |
 
 ### 26.11.2026 Etap 3 — asystent offline i sprawy A, B, C
 - Zasada całego etapu: „AI rozumie, aplikacja prowadzi”. Asystent rozpoznaje sprawę i odpowiada krótko; wysłanie, zastrzeżenie i zgłoszenie idą zawsze przez widoczne kroki z potwierdzeniem — te same co z Usług. Wszystko działa bez internetu i bez serwera.

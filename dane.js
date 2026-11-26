@@ -33,7 +33,7 @@
   /* Ostatnia aktualizacja dokumentu (np. „23.11.2026, 08:12”) */
   function aktualizacja(dni, godzina) { return formatuj(dataZaDni(-dni)) + ', ' + godzina; }
 
-  /* Dokumenty: kolejność = kolejność w portfelu od góry; ostatni leży z przodu.
+  /* Dokumenty: kolejność jak w Zarządzaj — pierwszy leży z przodu portfela.
      pola = dane na karcie (jak na prawdziwym dokumencie); dane = sekcja „Dane” w szczegółach.
      Trzeci element: 'dlugie' (cała szerokość karty), 'alarm' (ostrzeżenie: ikona + słowa). */
   var OSOBY = {
@@ -55,19 +55,19 @@
         { tekst: 'Zginął mi portfel' }
       ],
       dokumenty: [
-        { id: 'kdr', rodzaj: 'kdr', nazwa: 'Karta Dużej Rodziny', kolor: 'kdr', status: 'Ważna', ikonaStatusu: 'ok',
-          pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Numer karty', '12/2014/000184'], ['Ważność', 'bezterminowo']],
-          dane: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Numer karty', '12/2014/000184'], ['Rodzaj karty', 'Rodzic'], ['Ważność', 'bezterminowo']],
-          aktualizacja: aktualizacja(6, '10:24') },
-        { id: 'emeryt', rodzaj: 'emeryt', nazwa: 'mLegitymacja emeryta-rencisty', kolor: 'emeryt', status: 'Ważna', ikonaStatusu: 'ok',
-          pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['PESEL', '55031412345'], ['Ważność', 'bezterminowo'], ['Organ wydający', 'ZUS', 'dlugie']],
-          dane: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['PESEL', '55031412345'], ['Organ wydający', 'Zakład Ubezpieczeń Społecznych (ZUS)'], ['Ważność', 'bezterminowo']],
-          aktualizacja: aktualizacja(3, '09:05') },
         { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny', ikonaStatusu: 'ok',
           pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Data urodzenia', '14.03.1955'], ['PESEL', '55031412345']],
           dane: [['Seria i numer dowodu', 'XYZ 104233'], ['Termin ważności', '12.03.2031'], ['Data wydania', '12.03.2021'], ['Imię ojca', 'Stanisław'], ['Imię matki', 'Zofia']],
           dodatkowe: [['Nazwisko rodowe', 'Nowicka'], ['Miejsce urodzenia', 'Kraków'], ['Obywatelstwo', 'polskie']],
-          aktualizacja: aktualizacja(2, '08:12') }
+          aktualizacja: aktualizacja(2, '08:12') },
+        { id: 'emeryt', rodzaj: 'emeryt', nazwa: 'mLegitymacja emeryta-rencisty', nazwaKrotka: 'mLegitymacja emeryta', kolor: 'emeryt', status: 'Ważna', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['PESEL', '55031412345'], ['Ważność', 'bezterminowo'], ['Organ wydający', 'ZUS', 'dlugie']],
+          dane: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['PESEL', '55031412345'], ['Organ wydający', 'Zakład Ubezpieczeń Społecznych (ZUS)'], ['Ważność', 'bezterminowo']],
+          aktualizacja: aktualizacja(3, '09:05') },
+        { id: 'kdr', rodzaj: 'kdr', nazwa: 'Karta Dużej Rodziny', kolor: 'kdr', status: 'Ważna', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Numer karty', '12/2014/000184'], ['Ważność', 'bezterminowo']],
+          dane: [['Imię', 'Halina'], ['Nazwisko', 'Wiśniewska'], ['Numer karty', '12/2014/000184'], ['Rodzaj karty', 'Rodzic'], ['Ważność', 'bezterminowo']],
+          aktualizacja: aktualizacja(6, '10:24') }
       ],
       uwaga: { styl: 'nowe', ikona: 'list', etykieta: 'Nowe pismo', opis: 'Urząd Miasta: podatek od nieruchomości', href: '#/skrzynka/podatek' },
       wiadomosci: [
@@ -103,6 +103,15 @@
         { tekst: 'Zginął mi portfel' }
       ],
       dokumenty: [
+        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Data urodzenia', '22.06.1988'], ['PESEL', '88062254310']],
+          dane: [['Seria i numer dowodu', 'XYZ 552910'], ['Termin ważności', '03.10.2030'], ['Data wydania', '03.10.2020'], ['Imię ojca', 'Andrzej'], ['Imię matki', 'Ewa']],
+          dodatkowe: [['Nazwisko rodowe', 'Kowalski'], ['Miejsce urodzenia', 'Warszawa'], ['Obywatelstwo', 'polskie']],
+          aktualizacja: aktualizacja(2, '08:12') },
+        { id: 'prawko', rodzaj: 'prawko', nazwa: 'mPrawo jazdy', kolor: 'prawko', status: 'Ważne', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Kategorie', 'B, C, C+E'], ['Ważne do', '22.06.2031']],
+          dane: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Kategorie', 'B, C, C+E'], ['Ważne do', '22.06.2031']],
+          aktualizacja: aktualizacja(4, '18:31') },
         { id: 'pojazdy', rodzaj: 'pojazdy', nazwa: 'Moje pojazdy', kolor: 'pojazdy', status: 'OC: 12 dni', ikonaStatusu: 'uwaga', alarm: true,
           pojazd: { marka: 'Skoda Octavia', numer: 'WX 4821K', oc: KONIEC_OC_TOMASZA, ocDni: 12, badanie: '14.05.2027',
             przypomnienieOc: formatuj(dataZaDni(5)), przypomnienieBadanie: '07.05.2027' },
@@ -110,16 +119,7 @@
             ['OC ważne do', KONIEC_OC_TOMASZA + ' — zostało 12 dni', 'alarm dlugie'], ['Badanie techniczne do', '14.05.2027', 'dlugie']],
           dane: [['Marka i model', 'Skoda Octavia'], ['Numer rejestracyjny', 'WX 4821K'],
             ['OC ważne do', KONIEC_OC_TOMASZA + ' — zostało 12 dni', 'alarm'], ['Badanie techniczne do', '14.05.2027']],
-          aktualizacja: aktualizacja(1, '07:40') },
-        { id: 'prawko', rodzaj: 'prawko', nazwa: 'mPrawo jazdy', kolor: 'prawko', status: 'Ważne', ikonaStatusu: 'ok',
-          pola: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Kategorie', 'B, C, C+E'], ['Ważne do', '22.06.2031']],
-          dane: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Kategorie', 'B, C, C+E'], ['Ważne do', '22.06.2031']],
-          aktualizacja: aktualizacja(4, '18:31') },
-        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny', ikonaStatusu: 'ok',
-          pola: [['Imię', 'Tomasz'], ['Nazwisko', 'Kowalski'], ['Data urodzenia', '22.06.1988'], ['PESEL', '88062254310']],
-          dane: [['Seria i numer dowodu', 'XYZ 552910'], ['Termin ważności', '03.10.2030'], ['Data wydania', '03.10.2020'], ['Imię ojca', 'Andrzej'], ['Imię matki', 'Ewa']],
-          dodatkowe: [['Nazwisko rodowe', 'Kowalski'], ['Miejsce urodzenia', 'Warszawa'], ['Obywatelstwo', 'polskie']],
-          aktualizacja: aktualizacja(2, '08:12') }
+          aktualizacja: aktualizacja(1, '07:40') }
       ],
       uwaga: { styl: 'pilne', ikona: 'uwaga', etykieta: 'Kończy się OC', opis: 'OC samochodu kończy się za 12 dni (' + KONIEC_OC_TOMASZA + ')', href: '#/sprawa/samochod' },
       wiadomosci: [
@@ -156,6 +156,11 @@
         { tekst: 'Czy mój PESEL jest zastrzeżony?' }
       ],
       dokumenty: [
+        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny', ikonaStatusu: 'ok',
+          pola: [['Imię', 'Aleksandra'], ['Nazwisko', 'Nowak'], ['Data urodzenia', '09.02.2002'], ['PESEL', '02220912346']],
+          dane: [['Seria i numer dowodu', 'XYZ 731045'], ['Termin ważności', '09.02.2032'], ['Data wydania', '09.02.2022'], ['Imię ojca', 'Piotr'], ['Imię matki', 'Anna']],
+          dodatkowe: [['Nazwisko rodowe', 'Nowak'], ['Miejsce urodzenia', 'Gdańsk'], ['Obywatelstwo', 'polskie']],
+          aktualizacja: aktualizacja(2, '08:12') },
         { id: 'legitymacja', rodzaj: 'legitymacja', nazwa: 'mLegitymacja studencka', kolor: 'legitymacja', status: 'Ważna', ikonaStatusu: 'ok',
           pola: [['Imię', 'Aleksandra'], ['Nazwisko', 'Nowak'], ['Data urodzenia', '09.02.2002'], ['PESEL', '02220912346'],
             ['Nazwa uczelni', 'Uniwersytet Gdański', 'dlugie'], ['Numer albumu', '412377'], ['Data wydania', '04.10.2021']],
@@ -163,12 +168,7 @@
             ['Nazwa uczelni', 'Uniwersytet Gdański'], ['Numer albumu', '412377'], ['Data wydania', '04.10.2021']],
           kod: '412377',
           komunikat: 'Dokument wymaga potwierdzenia danych',
-          aktualizacja: aktualizacja(3, '12:47') },
-        { id: 'dowod', rodzaj: 'dowod', nazwa: 'mDowód', kolor: 'dowod', status: 'Ważny', ikonaStatusu: 'ok',
-          pola: [['Imię', 'Aleksandra'], ['Nazwisko', 'Nowak'], ['Data urodzenia', '09.02.2002'], ['PESEL', '02220912346']],
-          dane: [['Seria i numer dowodu', 'XYZ 731045'], ['Termin ważności', '09.02.2032'], ['Data wydania', '09.02.2022'], ['Imię ojca', 'Piotr'], ['Imię matki', 'Anna']],
-          dodatkowe: [['Nazwisko rodowe', 'Nowak'], ['Miejsce urodzenia', 'Gdańsk'], ['Obywatelstwo', 'polskie']],
-          aktualizacja: aktualizacja(2, '08:12') }
+          aktualizacja: aktualizacja(3, '12:47') }
       ],
       uwaga: { styl: 'nowe', ikona: 'dom', etykieta: 'Dokończ zameldowanie', opis: 'Nowy adres jest już wpisany. Sprawdź go i wyślij.', href: '#/sprawa/zameldowanie' },
       wiadomosci: [

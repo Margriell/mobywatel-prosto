@@ -9,9 +9,9 @@
 
    - Każda sprawa to JEDEN wpis w tablicy SPRAWY: słowa kluczowe,
      odpowiedź, przyciski i to, dokąd prowadzi.
-   - Całe rozpoznawanie jest w jednej funkcji rozpoznajSprawe(tekst).
-     Później można ją podmienić na model językowy (np. Bielik) — wystarczy,
-     że zwróci { sprawa: 'id-wpisu', dokumenty: [...] }.
+   - Rozpoznawanie: rozpoznajSprawe(tekst). Gdy w config.js jest adres modelu
+     (np. Bielik), najpierw pyta model; bez adresu albo gdy model nie odpowie
+     w 6 sekund — działają scenariusze z rozpoznajScenariuszem(tekst).
    - Tekst porównujemy małymi literami, bez polskich znaków,
      z tolerancją literówek.
    ===================================================================== */
@@ -293,6 +293,7 @@
     { id: 'pismo', opis: 'Wytłumaczenie pisma ze Skrzynki', priorytet: 4,
       slowa: [['pism', 'wytlumacz', 'wyjasnij', 'objasnij', 'co to znaczy', 'co znaczy', 'list z urzedu', 'decyzj', 'wezwani', 'prostym jezykiem']],
       lub: [['podatek', 'podatk'], ['ile', 'zaplac', 'termin', 'do kiedy', 'rata', 'raty', 'nieruchomosc']],
+      wykluczenia: ['przyszl', 'nowe pism', 'nowe wiadomosc', 'jakies pismo', 'jakis list'],
       dodatkowe: ['urzad', 'podatek', 'nieruchomosc'],
       odpowiedz: function (k, r) {
         var listy = k.wiadomosci.filter(function (w) { return w.wyjasnienie; });
@@ -478,18 +479,49 @@
           przyciski: [link(NAZWY[rodzaj].pokaz, '#/dokument/' + d.id, 'oko'), link('Pokaż kod QR', '#/kod-qr', 'qr')] };
       } },
 
-    /* --- Skrzynka --- */
-    { id: 'skrzynka', opis: 'Skrzynka', priorytet: 1,
-      slowa: [['skrzynk', 'wiadomosci', 'poczt', 'moje listy', 'nowe pisma']],
+    /* --- Co mam do załatwienia? (karta „Wymaga Twojej uwagi” + nieprzeczytane wiadomości) --- */
+    { id: 'do-zalatwienia', opis: 'Co czeka na osobę', priorytet: 2,
+      slowa: [['do zalatwienia', 'do zrobienia', 'jakie mam sprawy', 'moje sprawy', 'mam sprawy', 'na mnie czeka', 'czeka na mnie', 'cos czeka',
+        'co czeka', 'cos pilnego', 'co musze', 'co powinnam', 'co powinienem', 'co mam zalatwic', 'co mam zrobic', 'zaleglosci']],
       odpowiedz: function (k) {
-        var n = k.liczbaNowych;
+        var przyciski = [];
+        var u = k.uwaga;
+        if (u && u.styl !== 'ok') przyciski.push(link(u.etykieta + ': ' + u.opis, u.href || '#/dokumenty', u.ikona));
+        (k.nowe || []).forEach(function (w) {
+          if (!u || u.href !== '#/skrzynka/' + w.id) przyciski.push(link('Pismo: ' + w.tytul, '#/skrzynka/' + w.id, 'list'));
+        });
+        if (!przyciski.length) {
+          return { zdania: ['Nic na Ciebie nie czeka.', 'Wszystko jest w porządku.'], przyciski: podpowiedziJakoPrzyciski(k, 3).concat([dokumenty()]) };
+        }
+        var n = przyciski.length;
+        return { zdania: ['Czeka na Ciebie ' + n + ' ' + odmiana(n, 'sprawa', 'sprawy', 'spraw') + '.', 'Wybierz, od czego zaczniemy.'],
+          przyciski: przyciski.concat([dokumenty()]) };
+      } },
+
+    /* --- Jakie mam dokumenty? --- */
+    { id: 'dokumenty-lista', opis: 'Lista dokumentów z portfela', priorytet: 2,
+      slowa: [['jakie', 'moje', 'lista', 'wszystkie', 'ile mam', 'co mam', 'pokaz', 'wymien'], ['dokumenty', 'dokumentow', 'portfel', 'portfelu']],
+      odpowiedz: function (k) {
+        var n = k.dokumenty.length;
+        if (!n) return brakDokumentu(k, 'dowod');
+        return { zdania: ['Masz w aplikacji ' + n + ' ' + odmiana(n, 'dokument', 'dokumenty', 'dokumentów') + '.'],
+          przyciski: k.dokumenty.map(function (d) { return link(d.nazwa, '#/dokument/' + d.id, 'oko'); })
+            .concat([link('Zarządzaj dokumentami', '#/zarzadzaj', 'warstwy')]) };
+      } },
+
+    /* --- Skrzynka i nowe wiadomości --- */
+    { id: 'skrzynka', opis: 'Skrzynka', priorytet: 1,
+      slowa: [['skrzynk', 'wiadomosci', 'wiadomosc', 'poczt', 'moje listy', 'nowe pisma', 'przyszl']],
+      odpowiedz: function (k) {
+        var nowe = k.nowe || [], n = nowe.length;
         return { zdania: [n ? 'Masz ' + n + ' ' + odmiana(n, 'nową wiadomość', 'nowe wiadomości', 'nowych wiadomości') + '.' : 'Nie masz nowych wiadomości.'],
-          przyciski: [link('Otwórz Skrzynkę', '#/skrzynka', 'list'), dokumenty()] };
+          przyciski: nowe.map(function (w) { return link(w.tytul, '#/skrzynka/' + w.id, 'list'); })
+            .concat([link('Otwórz Skrzynkę', '#/skrzynka', 'list'), dokumenty()]) };
       } },
 
     /* --- Co umiesz? / Pomoc --- */
     { id: 'co-umiesz', opis: 'Co umiesz / pomoc', slaby: true,
-      slowa: [['co umiesz', 'co potrafisz', 'pomoc', 'pomocy', 'w czym pomozesz', 'jak dzialasz', 'co mozesz', 'kim jestes', 'jak to dziala', 'help', 'pomoz']],
+      slowa: [['co umiesz', 'co potrafisz', 'pomoc', 'pomocy', 'w czym pomozesz', 'czym mi pomozesz', 'w czym mi', 'jak mi pomozesz', 'jak dzialasz', 'co mozesz', 'kim jestes', 'jak to dziala', 'help', 'pomoz']],
       odpowiedz: function (k) {
         return { zdania: ['Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.', 'Nic nie wyślę bez Twojej zgody.'],
           przyciski: D.dzialajace.map(function (s) { return link(s.nazwa, s.href, s.ikona); })
@@ -531,7 +563,7 @@
     return null;
   }
 
-  /* ======================= ROZPOZNAWANIE (do podmiany na model językowy) ======================= */
+  /* ======================= ROZPOZNAWANIE NA SCENARIUSZACH (bez internetu) ======================= */
   function grupyPasuja(tok, grupy) {
     var n = 0;
     for (var i = 0; i < grupy.length; i++) {
@@ -541,7 +573,7 @@
     }
     return n;
   }
-  function rozpoznajSprawe(tekst) {
+  function rozpoznajScenariuszem(tekst) {
     var tok = tokeny(tekst);
     var wynik = {
       sprawa: 'nieznane', tokeny: tok, dokumenty: dokumentyWTekscie(tok), sms: znakiOszustwa(tekst),
@@ -572,10 +604,79 @@
     return wynik;
   }
 
+  /* ======================= MODEL JĘZYKOWY (np. Bielik) — NIEOBOWIĄZKOWY =======================
+     Ustawienia w config.js. Model dostaje listę naszych spraw i ma zwrócić TYLKO identyfikator
+     sprawy (albo „nie wiem”) i jedno krótkie, życzliwe zdanie. Nie układa kroków, nie podaje
+     faktów: zdanie z liczbami, datami albo adresami stron odrzucamy. Gdy adres jest pusty,
+     model milczy albo nie zdąży w limicie czasu — działają scenariusze i osoba nic nie zauważa. */
+  function ustawieniaModelu() { return (global.KONFIGURACJA && global.KONFIGURACJA.model) || {}; }
+  function modelWlaczony() { return !!(ustawieniaModelu().adres && typeof fetch === 'function'); }
+  function sprawyDlaModelu() {
+    return SPRAWY.filter(function (s) { return !s.wewnetrzny; });
+  }
+  function promptModelu() {
+    return 'Jesteś modułem rozpoznawania spraw w aplikacji mObywatel. Przypisz wiadomość osoby do JEDNEJ sprawy z listy. ' +
+      'Odpowiedz wyłącznie obiektem JSON: {"sprawa": "<identyfikator z listy albo nie wiem>", "zdanie": "<jedno krótkie, życzliwe zdanie po polsku, na Ty, ' +
+      'bez liczb, dat, kwot, adresów i porad prawnych>"}. Nie dodawaj nic więcej.\nLista spraw:\n' +
+      sprawyDlaModelu().map(function (s) { return '- ' + s.id + ': ' + s.opis; }).join('\n');
+  }
+  function oczyscZdanie(z) {
+    z = String(z || '').replace(/\s+/g, ' ').trim();
+    var koniec = z.search(/[.!?…](\s|$)/);
+    if (koniec >= 0) z = z.slice(0, koniec + 1);
+    if (!z || z.length > 140 || /\d|https?:|www\.|@/.test(z)) return null;
+    return z;
+  }
+  function zapytajModel(tekst) {
+    var u = ustawieniaModelu();
+    var kontroler = typeof AbortController === 'function' ? new AbortController() : null;
+    var zegar = setTimeout(function () { if (kontroler) kontroler.abort(); }, u.limitCzasu || 6000);
+    var limit = new Promise(function (ok) { setTimeout(function () { ok(null); }, (u.limitCzasu || 6000) + 50); });
+    var pytanie = fetch(u.adres, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: kontroler ? kontroler.signal : undefined,
+      body: JSON.stringify({ model: u.nazwa || 'bielik', temperature: 0, max_tokens: 120,
+        messages: [{ role: 'system', content: promptModelu() }, { role: 'user', content: String(tekst).slice(0, 500) }] })
+    }).then(function (odp) { return odp.ok ? odp.json() : null; }).then(function (dane) {
+      var tresc = dane && dane.choices && dane.choices[0] && dane.choices[0].message && dane.choices[0].message.content;
+      var json = tresc && String(tresc).match(/\{[\s\S]*\}/);
+      if (!json) return null;
+      var w = JSON.parse(json[0]);
+      var id = String(w.sprawa || '').trim();
+      var znane = sprawyDlaModelu().some(function (s) { return s.id === id; });
+      return { sprawa: znane ? id : 'nie wiem', zdanie: oczyscZdanie(w.zdanie) };
+    }).catch(function () { return null; });
+    return Promise.race([pytanie, limit]).then(function (w) { clearTimeout(zegar); return w; });
+  }
+  /* rozpoznajSprawe(tekst): najpierw model (gdy jest ustawiony), potem nasze scenariusze.
+     Zwraca obietnicę (Promise) z tym samym wynikiem co rozpoznajScenariuszem. */
+  function rozpoznajSprawe(tekst) {
+    var r = rozpoznajScenariuszem(tekst);
+    if (!modelWlaczony()) return Promise.resolve(r);
+    return zapytajModel(tekst).then(function (m) {
+      if (m && m.sprawa !== 'nie wiem') {
+        r.sprawa = m.sprawa;
+        r.zModelu = true;
+        r.zdanieModelu = m.zdanie;
+      }
+      return r;
+    });
+  }
+  /* Odpowiedź z modelem: zdanie modelu zastępuje tylko pierwsze, ogólne zdanie przy sprawach
+     z kartą albo pytaniem (np. „Przykro mi.”). Dane (daty, kwoty) zawsze pochodzą od nas. */
+  function odpowiedzZModelem(tekst, kontekst) {
+    return rozpoznajSprawe(tekst).then(function (r) {
+      var w = SPRAWA(r.sprawa).odpowiedz(kontekst, r);
+      if (r.zdanieModelu && (w.karta || w.wybor) && w.zdania && w.zdania.length) w.zdania = [r.zdanieModelu].concat(w.zdania.slice(1));
+      w.sprawa = r.sprawa;
+      return w;
+    });
+  }
+
   /* ======================= ODPOWIEDŹ ======================= */
-  /* kontekst: { osoba, dokumenty, wyniki, wiadomosci, liczbaNowych, pismo } */
+  /* kontekst: { osoba, dokumenty, wyniki, wiadomosci, nowe (nieprzeczytane), liczbaNowych, uwaga (karta „Wymaga Twojej uwagi”), pismo } */
+  /* Odpowiedź na scenariuszach — od razu, bez internetu */
   function odpowiedz(tekst, kontekst) {
-    var r = rozpoznajSprawe(tekst);
+    var r = rozpoznajScenariuszem(tekst);
     var w = SPRAWA(r.sprawa).odpowiedz(kontekst, r);
     w.sprawa = r.sprawa;
     return w;
@@ -592,7 +693,11 @@
   global.ASYSTENT = {
     normalizuj: normalizuj,
     rozpoznajSprawe: rozpoznajSprawe,
+    rozpoznajScenariuszem: rozpoznajScenariuszem,
     odpowiedz: odpowiedz,
+    odpowiedzZModelem: odpowiedzZModelem,
+    modelWlaczony: modelWlaczony,
+    promptModelu: promptModelu,
     dalej: dalej,
     sprawy: SPRAWY,
     nazwy: NAZWY,

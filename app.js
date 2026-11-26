@@ -150,14 +150,14 @@
   }
 
   /* ---------- Stan i ustawienia (localStorage w try/catch) ---------- */
-  var KLUCZ = 'mobywatel-prosto';
+  var KLUCZ = 'mobywatel-prosto-2'; /* 2: kolejność dokumentów liczona od przodu */
   var DOMYSLNE = { osoba: null, tekst: 'standardowy', motyw: 'jasny', prosty: false, czytanie: false, przeczytane: {}, kolejnosc: {}, uklady: {}, wyniki: {} };
   var ROZMIARY = ['standardowy', 'duzy', 'bardzo-duzy'];
   var MOTYWY = ['jasny', 'ciemny', 'kontrast'];
   var UKLADY = ['duze', 'male', 'lista'];
   var NAZWY_UKLADOW = { duze: 'Duże karty', male: 'Małe karty', lista: 'Lista' };
   var stan = wczytaj();
-  var przodPortfela = {}; /* która karta leży z przodu portfela (do końca wizyty) */
+  var przodPortfela = {}; /* karta pokazana chwilowo z przodu (do wyjścia z ekranu Dokumenty) */
   var rozmowa = [];       /* rozmowa z asystentem (do końca wizyty) */
   var szkice = {};        /* odpowiedzi w krokach spraw, zanim zostaną wysłane */
 
@@ -200,6 +200,7 @@
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', stan.motyw === 'jasny' ? '#FFFFFF' : stan.motyw === 'ciemny' ? '#1C1F27' : '#000000');
     if (!stan.czytanie) zatrzymajCzytanie();
+    if (typeof wyrownajPaski === 'function') wyrownajPaski();
   }
   function wybierzOsobe(id) {
     var o = D.osoby[id];
@@ -252,7 +253,7 @@
   function ukladOsoby(o) { return stan.uklady[o.id] || 'duze'; }
   function idPrzodu(o, docs) {
     var p = przodPortfela[o.id];
-    return p && znajdz(docs, p) ? p : docs[docs.length - 1].id;
+    return p && znajdz(docs, p) ? p : docs[0].id; /* z przodu: pierwszy z kolejności */
   }
   function czyNowa(o, w) { return w.nowa && !(stan.przeczytane[o.id] && stan.przeczytane[o.id][w.id]); }
   function liczbaNowych(o) {
@@ -314,7 +315,8 @@
      'podglad' i 'tyl-podglad' (podgląd w ustawieniach, bez klikania), 'mala' (układ Małe karty) */
   function kartaDokumentu(o, d, tryb) {
     var klasa = 'karta k-' + d.kolor;
-    var nazwa = '<span class="karta-nazwa">' + d.nazwa + '</span>';
+    /* W portfelu krótsza nazwa (np. „mLegitymacja emeryta”), pełna w szczegółach */
+    var nazwa = '<span class="karta-nazwa">' + (tryb === 'szczegoly' ? d.nazwa : d.nazwaKrotka || d.nazwa) + '</span>';
     if (tryb === 'tyl') {
       return '<div class="' + klasa + ' tyl" data-id="' + d.id + '">' +
         '<button type="button" class="karta-gora" data-akcja="na-przod" data-id="' + d.id + '" aria-label="Pokaż ' + d.nazwa + ' na przodzie. ' + d.status + '">' +
@@ -356,11 +358,21 @@
     if (uklad === 'lista') return '<ul class="lista portfel-lista">' + docs.map(wierszDokumentu).join('') + '</ul>';
     if (uklad === 'male') return '<ul class="male-karty">' + docs.map(function (d) { return '<li>' + kartaDokumentu(o, d, 'mala') + '</li>'; }).join('') + '</ul>';
     var przod = idPrzodu(o, docs);
-    var stos = docs.filter(function (d) { return d.id !== przod; }).concat([znajdz(docs, przod)]);
+    /* Z przodu pierwszy dokument; tuż za nim drugi, dalej kolejne (wyżej na ekranie) */
+    var stos = docs.filter(function (d) { return d.id !== przod; }).reverse().concat([znajdz(docs, przod)]);
     return '<div class="portfel" id="portfel">' + stos.map(function (d) {
       return kartaDokumentu(o, d, d.id === przod ? 'przod' : 'tyl');
     }).join('') + '</div>';
   }
+  /* Paski kart z tyłu mają zawsze równą wysokość (długa nazwa zawija się, a portfel się nie rozjeżdża) */
+  function wyrownajPaski() {
+    var paski = Array.prototype.slice.call(document.querySelectorAll('.portfel .karta.tyl > .karta-gora'));
+    paski.forEach(function (p) { p.style.minHeight = ''; });
+    var max = 0;
+    paski.forEach(function (p) { max = Math.max(max, p.getBoundingClientRect().height); });
+    paski.forEach(function (p) { p.style.minHeight = Math.ceil(max) + 'px'; });
+  }
+  window.addEventListener('resize', wyrownajPaski);
   /* Dotknięcie karty z tyłu przesuwa ją na przód — płynnie (bez animacji przy „ogranicz ruch”) */
   function naPrzod(id) {
     var o = osoba();
@@ -376,6 +388,7 @@
     tymczasowy.innerHTML = portfel(o);
     stary.parentNode.replaceChild(tymczasowy.firstChild, stary);
     var nowy = document.getElementById('portfel');
+    wyrownajPaski();
     var przodEl = nowy.querySelector('.karta.przod');
     if (ruch) {
       var lista = [];
@@ -456,7 +469,7 @@
     if (docs.length) {
       var przod = znajdz(docs, idPrzodu(o, docs));
       var reszta = docs.filter(function (d) { return d !== przod; });
-      stos = '<div class="portfel">' + (reszta.length ? kartaDokumentu(o, reszta[reszta.length - 1], 'tyl-podglad') : '') +
+      stos = '<div class="portfel">' + (reszta.length ? kartaDokumentu(o, reszta[0], 'tyl-podglad') : '') +
         kartaDokumentu(o, przod, 'podglad') + '</div>';
     }
     return '<div class="podglad" inert aria-hidden="true"><p class="podglad-etykieta">Podgląd</p>' +
@@ -576,7 +589,7 @@
     return {
       tytul: 'Zarządzaj dokumentami', uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/dokumenty',
       html: '<section class="sekcja">' + wstep() + '<ul class="lista">' +
-        wierszListy('#/zarzadzaj/kolejnosc', 'strzalki', 'Kolejność dokumentów', 'Ustaw, który dokument jest wyżej.') +
+        wierszListy('#/zarzadzaj/kolejnosc', 'strzalki', 'Kolejność dokumentów', 'Pierwszy dokument z listy będzie zawsze na przodzie.') +
         wierszListy('#/zarzadzaj/usun', 'kosz', 'Usuń dokument', 'Usuń dokument z aplikacji.') +
         wierszListy('#/zarzadzaj/uklad', 'uslugi', 'Wybierz układ', 'Teraz: ' + NAZWY_UKLADOW[ukladOsoby(o)] + '.') +
         wierszListy('#/zarzadzaj/dodaj', 'plus', 'Dodaj dokument', 'Zobacz dokumenty, które możesz dodać.') +
@@ -594,14 +607,14 @@
       return '<li class="kolejnosc-wiersz">' +
         '<div class="kolejnosc-dokument"><span class="mini-karta k-' + d.kolor + '" aria-hidden="true"></span>' +
           '<span class="tekst"><span class="tytul-wiersza">' + (i + 1) + '. ' + d.nazwa + '</span>' +
-          (duze && i === docs.length - 1 ? '<span class="opis">Leży z przodu portfela</span>' : '') + '</span></div>' +
+          (i === 0 ? '<span class="opis">' + (duze ? 'Zawsze z przodu portfela' : 'Zawsze pierwszy') + '</span>' : '') + '</span></div>' +
         '<div class="kolejnosc-przyciski">' + przycisk(-1, 'wGore', 'W górę', i === 0) + przycisk(1, 'wDol', 'W dół', i === docs.length - 1) + '</div></li>';
     }).join('');
   }
   function ekranKolejnosc() {
     var o = osoba();
     var docs = dokumentyOsoby(o);
-    var opis = 'Taka kolejność jest na ekranie Dokumenty.' + (ukladOsoby(o) === 'duze' ? ' Ostatni dokument leży z przodu portfela.' : '');
+    var opis = 'Pierwszy dokument z listy będzie zawsze na przodzie. Taka kolejność jest na ekranie Dokumenty.';
     return {
       tytul: 'Kolejność dokumentów', uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/zarzadzaj',
       html: '<section class="sekcja">' + wstep(docs.length ? opis : null) +
@@ -631,7 +644,7 @@
     if (btn) {
       btn.focus({ preventScroll: true });
       /* Przycisk zawsze w całości widoczny (nie pod paskiem „Wstecz” i nie pod dolną krawędzią) */
-      if (btn.scrollIntoView) btn.scrollIntoView({ block: 'nearest' });
+      przewinDo(btn, 'nearest');
     }
   }
   function ekranUsun() {
@@ -793,6 +806,7 @@
   function kontekstAsystenta(dodatki) {
     var o = osoba();
     return { osoba: o, dokumenty: dokumentyOsoby(o), wyniki: wynikiOsoby(o), wiadomosci: wiadomosciOsoby(o),
+      nowe: wiadomosciOsoby(o).filter(function (w) { return czyNowa(o, w); }), uwaga: uwagaOsoby(o),
       liczbaNowych: liczbaNowych(o), pismo: dodatki && dodatki.pismo };
   }
   function przyciskOdpowiedzi(p) {
@@ -871,19 +885,54 @@
     tymczasowy.innerHTML = rozmowa.slice(-ileNowych).map(wiadomoscHtml).join('');
     var pierwszy = tymczasowy.firstElementChild;
     while (tymczasowy.firstChild) lista.appendChild(tymczasowy.firstChild);
-    przewinDo(pierwszy);
+    przewinDo(pierwszy, 'start', true);
     var ogl = document.getElementById('ogloszenia');
     if (ogl) ogl.textContent = 'Asystent: ' + tekstWiadomosci(m);
   }
-  function przewinDo(el) {
+  /* Przewija tylko treść ekranu (albo stronę przy dużym powiększeniu) — nigdy ramki telefonu,
+     dzięki czemu dolny pasek zostaje zawsze na samym dole. blok: 'start' albo 'nearest' */
+  function przewinDo(el, blok, plynnie) {
     if (!el) return;
-    if (el.scrollIntoView) el.scrollIntoView({ block: 'start', behavior: ograniczRuch() ? 'auto' : 'smooth' });
+    var kontener = getComputedStyle(tresc).overflowY === 'auto' ? tresc : null;
+    var styl = getComputedStyle(kontener || html);
+    var gora = (kontener ? kontener.getBoundingClientRect().top : 0) + (parseFloat(styl.scrollPaddingTop) || 0);
+    var dol = (kontener ? kontener.getBoundingClientRect().bottom : window.innerHeight) - (parseFloat(styl.scrollPaddingBottom) || 0);
+    var r = el.getBoundingClientRect(), o;
+    if (blok === 'nearest') {
+      if (r.top < gora) o = r.top - gora;
+      else if (r.bottom > dol) o = Math.min(r.bottom - dol, r.top - gora);
+      else return;
+    } else o = r.top - gora;
+    var opcje = { top: (kontener ? kontener.scrollTop : window.pageYOffset) + o, behavior: plynnie && kontener && !ograniczRuch() ? 'smooth' : 'auto' };
+    if (kontener) kontener.scrollTo(opcje); else window.scrollTo(opcje);
   }
   function zapytaj(tekst, dodatki) {
     tekst = String(tekst || '').trim();
     if (!tekst) return;
-    var m = dodajWymiane(tekst, window.ASYSTENT.odpowiedz(tekst, kontekstAsystenta(dodatki)));
-    pokazOdpowiedz(m, 2);
+    var A = window.ASYSTENT;
+    if (!A.modelWlaczony()) {
+      /* Bez modelu: odpowiedź od razu, ze scenariuszy (bez internetu) */
+      pokazOdpowiedz(dodajWymiane(tekst, A.odpowiedz(tekst, kontekstAsystenta(dodatki))), 2);
+      return;
+    }
+    /* Z modelem (config.js): najpierw „Chwileczkę…”, potem odpowiedź — najwyżej po 6 sekundach */
+    var czeka = dodajWymiane(tekst, { zdania: ['Chwileczkę…'], przyciski: [] });
+    pokazOdpowiedz(czeka, 2);
+    A.odpowiedzZModelem(tekst, kontekstAsystenta(dodatki)).catch(function () {
+      return A.odpowiedz(tekst, kontekstAsystenta(dodatki));
+    }).then(function (w) {
+      w.kto = 'asystent';
+      w.id = czeka.id;
+      var i = rozmowa.indexOf(czeka);
+      if (i < 0) return;
+      rozmowa[i] = w;
+      var el = document.getElementById('w-' + w.id);
+      if (el) {
+        el.outerHTML = wiadomoscHtml(w);
+        var ogl = document.getElementById('ogloszenia');
+        if (ogl) ogl.textContent = 'Asystent: ' + tekstWiadomosci(w);
+      }
+    });
   }
   /* Odpowiedź na pytanie z wyborem (np. „Co zginęło?”) */
   function odpowiedzNaWybor(idWyboru, idWiadomosci, wartosci) {
@@ -1163,7 +1212,7 @@
         }
       });
       /* Widać całość: etykietę, komunikat o błędzie i pole (nie pod paskiem „Wstecz”) */
-      if (pierwszyBlok && pierwszyBlok.scrollIntoView) pierwszyBlok.scrollIntoView({ block: 'start' });
+      przewinDo(pierwszyBlok, 'start');
       if (pierwszy) pierwszy.focus({ preventScroll: true });
       return;
     }
@@ -1543,6 +1592,8 @@
     }
     if (!ekran) { location.replace('#/dokumenty'); return; }
     oznaczHistorie();
+    /* Karta pokazana z przodu dotknięciem jest tylko chwilowa: po wyjściu z Dokumentów wraca pierwszy dokument z kolejności */
+    if (a.sciezka !== '/dokumenty') przodPortfela = {};
 
     var naglowek = ekran.naglowek || (ekran.uklad === 'glowny' ? naglowekAplikacji() : naglowekWstecz(ekran.rodzic || '#/dokumenty', ekran.h1 || ekran.tytul, ekran.wsteczDoRodzica));
     var komunikat = komunikatPoPrzejsciu;
@@ -1550,9 +1601,11 @@
     tresc.innerHTML = naglowek + '<main id="glowna">' +
       (komunikat ? '<p class="komunikat-ok" role="status" tabindex="-1">' + ikona('ok') + '<span>' + esc(komunikat) + '</span></p>' : '') +
       ekran.html + '</main>';
+    wyrownajPaski();
     tresc.scrollTop = 0;
+    tresc.parentNode.scrollTop = 0;
     window.scrollTo(0, 0);
-    document.title = ekran.tytul + ' · mObywatel';
+    document.title = ekran.tytul + ' · mObywatel dla każdego';
 
     /* W krokach sprawy dolny pasek jest ukryty (jedna rzecz na ekranie) */
     nawigacja.hidden = ekran.uklad === 'wejscie' || ekran.uklad === 'krok';
@@ -1608,6 +1661,8 @@
   /* „Powiedz”: rozpoznawanie mowy w przeglądarce, gdy jest dostępne (pl-PL) */
   var Rozpoznawanie = window.SpeechRecognition || window.webkitSpeechRecognition || null;
   var sluchanie = null;
+  var MOWA_BRAK = 'Ta przeglądarka nie obsługuje mówienia. Wpisz pytanie albo otwórz aplikację w Chrome lub Edge.';
+  var MOWA_INTERNET = 'Mówienie wymaga internetu. Wpisz pytanie albo wybierz gotowe pytanie.';
   function zatrzymajSluchanie() {
     if (!sluchanie) return;
     var s = sluchanie;
@@ -1618,10 +1673,9 @@
   }
   function sluchaj() {
     if (sluchanie) { try { sluchanie.stop(); } catch (e) { zatrzymajSluchanie(); } return; }
-    if (!Rozpoznawanie) {
-      oknoInformacja('Mówienie', 'Ta przeglądarka nie rozpoznaje mowy. Napisz, co chcesz załatwić, albo wybierz gotowe pytanie.');
-      return;
-    }
+    /* Opera i Firefox nie obsługują mówienia (Opera ma przycisk, ale rozpoznawanie nie działa) */
+    if (!Rozpoznawanie || /OPR\//.test(navigator.userAgent)) { oknoInformacja('Mówienie', MOWA_BRAK); return; }
+    if (navigator.onLine === false) { oknoInformacja('Mówienie', MOWA_INTERNET); return; }
     var r, uslyszane = '', blad = null;
     try { r = new Rozpoznawanie(); } catch (e) { oknoInformacja('Mówienie', 'Mówienie nie działa teraz w tej przeglądarce. Napisz, co chcesz załatwić.'); return; }
     r.lang = 'pl-PL';
@@ -1640,7 +1694,7 @@
       ustawPrzyciskMow();
       if (tekst) { zapytaj(tekst); return; }
       if (blad === 'not-allowed' || blad === 'service-not-allowed') oknoInformacja('Mówienie', 'Przeglądarka nie ma dostępu do mikrofonu. Zezwól na mikrofon albo napisz, co chcesz załatwić.');
-      else if (blad === 'network') oknoInformacja('Mówienie', 'W tej przeglądarce rozpoznawanie mowy potrzebuje internetu. Napisz, co chcesz załatwić, albo wybierz gotowe pytanie.');
+      else if (blad === 'network') oknoInformacja('Mówienie', navigator.onLine === false ? MOWA_INTERNET : MOWA_BRAK);
       else if (blad && blad !== 'aborted') oknoInformacja('Mówienie', 'Nie udało się rozpoznać mowy. Spróbuj jeszcze raz albo napisz, co chcesz załatwić.');
     };
     sluchanie = r;

@@ -1,6 +1,6 @@
 # Specyfikacja prototypu „mObywatel dla każdego”
 
-Wersja 2.3 · 26.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu; 2.3: asystent offline i sprawy A, B, C)
+Wersja 2.4 · 26.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu; 2.3: asystent offline i sprawy A, B, C; 2.4: poprawki po teście, publikacja, przygotowanie pod Bielika)
 
 Klikalny prototyp aplikacji mObywatel na konkurs mObywatel Challenge (termin zgłoszenia: 26.11 wieczorem). Konkurs ma pierwszeństwo: prototyp ma być lepszy od prototypu referencyjnego Janusza Cieszyńskiego (mobywatel.ai), mieć na to dowody i wyróżniać się.
 
@@ -70,7 +70,7 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 | Ikony | Zawsze z podpisem |
 | Język | Zdania do 15 słów, na „Ty”, bez żargonu, formy neutralne płciowo |
 | Układ | Jedna kolumna, naturalny przepływ, nic się nie nakłada, jednostki rem. Działa przy 320 px i powiększeniu 200%. Jedyny wyjątek: portfel kart dokumentów — karty leżą jedna za drugą, ale pasek każdej karty (nazwa i status) jest w całości widoczny i ma min. 48 px wysokości |
-| Nawigacja | Dolny pasek widoczny poza krokami sprawy. Na każdym podekranie górny pasek z „Wstecz” (z napisem) i tytułem ekranu, przyklejony u góry — nie znika przy przewijaniu. W sprawach „Krok 2 z 4” |
+| Nawigacja | Dolny pasek widoczny poza krokami sprawy, zawsze na samym dole ekranu — na każdej zakładce, w każdym rozmiarze tekstu i motywie (przewija się tylko treść, nigdy cała ramka). Na każdym podekranie górny pasek z „Wstecz” (z napisem) i tytułem ekranu, przyklejony u góry — nie znika przy przewijaniu. W sprawach „Krok 2 z 4” |
 | Czas i ruch | Brak limitów czasu i znikających komunikatów. Animacje subtelne, wyłączone przy „ogranicz ruch” |
 | Czytniki ekranu | `lang="pl"`, nagłówki, etykiety pól, `aria-live` dla asystenta, pola wyboru ogłaszające zaznaczenie, widoczny fokus |
 | Oznaczenia | Nazwa „mObywatel”. Ikona: czerwony kwadrat z zaokrąglonymi rogami i prostym białym znakiem własnego projektu — bez godła i oficjalnego logo. Informacja „Prototyp konkursowy, dane fikcyjne” tylko na ekranie wyboru osoby i w „Więcej”. Awatary z inicjałów |
@@ -118,7 +118,7 @@ Gotowe pytania asystenta (3 pierwsze pod polem asystenta, 4 na pustym ekranie As
 **4. Dokumenty (ekran startowy).** Wzór: `warianty/makieta-dokumenty.html`. Od góry:
 1. Pasek telefonu (godzina, bateria), nagłówek (znak + „mObywatel”, „Dostosuj”, „Skrzynka” z licznikiem), powitanie „Dzień dobry, Halino”.
 2. Nad portfelem przycisk „Zarządzaj” (ikona z podpisem) — ekran 5a.
-3. Portfel kart ułożonych jedna za drugą (układ „Duże karty”): karty z tyłu pokazują czytelny pasek z nazwą i statusem, mDowód jest z przodu w całości. Dotknięcie karty z tyłu przesuwa ją na przód (płynna animacja, wyłączona przy „ogranicz ruch”). Szczegóły otwiera dopiero przycisk na przedniej karcie. Dla czytnika ekranu każda karta z tyłu to przycisk „Pokaż [nazwa] na przodzie”. Wygląd kart — sekcja „Karty dokumentów”.
+3. Portfel kart ułożonych jedna za drugą (układ „Duże karty”): karty z tyłu pokazują czytelny pasek z nazwą i statusem. Z przodu, w całości, jest zawsze pierwszy dokument z kolejności ustawionej w „Zarządzaj” (domyślnie mDowód), tuż za nim drugi itd. Dotknięcie karty z tyłu pokazuje ją z przodu tylko chwilowo (płynna animacja, wyłączona przy „ogranicz ruch”): po wyjściu z ekranu Dokumenty i powrocie, a także po ponownym otwarciu aplikacji, z przodu jest znów pierwszy dokument. Paski kart z tyłu mają zawsze równą wysokość; długa nazwa zawija się albo ma krótszą wersję na karcie (np. „mLegitymacja emeryta”), pełna nazwa jest w szczegółach. Szczegóły otwiera dopiero przycisk na przedniej karcie. Dla czytnika ekranu każda karta z tyłu to przycisk „Pokaż [nazwa] na przodzie”. Wygląd kart — sekcja „Karty dokumentów”.
 4. „Wymaga Twojej uwagi” — karta zależna od osoby.
 5. Pole asystenta przypięte nad dolnym paskiem („Co chcesz załatwić?” + „Powiedz”); po dotknięciu pola 3 gotowe pytania. Wcześniejszy blok asystenta pod kartą sprawy usunięty.
 Przy tekście Standardowym na 390 × 844 bez przewijania widać mDowód, kartę sprawy i pole asystenta. Jeśli się nie mieści — zapytaj autorkę, zanim coś ukryjesz.
@@ -137,7 +137,7 @@ Przy tekście Standardowym na 390 × 844 bez przewijania widać mDowód, kartę 
 - Pozostałe dokumenty analogicznie, tylko z danymi z karty (sekcja „Karty dokumentów”).
 
 **5a. Zarządzaj** (jak w mObywatelu; otwiera go przycisk nad portfelem).
-- Kolejność dokumentów: przyciski „W górę” / „W dół” przy każdym dokumencie (bez przeciągania — łatwiej dla seniorów).
+- Kolejność dokumentów: przyciski „W górę” / „W dół” przy każdym dokumencie (bez przeciągania — łatwiej dla seniorów). Dopisek: „Pierwszy dokument z listy będzie zawsze na przodzie”. Kolejność decyduje o wszystkich układach: w „Duże karty” pierwszy jest z przodu portfela, w „Małe karty” i „Lista” pierwszy jest na górze.
 - Usuń dokument (z potwierdzeniem).
 - Wybierz układ: Duże karty (portfel), Małe karty, Lista. Każdy układ spełnia zasady projektowe (tekst min. 16 px, przyciski min. 48 px).
 - Dodaj dokument: lista dokumentów dostępnych w mObywatelu, m.in. mLegitymacja szkolna, studencka, doktoranta, emeryta-rencisty, osoby niepełnosprawnej, Karta Dużej Rodziny, legitymacja ulgowych usług transportowych, legitymacje zawodowe (adwokacka, radcy prawnego, PWZ lekarza, pielęgniarki i położnej, farmaceuty, fizjoterapeuty, nauczyciela i inne). Wybór otwiera okno „Niedostępne w prototypie”.
@@ -192,17 +192,20 @@ Rozpoznaje sprawę, zadaje najwyżej 1–2 pytania i przekazuje do tych samych w
 - Działa bez internetu i bez serwera. Każda sprawa to jeden wpis w jednym miejscu w `asystent.js`: słowa kluczowe, odpowiedź, przyciski, dokąd prowadzi. Całe rozpoznawanie w jednej funkcji `rozpoznajSprawe(tekst)` (później podmieniana na model Bielik).
 - Tekst bez polskich znaków i małymi literami, z tolerancją literówek (1 literówka w słowach od 5 liter, 2 od 8 liter); szerokie listy słów: A — zgubić, ukradli, kradzież, portfel, torebka, dowód, zastrzec, PESEL, karta; B — OC, ubezpieczenie, przegląd, badanie, samochód, auto; C — meldunek, zameldować, przeprowadzka, nowy adres. Gdy żadna sprawa nie pasuje, asystent szuka w liście Usług.
 - Gdy nie rozumie: „Nie rozumiem jeszcze tej prośby. Mogę pomóc w tych sprawach:” + przyciski działających spraw + „Zobacz wszystkie usługi”. Nigdy „tego nie załatwię”.
-- Najwyżej 2 krótkie zdania na wiadomość, jedno pytanie naraz, każda wiadomość kończy się przyciskami następnego kroku albo kartą sprawy („Zacznij” / „Wolę przejść krok po kroku sam(a)”). Wybór wielu opcji jako pola wyboru. Przy każdej odpowiedzi „Przeczytaj na głos” (głosy systemu — działa bez internetu). „Powiedz” używa rozpoznawania mowy w przeglądarce, gdy jest dostępne; jeśli nie działa (brak mikrofonu, brak internetu w przeglądarce, która go wymaga), asystent prosi o wpisanie pytania.
+- Najwyżej 2 krótkie zdania na wiadomość, jedno pytanie naraz, każda wiadomość kończy się przyciskami następnego kroku albo kartą sprawy („Zacznij” / „Wolę przejść krok po kroku sam(a)”). Wybór wielu opcji jako pola wyboru. Przy każdej odpowiedzi „Przeczytaj na głos” (głosy systemu — działa bez internetu). „Powiedz” używa rozpoznawania mowy w przeglądarce (Chrome, Edge). Gdy przeglądarka go nie obsługuje (np. Opera, Firefox): „Ta przeglądarka nie obsługuje mówienia. Wpisz pytanie albo otwórz aplikację w Chrome lub Edge.” Gdy nie ma internetu: „Mówienie wymaga internetu. Wpisz pytanie albo wybierz gotowe pytanie.” Brak dostępu do mikrofonu — prośba o zezwolenie albo wpisanie pytania.
 - Szybkie sprawy (odpowiedź 1–2 zdania + przycisk do właściwego ekranu lub danych): wytłumacz pismo (od kogo, ile, do kiedy, co zrobić; „Pokaż pismo”, „Jak zapłacić?”), czy ten SMS to oszustwo (3 znaki rozpoznawcze, czego nie robić, przekazanie SMS-a na 8080), pokaż dowód / kod QR, ważność dokumentu, punkty karne, mandat do zapłaty, gdzie głosuję, zniżki z legitymacji (ogólnie, bez liczb), gdzie użyć Karty Dużej Rodziny (ogólnie), czy PESEL jest zastrzeżony (+ „Zastrzeż PESEL”). Gdy osoba nie ma dokumentu, o który pyta — uprzejma informacja i co może zrobić.
+- Ogólne pytania: „Co mam do załatwienia?”, „Jakie mam sprawy?”, „Czy coś na mnie czeka?” → karta „Wymaga Twojej uwagi” i nieprzeczytane wiadomości, każda z przyciskiem; „Jakie mam dokumenty?” → dokumenty z portfela (w kolejności) z przyciskami; „Co umiesz?”, „W czym mi pomożesz?”, „Pomoc” → krótko, co asystent potrafi, + przyciski spraw; „Mam nowe wiadomości?” → nieprzeczytane wiadomości z przyciskami; „Dziękuję”, „Dzień dobry” → krótka, życzliwa odpowiedź + podpowiedzi.
+- **Model językowy (np. Bielik) — nieobowiązkowy.** Adres w `config.js` (domyślnie pusty). Pusty adres albo brak odpowiedzi modelu w 6 sekund — asystent działa na scenariuszach, osoba nic nie zauważa. Gdy adres jest ustawiony, `rozpoznajSprawe(tekst)` najpierw pyta model; model zwraca tylko identyfikator sprawy z naszej listy (albo „nie wiem”) i jedno krótkie, życzliwe zdanie (zdanie z liczbami, datami lub adresami jest odrzucane). Dalej zawsze prowadzą nasze kroki, a dane (daty, kwoty) pochodzą z aplikacji. Model jest za pośrednikiem (Cloudflare Worker w `bielik/`, format API OpenAI), który ukrywa klucz API; instrukcja wdrożenia: `bielik/INSTRUKCJA.md`.
 
 ## Technika
 
 - Zwykłe HTML, CSS, JavaScript, bez frameworków i budowania. **Wszystko działa po otwarciu `index.html` dwuklikiem (bez serwera) i na GitHub Pages** — bez iframe i bez wczytywania lokalnych plików przez fetch. **Wszystko działa bez internetu** (z internetu korzysta tylko czcionka — bez niego jest systemowa — oraz, w niektórych przeglądarkach, rozpoznawanie mowy „Powiedz”).
-- Pliki: `index.html`, `style.css`, `app.js`, `dane.js`, `asystent.js`.
+- Pliki: `index.html`, `style.css`, `app.js`, `dane.js`, `asystent.js`, `config.js` (ustawienia modelu), `media/` (ikona, obrazek podglądu linku), `bielik/` (pośrednik i instrukcja — nie jest częścią aplikacji), `README.md`.
 - Każdy ekran ma własny adres (`#/dokumenty`, `#/uslugi`, `#/sprawa/zgubione/krok-2`). Parametry: `?osoba=halina`, `?reset=1`.
 - Ustawienia zapamiętywane w localStorage (w try/catch); aplikacja działa także bez niego.
 - Na komputerze aplikacja w ramce telefonu na środku ekranu; na telefonie na pełnym ekranie.
-- Ikony: Lucide (MIT), wklejone jako SVG.
+- Ikony: Lucide (licencja ISC), wklejone jako SVG.
+- **Publikacja na GitHub Pages:** `index.html` w głównym folderze, wszystkie ścieżki względne, pusty plik `.nojekyll`. Tytuł strony „mObywatel dla każdego — prototyp konkursowy”, opis strony, ikona w karcie przeglądarki (czerwony kwadrat z białym „m”), podgląd linku Open Graph (tytuł, opis, obrazek 1200 × 630 z ekranem Dokumenty). README.md po polsku. Folder `warianty/` zostaje jako dokumentacja procesu, ale aplikacja do niego nie linkuje.
 
 ## Kontrola (po każdym etapie)
 

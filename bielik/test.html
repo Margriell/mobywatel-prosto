@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Test pośrednika modelu — mObywatel dla każdego</title>
+<style>
+  body { font-family: system-ui, "Segoe UI", sans-serif; font-size: 18px; line-height: 1.5; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; color: #1A1D26; }
+  label { display: block; font-weight: 700; margin-top: 1rem; }
+  input { width: 100%; min-height: 48px; font: inherit; padding: 0 .75rem; border: 2px solid #8A91A3; border-radius: 10px; box-sizing: border-box; }
+  button { margin-top: 1rem; min-height: 52px; padding: 0 1.25rem; font: inherit; font-weight: 700; color: #fff; background: #1D3F8F; border: 0; border-radius: 12px; cursor: pointer; }
+  pre { white-space: pre-wrap; background: #F3F4F7; padding: 1rem; border-radius: 10px; }
+</style>
+</head>
+<body>
+<h1>Test pośrednika modelu</h1>
+<p>Ta strona sprawdza, czy pośrednik z <code>worker.js</code> odpowiada. Nie jest częścią aplikacji.</p>
+<label for="adres">Adres pośrednika (kończy się na /v1/chat/completions)</label>
+<input id="adres" placeholder="https://mobywatel-bielik.twoja-nazwa.workers.dev/v1/chat/completions">
+<label for="pytanie">Pytanie</label>
+<input id="pytanie" value="Zginął mi portfel">
+<button type="button" id="sprawdz">Sprawdź</button>
+<h2>Wynik</h2>
+<pre id="wynik" aria-live="polite">Jeszcze nic nie sprawdzono.</pre>
+<script>
+  document.getElementById('sprawdz').addEventListener('click', function () {
+    var wynik = document.getElementById('wynik');
+    var adres = document.getElementById('adres').value.trim();
+    if (!adres) { wynik.textContent = 'Wpisz adres pośrednika.'; return; }
+    wynik.textContent = 'Czekam na odpowiedź…';
+    var start = Date.now();
+    fetch(adres, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'bielik', temperature: 0, max_tokens: 120, messages: [
+        { role: 'system', content: 'Odpowiedz wyłącznie JSON: {"sprawa": "zgubione albo nie wiem", "zdanie": "jedno krótkie, życzliwe zdanie"}.' },
+        { role: 'user', content: document.getElementById('pytanie').value }] })
+    }).then(function (o) { return o.text().then(function (t) { return [o.status, t]; }); })
+      .then(function (w) {
+        var czas = ((Date.now() - start) / 1000).toFixed(1);
+        var tresc = w[1];
+        try { tresc = JSON.parse(w[1]).choices[0].message.content; } catch (e) { /* pokaż całą odpowiedź */ }
+        wynik.textContent = (w[0] === 200 ? 'Działa! ' : 'Błąd ' + w[0] + '. ') + 'Czas: ' + czas + ' s.\n\n' + tresc +
+          (Number(czas) > 6 ? '\n\nUwaga: ponad 6 sekund — aplikacja w takim wypadku użyje scenariuszy.' : '');
+      })
+      .catch(function (e) { wynik.textContent = 'Nie udało się połączyć: ' + e.message; });
+  });
+</script>
+</body>
+</html>
