@@ -18,7 +18,7 @@
   var podpowiedziPaska = document.getElementById('podpowiedzi-paska');
   var okno = document.getElementById('okno');
 
-  /* ---------- Ikony: Lucide (licencja MIT), wklejone jako SVG ---------- */
+  /* ---------- Ikony: Lucide (licencja ISC), wklejone jako SVG ---------- */
   var IKONY = {
     list: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
     suwaki: '<line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>',
@@ -278,6 +278,27 @@
   var przodPortfela = {}; /* karta pokazana chwilowo z przodu (do wyjścia z ekranu Dokumenty) */
   var rozmowa = [];       /* rozmowa z asystentem (do końca wizyty) */
   var szkice = {};        /* odpowiedzi w krokach spraw, zanim zostaną wysłane */
+  /* Sprawy w toku, rozmowa i ekran Gotowe przetrwają odświeżenie strony: trzymamy je w pamięci
+     tej karty przeglądarki (sessionStorage, w try/catch) — do końca wizyty, jak rozmowa */
+  var KLUCZ_SESJI = 'mobywatel-prosto-sesja';
+  function zapiszSesje() {
+    try {
+      sessionStorage.setItem(KLUCZ_SESJI, JSON.stringify({ osoba: stan.osoba, szkice: szkice, rozmowa: rozmowa, nr: nrWiadomosci,
+        zakonczenia: ostatnieZakonczenie, parametry: zastosowaneParametry, pytanie: ostatniePytanieZAdresu }));
+    } catch (e) { /* bez tej pamięci po odświeżeniu sprawa zaczyna się od nowa */ }
+  }
+  function wczytajSesje() {
+    try {
+      var z = JSON.parse(sessionStorage.getItem(KLUCZ_SESJI) || 'null');
+      if (!z || typeof z !== 'object' || z.osoba !== stan.osoba) return;
+      if (z.szkice && typeof z.szkice === 'object') szkice = z.szkice;
+      if (Array.isArray(z.rozmowa)) rozmowa = z.rozmowa.filter(function (m) { return m && typeof m === 'object' && (m.kto === 'ty' || m.kto === 'asystent'); });
+      if (typeof z.nr === 'number') nrWiadomosci = z.nr;
+      if (z.zakonczenia && typeof z.zakonczenia === 'object') ostatnieZakonczenie = z.zakonczenia;
+      if (z.parametry && typeof z.parametry === 'object') zastosowaneParametry = z.parametry;
+      if (typeof z.pytanie === 'string') ostatniePytanieZAdresu = z.pytanie;
+    } catch (e) { /* zaczynamy od nowa */ }
+  }
 
   function wczytaj() {
     var s = JSON.parse(JSON.stringify(DOMYSLNE));
@@ -336,7 +357,10 @@
     delete przodPortfela[id];
     rozmowa = [];
     szkice = {};
+    zastosowaneParametry = {};
+    Object.keys(ostatnieZakonczenie).forEach(function (k) { if (k.indexOf(id + ':') === 0) delete ostatnieZakonczenie[k]; });
     zapisz();
+    zapiszSesje();
     zastosujUstawienia();
   }
   function osoba() { return D.osoby[stan.osoba] || D.osoby.halina; }
@@ -417,6 +441,9 @@
   }
 
   /* ---------- Karty dokumentów: jeden wspólny szablon ---------- */
+  /* Biernik nazwy dokumentu dla czytnika ekranu („Pokaż Kartę Dużej Rodziny na przodzie”) */
+  var BIERNIK = { 'mLegitymacja studencka': 'mLegitymację studencką', 'mLegitymacja emeryta-rencisty': 'mLegitymację emeryta-rencisty', 'Karta Dużej Rodziny': 'Kartę Dużej Rodziny' };
+  function biernik(nazwa) { return BIERNIK[nazwa] || nazwa; }
   function statusKarty(d) {
     return '<span class="karta-status' + (d.alarm ? ' alarm' : '') + '">' + ikona(d.ikonaStatusu || 'ok') + d.status + '</span>';
   }
@@ -440,7 +467,7 @@
     var gora = nazwa + statusKarty(d) + ikonaDokumentu(d.rodzaj);
     if (tryb === 'tyl') {
       return '<div class="' + klasa + ' tyl" data-id="' + d.id + '">' +
-        '<button type="button" class="karta-gora" data-akcja="na-przod" data-id="' + d.id + '" aria-label="Pokaż ' + d.nazwa + ' na przodzie. ' + d.status + '">' +
+        '<button type="button" class="karta-gora" data-akcja="na-przod" data-id="' + d.id + '" aria-label="Pokaż ' + biernik(d.nazwa) + ' na przodzie. ' + d.status + '">' +
           gora + '</button></div>';
     }
     if (tryb === 'tyl-podglad') {
@@ -835,7 +862,7 @@
       html: '<section class="sekcja">' + tytul('Usługi', 'Wszystko, co możesz załatwić. Nic nie jest ukryte.') +
         '<div class="szukaj" role="search"><label class="szukaj-etykieta" for="szukaj">Szukaj usługi</label>' +
           '<label class="pole pole-szukaj">' + ikona('lupa') +
-          '<input id="szukaj" type="text" inputmode="search" enterkeyhint="search" placeholder="np. PESEL" autocomplete="off"></label></div>' +
+          '<input id="szukaj" type="text" inputmode="search" enterkeyhint="search" placeholder="np. PESEL" autocomplete="off" maxlength="100"></label></div>' +
         '<div id="wyniki" aria-live="polite"></div>' +
         '<div id="lista-uslug">' + wszystkie + '</div></section><div class="odstep-dol"></div>',
       po: podlaczWyszukiwarke
@@ -990,6 +1017,7 @@
     odpowiedz.kto = 'asystent';
     odpowiedz.id = ++nrWiadomosci;
     rozmowa.push(odpowiedz);
+    zapiszSesje();
     return odpowiedz;
   }
   function naEkranieAsystenta() { return biezacyAdres().sciezka === '/asystent' && document.getElementById('glowna'); }
@@ -1039,6 +1067,7 @@
     var w = window.ASYSTENT.dalej(idWyboru, wartosci, kontekstAsystenta());
     if (zrodlo && w.ty) {
       zrodlo.odpowiedziano = w.ty;
+      zapiszSesje();
       var stary = document.getElementById('w-' + idWiadomosci);
       if (stary) stary.outerHTML = wiadomoscHtml(zrodlo);
     }
@@ -1105,7 +1134,7 @@
           return '<li><a class="wiersz-listy wiadomosc' + (nowa ? ' nowa' : '') + '" href="#/skrzynka/' + w.id + '">' +
             '<span class="ikona-kolo">' + ikona('list') + '</span><span class="tekst">' +
             (nowa ? '<span class="etykieta-nowa">Nowa</span>' : '') +
-            '<span class="tytul-wiersza">' + w.tytul + '</span><span class="opis">' + w.nadawca + ' · ' + (w.data === D.dzis ? 'dziś' : w.data) + '</span></span>' +
+            '<span class="tytul-wiersza">' + esc(w.tytul) + '</span><span class="opis">' + esc(w.nadawca) + ' · ' + (w.data === D.dzis ? 'dziś' : esc(w.data)) + '</span></span>' +
             ikona('dalej', 'chevron') + '</a></li>';
         }).join('') + '</ul></section><div class="odstep-dol"></div>'
     };
@@ -1126,9 +1155,10 @@
         '<button type="button" class="btn glowny" data-akcja="niedostepne" data-nazwa="' + esc(w.akcja.niedostepne) + '">' + ikona(w.akcja.ikona) + w.akcja.tekst + '</button>';
     }
     return {
-      tytul: w.tytul, uklad: 'pod', zakladka: null, rodzic: '#/skrzynka',
-      html: '<section class="sekcja">' + wstep() + '<p class="metryczka">' + w.nadawca + ' · ' + (w.data === D.dzis ? 'dziś' : w.data) + '</p>' +
-        '<div class="pismo">' + w.tresc.map(function (p) { return '<p>' + p + '</p>'; }).join('') + '</div>' +
+      tytul: w.tytul, h1: esc(w.tytul), uklad: 'pod', zakladka: null, rodzic: '#/skrzynka',
+      /* Treść zawsze jako tekst (np. adres wpisany w sprawie C) — nigdy jako kod HTML */
+      html: '<section class="sekcja">' + wstep() + '<p class="metryczka">' + esc(w.nadawca) + ' · ' + (w.data === D.dzis ? 'dziś' : esc(w.data)) + '</p>' +
+        '<div class="pismo">' + (w.tresc || []).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' +
         '<div class="przyciski-pion">' +
           (w.wyjasnienie ? '<button type="button" class="btn drugi" data-akcja="zapytaj" data-pytanie="Wytłumacz mi to pismo" data-pismo="' + w.id + '">' + ikona('iskry') + 'Wytłumacz prostym językiem</button>' : '') +
           akcja + '</div></section><div class="odstep-dol"></div>'
@@ -1170,10 +1200,29 @@
     if (id === 'samochod' && p.get('przypomnij')) s.terminy = [p.get('przypomnij')];
     if (id === 'zameldowanie' && p.get('podstawa')) s.podstawa = p.get('podstawa');
   }
+  /* Wejście z adresu w środek sprawy (albo powrót do zakończonej): bez wcześniejszych odpowiedzi
+     prowadzimy do pierwszego niewypełnionego kroku — nigdy do „Potwierdzam” ani fałszywego „Gotowe” */
+  var infoKroku = false;
+  function brakujacyKrok(id, krok, o, s) {
+    if (krok === SPRAWY_UI[id].kroki) return ostatnieZakonczenie[o.id + ':' + id] ? 0 : 1;
+    if (id === 'zgubione' && krok >= 3 && s.zginelo === undefined) return 1;
+    if (id === 'zameldowanie') {
+      if (krok >= 2 && !adresSzkicu(s.adres)) return 1;
+      if (krok >= 3 && !s.od) return 2;
+      if (krok >= 4 && !s.podstawa) return 3;
+    }
+    return 0;
+  }
   function ekranSprawa(id, parametry, krok) {
     krok = Math.min(Math.max(+krok || 1, 1), SPRAWY_UI[id].kroki);
     zastosujParametry(id, parametry);
     var o = osoba(), s = szkic(id);
+    var brak = brakujacyKrok(id, krok, o, s);
+    if (brak) {
+      infoKroku = true;
+      location.replace('#/sprawa/' + id + (brak > 1 ? '/krok-' + brak : ''));
+      return { przekierowanie: true };
+    }
     if (krok === SPRAWY_UI[id].kroki) return ekranGotowe(id);
     if (id === 'zgubione') return [sprawaA1, sprawaA2, sprawaA3][krok - 1](o, s);
     if (id === 'samochod') return [sprawaB1, sprawaB2][krok - 1](o, s);
@@ -1186,10 +1235,13 @@
     var info = SPRAWY_UI[id];
     var gotowe = krok === info.kroki;
     var poprzedni = krok > 2 ? '#/sprawa/' + id + '/krok-' + (krok - 1) : krok === 2 ? '#/sprawa/' + id : '#/dokumenty';
+    var brakowalo = infoKroku;
+    infoKroku = false;
     return {
       tytul: info.nazwa.indexOf(h1) === 0 ? info.nazwa : info.nazwa + ': ' + h1, h1: h1, uklad: 'krok', zakladka: null,
       rodzic: gotowe ? '#/dokumenty' : poprzedni, wsteczDoRodzica: gotowe,
       html: '<section class="sekcja">' + wstep() + licznikKroku(info, krok) +
+        (brakowalo ? '<p class="z-asystenta">' + ikona('info') + '<span>Brakuje odpowiedzi z wcześniejszych kroków. Zacznij tutaj.</span></p>' : '') +
         (opcje.zAsystenta ? '<p class="z-asystenta">' + ikona('iskry') + '<span>Zaznaczyliśmy odpowiedzi z rozmowy z asystentem. Sprawdź je.</span></p>' : '') +
         html + '</section><div class="odstep-dol"></div>'
     };
@@ -1273,7 +1325,10 @@
     return '<li><button type="button" class="wiersz-listy" data-akcja="niedostepne" data-nazwa="' + esc(a.niedostepne) + '">' + srodek + '</button></li>';
   }
   /* Po potwierdzeniu: skutki sprawy, wiadomość w Skrzynce, ekran Gotowe */
+  var KROK_WYSYLKI = { zgubione: 3, samochod: 2, zameldowanie: 4 };
   function zakonczSprawe(id) {
+    /* Wysyłamy tylko z kroku potwierdzenia — drugie kliknięcie (już po wysłaniu) nic nie robi */
+    if (biezacyAdres().sciezka !== '/sprawa/' + id + '/krok-' + KROK_WYSYLKI[id]) return;
     var o = osoba(), w = wynikiOsoby(o), s = szkic(id);
     var z = id === 'zgubione' ? zakonczA(o, w, s) : id === 'samochod' ? zakonczB(o, w, s) : zakonczC(o, w, s);
     var wiadomosc = { id: id + '-' + Date.now(), nowa: true, nadawca: 'mObywatel', tytul: z.tytulWiadomosci, data: D.dzis, tresc: z.trescWiadomosci };
@@ -1363,6 +1418,8 @@
       html += '<h2>Zrobimy to za Ciebie</h2>' + '<div id="dzialania" class="dzialania" aria-describedby="blad-dzialania">' + bladHtml('dzialania') +
         dostepne.map(function (x) { return przelacznikDzialania(x, s.dzialania[x]); }).join('') + '</div>';
     }
+    if (zg.indexOf('dowod') >= 0 && w.dowodUniewazniony) html += '<p class="komunikat-ok statyczny">' + ikona('ok') + '<span>Twój dowód osobisty jest już unieważniony.</span></p>';
+    if (zg.indexOf('prawko') >= 0 && w.prawkoZgloszone) html += '<p class="komunikat-ok statyczny">' + ikona('ok') + '<span>Utrata prawa jazdy jest już zgłoszona.</span></p>';
     if (w.pesel) html += '<p class="komunikat-ok statyczny">' + ikona('ok') + '<span>Twój PESEL jest już zastrzeżony.</span></p>';
     var reszta = zg.filter(function (x) { return x !== 'dowod' && x !== 'prawko'; });
     if (reszta.length) {
@@ -1514,12 +1571,12 @@
     return ekranKroku('zameldowanie', 3, 'Podstawa zameldowania',
       '<form class="krok-formularz" data-sprawa="zameldowanie" data-krok="3" novalidate>' +
         grupaPol('podstawa', 'Na jakiej podstawie tu mieszkasz?',
-          opcjaPola('radio', 'podstawa', 'wlasciciel', 'Jestem właścicielem lub współwłaścicielem', s.podstawa === 'wlasciciel') +
+          opcjaPola('radio', 'podstawa', 'wlasciciel', 'Mieszkanie jest moje', s.podstawa === 'wlasciciel', 'Własność albo współwłasność.') +
           opcjaPola('radio', 'podstawa', 'wynajem', 'Wynajmuję mieszkanie', s.podstawa === 'wynajem', 'W prawdziwej aplikacji dołączysz tu umowę najmu.')) +
         przyciskDalej('Dalej') + '</form>',
       { zAsystenta: s.zAsystenta });
   }
-  var PODSTAWY = { wlasciciel: 'Jestem właścicielem lub współwłaścicielem', wynajem: 'Wynajmuję mieszkanie' };
+  var PODSTAWY = { wlasciciel: 'Mieszkanie jest moje (własność albo współwłasność)', wynajem: 'Wynajmuję mieszkanie' };
   function sprawaC4(o, s) {
     if (!adresSzkicu(s.adres) || !s.od || !s.podstawa) {
       return ekranKroku('zameldowanie', 4, 'Sprawdź, zanim wyślemy', '<p>Brakuje części odpowiedzi.</p>' +
@@ -1544,6 +1601,10 @@
         'Urząd sprawdzi wniosek. Odpowiedź dostaniesz w Skrzynce.']
     };
   }
+  /* Litera w dowolnym alfabecie (także cyrylica) — nazwa ulicy i miejscowości nie może być z samych znaków i emoji */
+  var LITERA = (function () {
+    try { return new RegExp('\\p{L}', 'u'); } catch (e) { return /[A-Za-z\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF\u0590-\u05FF\u0600-\u06FF]/; }
+  })();
   /* Data w formacie dd.mm.rrrr: sprawdza, czy istnieje i czy nie jest z przyszłości */
   function sprawdzDate(t) {
     var m = String(t).match(/^(\d{1,2})[.\-\/ ](\d{1,2})[.\-\/ ](\d{4})$/);
@@ -1577,16 +1638,25 @@
       return 'koniec';
     },
     'zameldowanie-1': function (o, s, zaznaczone, tekst, blad) {
-      var a = { ulica: tekst('ulica'), mieszkanie: tekst('mieszkanie'), kod: tekst('kod'), miejscowosc: tekst('miejscowosc') };
-      var cyfry = a.kod.replace(/\D/g, '');
-      if (!a.ulica) blad('m-ulica', 'Wpisz ulicę i numer domu, np. ul. Lipowa 5.');
-      else if (!/\d/.test(a.ulica)) blad('m-ulica', 'Dopisz numer domu, np. ul. Lipowa 5.');
-      if (a.mieszkanie && !/^[0-9]{1,4}[a-zA-Z]?$/.test(a.mieszkanie)) blad('m-mieszkanie', 'Wpisz sam numer mieszkania, np. 5.');
-      if (!a.kod) blad('m-kod', 'Wpisz kod pocztowy, np. 80-180.');
-      else if (cyfry.length !== 5 || !/^\d{2}-?\d{3}$/.test(a.kod)) blad('m-kod', 'Kod pocztowy ma 5 cyfr, np. 80-180.');
-      if (!a.miejscowosc) blad('m-miejscowosc', 'Wpisz nazwę miejscowości, np. Gdańsk.');
-      else if (/\d/.test(a.miejscowosc)) blad('m-miejscowosc', 'Nazwa miejscowości nie ma cyfr. Kod pocztowy wpisz wyżej.');
-      if (!a.ulica || !/\d/.test(a.ulica) || (a.mieszkanie && !/^[0-9]{1,4}[a-zA-Z]?$/.test(a.mieszkanie)) || cyfry.length !== 5 || !/^\d{2}-?\d{3}$/.test(a.kod) || !a.miejscowosc || /\d/.test(a.miejscowosc)) return null;
+      function czysty(n) { return tekst(n).replace(/\s+/g, ' '); }
+      var a = { ulica: czysty('ulica'), mieszkanie: czysty('mieszkanie'), kod: czysty('kod'), miejscowosc: czysty('miejscowosc') };
+      /* Kod pocztowy: także „21 100” i „21–100” (spacja, półpauza) */
+      var kod = a.kod.replace(/[\u2010-\u2015\u2212]/g, '-').replace(/\s+/g, '');
+      var ile = 0;
+      function zle(pole, opis) { blad(pole, opis); ile++; }
+      if (!a.ulica) zle('m-ulica', 'Wpisz ulicę i numer domu, np. ul. Lipowa 5.');
+      else if (a.ulica.length > 100) zle('m-ulica', 'Ten adres jest za długi. Wpisz najwyżej 100 znaków, np. ul. Lipowa 5.');
+      else if (!LITERA.test(a.ulica)) zle('m-ulica', 'Wpisz nazwę ulicy albo miejscowości i numer domu, np. ul. Lipowa 5.');
+      else if (!/\d/.test(a.ulica)) zle('m-ulica', 'Dopisz numer domu, np. ul. Lipowa 5.');
+      if (a.mieszkanie && !/^[0-9]{1,4}[a-zA-Z]?$/.test(a.mieszkanie)) zle('m-mieszkanie', 'Wpisz sam numer mieszkania, np. 5.');
+      if (!a.kod) zle('m-kod', 'Wpisz kod pocztowy, np. 80-180.');
+      else if (!/^\d{2}-?\d{3}$/.test(kod)) zle('m-kod', 'Kod pocztowy ma 5 cyfr, np. 80-180.');
+      if (!a.miejscowosc) zle('m-miejscowosc', 'Wpisz nazwę miejscowości, np. Gdańsk.');
+      else if (/\d/.test(a.miejscowosc)) zle('m-miejscowosc', 'Wpisz samą nazwę, bez cyfr, np. Gdańsk. Kod pocztowy wpisz wyżej.');
+      else if (a.miejscowosc.length > 60) zle('m-miejscowosc', 'Ta nazwa jest za długa. Wpisz najwyżej 60 znaków, np. Gdańsk.');
+      else if (!LITERA.test(a.miejscowosc)) zle('m-miejscowosc', 'Wpisz nazwę miejscowości literami, np. Gdańsk.');
+      if (ile) return null;
+      var cyfry = kod.replace(/\D/g, '');
       a.kod = cyfry.slice(0, 2) + '-' + cyfry.slice(2);
       s.adres = a;
       return '#/sprawa/zameldowanie/krok-2';
@@ -1688,6 +1758,7 @@
       var m = a.sciezka.match(TRASY[i][0]);
       if (m) ekran = TRASY[i][1](m[1], a.parametry, m[2]);
     }
+    if (ekran && ekran.przekierowanie) return;
     if (!ekran) { location.replace('#/dokumenty'); return; }
     oznaczHistorie();
     /* Karta pokazana z przodu dotknięciem jest tylko chwilowa: po wyjściu z Dokumentów wraca pierwszy dokument z kolejności */
@@ -1733,6 +1804,7 @@
     }
     pierwszeRysowanie = false;
 
+    zapiszSesje();
     /* Po „Zaczynam” od razu widać gotowe pytania pod polem asystenta */
     if (otworzPodpowiedziPoWejsciu && ekran.pasekAsystenta === 'z-podpowiedziami') otworzPodpowiedzi();
     otworzPodpowiedziPoWejsciu = false;
@@ -1832,10 +1904,20 @@
   poleAsystenta.addEventListener('focus', otworzPodpowiedzi);
   poleAsystenta.addEventListener('click', otworzPodpowiedzi);
   poleAsystenta.addEventListener('input', ustawPrzyciskMow);
+  /* „Powiedz” (albo „Stop”) tylko po dotknięciu przycisku — Enter w pustym polu nic nie robi */
+  przyciskMow.addEventListener('click', function (e) {
+    /* Enter w polu „klika” ten przycisk za nas (wysłanie formularza) — wtedy mikrofonu nie włączamy */
+    var zEntera = e.detail === 0 && document.activeElement === poleAsystenta;
+    if (sluchanie || !poleAsystenta.value.trim()) {
+      e.preventDefault();
+      if (sluchanie || !zEntera) sluchaj();
+    }
+  });
   pasek.addEventListener('submit', function (e) {
     e.preventDefault();
     var tekst = poleAsystenta.value.trim();
-    if (sluchanie || !tekst) { sluchaj(); return; }
+    if (sluchanie) { sluchaj(); return; }
+    if (!tekst) return;
     poleAsystenta.value = '';
     ustawPrzyciskMow();
     zapytaj(tekst);
@@ -1894,6 +1976,22 @@
     if (/^\/dokument\//.test(biezacyAdres().sciezka)) wstecz('#/dokumenty');
     else pokaz();
   }
+  /* Fokus uwięziony w oknie: Tab z ostatniego przycisku wraca do pierwszego, Shift+Tab z pierwszego — do ostatniego */
+  okno.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab') return;
+    var cele = Array.prototype.filter.call(okno.querySelectorAll('a[href], button:not([disabled])'), function (el) { return el.offsetParent !== null; });
+    if (!cele.length) return;
+    var pierwszy = cele[0], ostatni = cele[cele.length - 1], teraz = document.activeElement;
+    if (e.shiftKey && (teraz === pierwszy || cele.indexOf(teraz) < 0)) { e.preventDefault(); ostatni.focus(); }
+    else if (!e.shiftKey && (teraz === ostatni || cele.indexOf(teraz) < 0)) { e.preventDefault(); pierwszy.focus(); }
+  });
+  /* Dotknięcie zakładki, na której już jesteś: ekran wraca na górę (jak w aplikacjach na telefon) */
+  nawigacja.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href]');
+    if (!a || a.getAttribute('href') !== location.hash) return;
+    e.preventDefault();
+    pokaz();
+  });
   /* Kliknięcie w przyciemnione tło (poza oknem) zamyka okno */
   okno.addEventListener('click', function (e) {
     if (e.target !== okno) return;
@@ -1945,6 +2043,14 @@
   }
 
   /* ======================= KLIKNIĘCIA ======================= */
+  /* Safari na iPhonie pokazuje stan „wciśnięty” (:active) tylko, gdy strona nasłuchuje dotyku */
+  document.addEventListener('touchstart', function () { /* nic */ }, { passive: true });
+  /* Podwójne i potrójne kliknięcie działa jak jedno (wiele osób klika dwa razy z przyzwyczajenia):
+     drugie i kolejne kliknięcie z tej samej serii nic nie robi — nie przeskoczy kroku, nie wyśle
+     sprawy drugi raz i nie trafi w przycisk, który właśnie pojawił się w tym samym miejscu. */
+  document.addEventListener('click', function (e) {
+    if (e.detail > 1) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
   document.addEventListener('click', function (e) {
     var el = e.target.closest('[data-akcja]');
     if (!el || el.disabled) return;
@@ -1988,6 +2094,7 @@
         sA.dzialania[x] = !sA.dzialania[x];
         el.setAttribute('aria-checked', String(sA.dzialania[x]));
         el.querySelector('.slowo').textContent = sA.dzialania[x] ? 'Tak' : 'Nie';
+        zapiszSesje();
         break;
       case 'potwierdz': oknoPotwierdzenia(el.getAttribute('data-sprawa')); break;
       case 'potwierdz-wyslij': zakonczSprawe(el.getAttribute('data-sprawa')); break;
@@ -2059,6 +2166,7 @@
     var zmieniono = false;
     if (parametry && parametry.get('reset') === '1') {
       try { localStorage.removeItem(KLUCZ); } catch (e) { /* nic */ }
+      try { sessionStorage.removeItem(KLUCZ_SESJI); } catch (e) { /* nic */ }
       stan = wczytaj();
       stan.osoba = null;
       location.hash = '';
@@ -2074,6 +2182,8 @@
       catch (e) { location.replace(location.pathname + location.hash); return; }
     }
     zastosujUstawienia();
+    wczytajSesje();
+    window.addEventListener('pagehide', zapiszSesje);
     if (!biezacyAdres().sciezka) {
       try { history.replaceState(null, '', '#' + (stan.osoba ? '/dokumenty' : '/osoba')); }
       catch (e) { location.replace('#' + (stan.osoba ? '/dokumenty' : '/osoba')); return; }

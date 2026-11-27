@@ -1,6 +1,6 @@
 # Specyfikacja prototypu „mObywatel dla każdego”
 
-Wersja 2.6 · 26.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu; 2.3: asystent offline i sprawy A, B, C; 2.4: poprawki po teście, publikacja; 2.5: asystent zna wszystkie usługi i język ludzi, rezygnacja z modelu językowego; 2.6: nowocześniejsze karty dokumentów, czerwień marki)
+Wersja 2.7 · 27.11.2026 · zastępuje wszystkie wcześniejsze wersje (2.1: decyzje z makiety ekranu Dokumenty; 2.2: dokumenty jak w prawdziwym mObywatelu; 2.3: asystent offline i sprawy A, B, C; 2.4: poprawki po teście, publikacja; 2.5: asystent zna wszystkie usługi i język ludzi, rezygnacja z modelu językowego; 2.6: nowocześniejsze karty dokumentów, czerwień marki; 2.7: zachowanie jak na telefonie — dotyk zamiast najechania myszką)
 
 Klikalny prototyp aplikacji mObywatel na konkurs mObywatel Challenge (termin zgłoszenia: 26.11 wieczorem). Konkurs ma pierwszeństwo: prototyp ma być lepszy od prototypu referencyjnego Janusza Cieszyńskiego (mobywatel.ai), mieć na to dowody i wyróżniać się.
 
@@ -72,6 +72,7 @@ Po etapie 3 aplikacja musi nadawać się do zgłoszenia.
 | Układ | Jedna kolumna, naturalny przepływ, nic się nie nakłada, jednostki rem. Działa przy 320 px i powiększeniu 200%. Jedyny wyjątek: portfel kart dokumentów — karty leżą jedna za drugą, ale pasek każdej karty (nazwa i status) jest w całości widoczny i ma min. 48 px wysokości |
 | Nawigacja | Dolny pasek widoczny poza krokami sprawy, zawsze na samym dole ekranu — na każdej zakładce, w każdym rozmiarze tekstu i motywie (przewija się tylko treść, nigdy cała ramka). Na każdym podekranie górny pasek z „Wstecz” (z napisem) i tytułem ekranu, przyklejony u góry — nie znika przy przewijaniu. W sprawach „Krok 2 z 4” |
 | Czas i ruch | Brak limitów czasu i znikających komunikatów. Animacje subtelne, wyłączone przy „ogranicz ruch” (także błysk na karcie dokumentu, który dodatkowo nie działa w trybie wysokiego kontrastu) |
+| Dotyk | Prototyp zachowuje się jak aplikacja na ekranie dotykowym. Nic nie reaguje na samo najechanie myszką (brak efektów `:hover` — przyciski, wiersze, karty, zakładki i podpowiedzi), także na komputerze. Informacja zwrotna dopiero w chwili dotknięcia albo kliknięcia (`:active`): lekkie przyciemnienie i zmniejszenie przycisku albo ciemniejsze tło wiersza. Bez niebieskiego mignięcia przy dotknięciu na Androidzie (`-webkit-tap-highlight-color: transparent`). Kursor „rączka” nad elementami klikalnymi zostaje. Widoczny fokus dla klawiatury (`:focus-visible`) zostaje zawsze |
 | Czytniki ekranu | `lang="pl"`, nagłówki, etykiety pól, `aria-live` dla asystenta, pola wyboru ogłaszające zaznaczenie, widoczny fokus |
 | Oznaczenia | Nazwa „mObywatel”. Ikona: czerwony kwadrat z zaokrąglonymi rogami i prostym białym znakiem własnego projektu — bez godła i oficjalnego logo. Informacja „Prototyp konkursowy, dane fikcyjne” tylko na ekranie wyboru osoby i w „Więcej”. Awatary z inicjałów (wybór osoby, Więcej); na kartach dokumentów ilustrowane portrety (nie zdjęcia prawdziwych osób) |
 

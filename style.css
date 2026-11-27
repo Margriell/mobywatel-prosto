@@ -22,6 +22,7 @@
   --pole-ramka: #8A91A3;
   --fokus: #1D3F8F;
   --logo: #D4213D;
+  --wcisniety: #DCE3F2; /* tło wiersza w chwili dotknięcia */
   /* Karty dokumentów: kolor główny (też tekst przycisku na karcie) + gradient od jasnego do ciemnego.
      Najjaśniejszy odcień dobrany tak, by biały tekst miał min. 4,5:1 nawet na skrzyżowaniu
      jasnych linii wzoru i podczas błysku. */
@@ -54,6 +55,7 @@
   --pilne-jasne: #3A1F1F;
   --fokus: #9DB8FF;
   --tlo-strony: #2A2E38;
+  --wcisniety: #2E3A5C;
   --cien-okna: rgba(0, 0, 0, .7);
   color-scheme: dark;
 }
@@ -74,6 +76,7 @@
   --pole-ramka: #FFF;
   --fokus: #FFE500;
   --tlo-strony: #222;
+  --wcisniety: #333;
   --cien-okna: rgba(0, 0, 0, .8);
   color-scheme: dark;
 }
@@ -100,7 +103,9 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 }
 .bez-js { padding: 24px; font-size: 1rem; }
 
-/* ---------- Telefon: na telefonie pełny ekran, na komputerze ramka ---------- */
+/* ---------- Telefon: na telefonie pełny ekran, na komputerze i tablecie ramka ----------
+   Ramka już od 481 px wysokości okna (typowe laptopy: 1366 × 768, 1536 × 864 z powiększeniem 125%);
+   niższe okno (np. powiększenie 200%) — cała strona się przewija, bez ramki. */
 .ekran {
   width: 100%; height: 100vh; height: 100dvh;
   background: var(--tlo); color: var(--tekst);
@@ -108,7 +113,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
   overflow: clip; /* ramki nie da się przewinąć — dolny pasek zawsze na samym dole */
 }
 .status { display: none; }
-@media (min-width: 31em) and (min-height: 46em) {
+@media (min-width: 31em) and (min-height: 30.01em) {
   body {
     background: var(--tlo-strony); min-height: 100vh;
     display: flex; justify-content: center; align-items: center; padding: 16px;
@@ -128,6 +133,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .tresc { flex: 1; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; }
 /* Element z fokusem nigdy nie chowa się pod przyklejonym paskiem „Wstecz” (wysokość paska liczy app.js) */
 html, .tresc { scroll-padding-top: calc(var(--pasek-gora, 0px) + 8px); }
+/* Pole z fokusem (np. nad klawiaturą ekranową) nie jest przyklejone do dolnej krawędzi */
+.tresc { scroll-padding-bottom: 12px; }
 .tresc::-webkit-scrollbar { display: none; }
 /* Niski ekran (np. powiększenie 200%): przewija się cała strona, dolny pasek zostaje na dole */
 @media (max-height: 30em) {
@@ -154,7 +161,6 @@ html, .tresc { scroll-padding-top: calc(var(--pasek-gora, 0px) + 8px); }
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   font-size: 16px; line-height: 1.2; border-radius: 12px; position: relative; padding: 2px 6px;
 }
-.ikona-btn:hover { background: var(--akcent-jasny); }
 .ikona-btn svg { width: 24px; height: 24px; }
 .licznik {
   position: absolute; top: 0; right: 6px; min-width: 24px; height: 24px; border-radius: 12px;
@@ -180,7 +186,6 @@ html, .tresc { scroll-padding-top: calc(var(--pasek-gora, 0px) + 8px); }
   min-height: 48px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px 0 4px;
   border: 0; background: none; color: var(--akcent); font-weight: 700; font-size: 1rem; border-radius: 12px;
 }
-.wstecz:hover { background: var(--akcent-jasny); }
 .wstecz svg { width: 26px; height: 26px; }
 /* Ekran wyboru osoby: sam znak */
 .naglowek-wejscie { justify-content: flex-start; min-height: 60px; }
@@ -269,7 +274,6 @@ h1:focus { outline: none; }
 .karta.tyl > .karta-gora {
   width: 100%; padding: 12px 16px 42px; border: 0; background: none; color: inherit; text-align: left; line-height: 1.25;
 }
-button.karta-gora:hover .karta-nazwa { text-decoration: underline; text-underline-offset: 3px; }
 .karta.tyl > button.karta-gora:focus-visible { outline: none; }
 .karta.tyl > button.karta-gora:focus-visible .karta-nazwa { outline: 3px solid #fff; outline-offset: 3px; border-radius: 4px; }
 /* Przód karty: zdjęcie i dane jak na dokumencie */
@@ -335,7 +339,6 @@ button.karta-gora:hover .karta-nazwa { text-decoration: underline; text-underlin
   min-height: 112px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 10px;
   padding: 14px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .26), 0 2px 6px rgba(0, 0, 0, .2);
 }
-a.karta.mala:hover .karta-nazwa { text-decoration: underline; text-underline-offset: 3px; }
 /* Mała karta w listach (układ „Lista”, Zarządzaj) */
 .mini-karta {
   flex: none; width: 46px; height: 32px; border-radius: 6px; background-color: var(--karta);
@@ -350,7 +353,6 @@ a.karta.mala:hover .karta-nazwa { text-decoration: underline; text-underline-off
   background: var(--akcent-jasny); color: var(--akcent); font-weight: 700; font-size: 16px; line-height: 1.2; text-decoration: none;
 }
 .btn-zarzadzaj svg { width: 22px; height: 22px; }
-.btn-zarzadzaj:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- Wymaga Twojej uwagi (makieta) ---------- */
 .uwaga {
@@ -358,7 +360,6 @@ a.karta.mala:hover .karta-nazwa { text-decoration: underline; text-underline-off
   display: flex; gap: 14px; align-items: center; border: 1px solid var(--linia);
   color: var(--tekst); text-decoration: none;
 }
-a.uwaga:hover { border-color: var(--akcent); }
 .ikona-kolo {
   flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--akcent-jasny); color: var(--akcent);
   display: grid; place-items: center;
@@ -422,7 +423,6 @@ a.uwaga:hover { border-color: var(--akcent); }
   min-height: 48px; padding: 6px 14px; border-radius: 24px; border: 0; background: var(--akcent-jasny); color: var(--akcent);
   display: flex; align-items: center; font-weight: 700; font-size: 16px; line-height: 1.3; text-align: left;
 }
-.podpowiedz:hover { text-decoration: underline; text-underline-offset: 3px; }
 @media (prefers-reduced-motion: no-preference) {
   .pasek-podpowiedzi { animation: pojaw .18s ease-out; }
   @keyframes pojaw { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -434,7 +434,7 @@ a.uwaga:hover { border-color: var(--akcent); }
   display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr; padding: 6px 2px 8px;
   padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
-@media (min-width: 31em) and (min-height: 46em) { .dolny-pasek { padding-bottom: 18px; } }
+@media (min-width: 31em) and (min-height: 30.01em) { .dolny-pasek { padding-bottom: 18px; } }
 .dolny-pasek a {
   display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--tekst-2);
   text-decoration: none; font-size: 16px; line-height: 1.2; min-height: 56px; justify-content: center;
@@ -459,8 +459,6 @@ a.uwaga:hover { border-color: var(--akcent); }
 .btn svg { width: 22px; height: 22px; }
 .btn.glowny { background: var(--akcent); color: var(--powierzchnia); }
 .btn.drugi { background: var(--powierzchnia); color: var(--akcent); }
-.btn:hover { filter: brightness(1.08); }
-.btn.drugi:hover { background: var(--akcent-jasny); }
 .przyciski-pion { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
 .link-strzalka {
   display: inline-flex; align-items: center; gap: 4px; min-height: 48px; font-weight: 700; color: var(--akcent);
@@ -475,7 +473,6 @@ a.uwaga:hover { border-color: var(--akcent); }
   display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 12px 14px 12px 16px;
   background: none; border: 0; text-align: left; color: var(--tekst); text-decoration: none; line-height: 1.35;
 }
-.wiersz-listy:hover { background: var(--akcent-jasny); }
 .wiersz-listy:focus-visible { outline-offset: -3px; }
 .wiersz-listy .tekst { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .tytul-wiersza { font-weight: 700; font-size: 1rem; }
@@ -500,7 +497,7 @@ a.uwaga:hover { border-color: var(--akcent); }
   min-height: 48px; padding: 0 12px; border: 0; background: none; color: var(--akcent); font-weight: 700;
   text-decoration: underline; text-underline-offset: 3px; border-radius: 12px;
 }
-.pusty-wynik { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 16px; }
+.pusty-wynik { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 16px; overflow-wrap: anywhere; }
 .pusty-wynik p + p { margin-top: 6px; }
 
 /* ---------- Szczegóły dokumentu ---------- */
@@ -519,7 +516,6 @@ a.uwaga:hover { border-color: var(--akcent); }
   padding: 10px 16px; font-weight: 700; color: var(--akcent); cursor: pointer; line-height: 1.3;
 }
 .rozwijane summary::-webkit-details-marker { display: none; }
-.rozwijane summary:hover { background: var(--akcent-jasny); }
 .rozwijane summary:focus-visible { outline-offset: -3px; }
 .strzalka-rozwin { width: 24px; height: 24px; flex: none; transition: transform .2s; }
 .rozwijane[open] .strzalka-rozwin { transform: rotate(180deg); }
@@ -566,7 +562,6 @@ a.uwaga:hover { border-color: var(--akcent); }
   width: 100%; display: flex; align-items: center; gap: 14px; padding: 14px 14px 14px 16px; text-align: left;
   background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; color: var(--tekst); line-height: 1.35;
 }
-.karta-osoby:hover { border-color: var(--akcent); }
 .karta-osoby .tekst { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .awatar {
   flex: none; width: 56px; height: 56px; border-radius: 50%; background: var(--akcent-jasny); color: var(--akcent);
@@ -592,7 +587,6 @@ a.uwaga:hover { border-color: var(--akcent); }
   display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 14px; cursor: pointer;
   background: var(--powierzchnia); border: 2px solid var(--linia); border-radius: 12px; line-height: 1.3;
 }
-.opcja:hover { border-color: var(--akcent); }
 .opcja input { width: 24px; height: 24px; margin: 0; flex: none; accent-color: var(--akcent); }
 .opcja-nazwa { flex: 1; min-width: 0; }
 .opcja.wybrana { border-color: var(--akcent); background: var(--akcent-jasny); font-weight: 700; }
@@ -611,7 +605,6 @@ a.uwaga:hover { border-color: var(--akcent); }
   min-height: 64px; padding: 10px 14px; margin-bottom: 12px; text-align: left; line-height: 1.35;
   background: var(--powierzchnia); border: 2px solid var(--linia); border-radius: 12px; color: var(--tekst);
 }
-.przelacznik:hover { border-color: var(--akcent); }
 .przelacznik .tekst { flex: 1 1 9em; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .przelacznik-stan { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; }
 .tor {
@@ -711,7 +704,7 @@ fieldset.z-bledem .opcja { border-color: var(--pilne); }
   background: var(--akcent); color: var(--powierzchnia);
 }
 .wiad.asystent .dymek {
-  width: 100%; padding: 12px 14px 14px; border-radius: 4px 18px 18px 18px; line-height: 1.45;
+  width: 100%; padding: 12px 14px 14px; border-radius: 4px 18px 18px 18px; line-height: 1.45; overflow-wrap: anywhere;
   background: var(--powierzchnia); border: 1px solid var(--linia);
 }
 .wiad.asystent:focus { outline: none; }
@@ -758,7 +751,6 @@ fieldset.z-bledem .opcja { border-color: var(--pilne); }
   width: 100%; display: flex; align-items: center; gap: 16px; padding: 18px 16px; min-height: 112px; text-align: left;
   background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; color: var(--tekst); line-height: 1.35;
 }
-.kafel:hover { border-color: var(--akcent); }
 .kafel .ikona-kolo { width: 60px; height: 60px; }
 .kafel .ikona-kolo svg { width: 30px; height: 30px; }
 .kafel .tekst { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -783,7 +775,7 @@ fieldset.z-bledem .opcja { border-color: var(--pilne); }
   border-radius: 12px; padding: 1px 10px; margin-bottom: 2px;
 }
 .metryczka { color: var(--tekst-2); margin: -4px 0 14px; }
-.pismo { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 16px; }
+.pismo { background: var(--powierzchnia); border: 1px solid var(--linia); border-radius: 16px; padding: 16px; overflow-wrap: anywhere; }
 .pismo p + p { margin-top: 8px; }
 
 /* ---------- W budowie ---------- */
@@ -800,6 +792,28 @@ fieldset.z-bledem .opcja { border-color: var(--pilne); }
 .okno .okno-nazwa { font-weight: 700; margin-bottom: 4px; }
 .okno .ikona-kolo { margin-bottom: 12px; }
 .okno .przyciski-pion { margin-top: 14px; }
+
+/* ---------- Dotyk jak na telefonie ----------
+   Prototyp zachowuje się jak aplikacja na ekranie dotykowym: nic nie reaguje na samo najechanie
+   myszką (brak :hover, także na komputerze). Informacja zwrotna pojawia się dopiero w chwili
+   dotknięcia albo kliknięcia (:active): przyciski lekko się zmniejszają i przyciemniają, wiersze
+   list dostają ciemniejsze tło. Bez niebieskiego mignięcia przy dotknięciu (Android).
+   Kursor „rączka” nad elementami klikalnymi i widoczny fokus z klawiatury zostają. */
+html, a, button, summary, label, input { -webkit-tap-highlight-color: transparent; }
+.btn, .podpowiedz, .mow, .btn-czytaj, .btn-zarzadzaj, .btn-pokaz, .btn-tekst, .wstecz, .ikona-btn, .link-strzalka,
+.dolny-pasek a, .kafel, .karta-osoby, .uwaga, .przelacznik, .opcja, .karta.mala, .link-skrzynka {
+  transition: transform .08s ease-out, filter .08s ease-out, background-color .08s ease-out;
+}
+.btn:not(:disabled):active, .podpowiedz:active, .mow:active, .btn-czytaj:active, .btn-zarzadzaj:active, .btn-pokaz:active,
+.btn-tekst:active, .wstecz:active, .ikona-btn:active, .link-strzalka:active, .dolny-pasek a:active {
+  transform: scale(.96); filter: brightness(.9);
+}
+.kafel:active, .karta-osoby:active, .uwaga:active, .przelacznik:active, .opcja:active, .karta.mala:active, .link-skrzynka:active {
+  transform: scale(.98); filter: brightness(.94);
+}
+.wiersz-listy:active, .rozwijane summary:active { background: var(--wcisniety); }
+.karta.tyl > button.karta-gora:active { background: rgba(0, 0, 0, .18); }
+.ikona-btn:active, .wstecz:active, .btn-tekst:active, .dolny-pasek a:active .tlo-ikony { background: var(--wcisniety); }
 
 /* ---------- Tryb prosty: większe przyciski, mniej elementów ---------- */
 [data-prosty="tak"] .btn, [data-prosty="tak"] .btn-pokaz { min-height: 64px; }
@@ -845,8 +859,6 @@ fieldset.z-bledem .opcja { border-color: var(--pilne); }
 [data-motyw="kontrast"] .dolny-pasek a[aria-current="page"] .tlo-ikony { outline: 2px solid #FFE500; }
 [data-motyw="kontrast"] .logo { box-shadow: 0 0 0 2px #fff; }
 [data-motyw="kontrast"] .mow { border: 2px solid #FFE500; }
-[data-motyw="kontrast"] .wiersz-listy:hover, [data-motyw="kontrast"] .ikona-btn:hover, [data-motyw="kontrast"] .wstecz:hover,
-[data-motyw="kontrast"] .btn.drugi:hover { background: #000; text-decoration: underline; }
 [data-motyw="kontrast"] .etykieta-nowa { color: #000; }
 
 /* ---------- Ogranicz ruch ---------- */

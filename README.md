@@ -46,9 +46,15 @@ Warto też zapytać asystenta jako Halina: „Wytłumacz mi pismo” i „Czy te
 | `dane.js` | fikcyjne osoby, dokumenty, wiadomości i usługi |
 | `media/` | ikona i obrazek podglądu linku |
 | `SPECYFIKACJA.md`, `POSTEP.md` | specyfikacja i dziennik prac |
+| `RAPORT-TESTOW.md` | wyniki wielkiego testu końcowego: przypadki, błędy, poprawki |
+| `testy/` | testy do powtórzenia jednym poleceniem: `node testy/uruchom.js` (instrukcja: `testy/README.md`) |
 | `warianty/` | dokumentacja procesu: wcześniejsze warianty wyglądu (nie są częścią aplikacji) |
 
 Asystent działa bez serwera i bez internetu, wyłącznie na wbudowanych scenariuszach z `asystent.js`.
+
+## Testy
+
+Wszystkie testy prototypu (ścieżki użytkowników, nawigacja, formularze, asystent, urządzenia, dostępność, treść, pełna „Kontrola”) uruchamia jedno polecenie: `node testy/uruchom.js` — potrzebne są tylko Node.js 22+ i Chrome albo Edge. Szczegóły w `testy/README.md`, wyniki w `RAPORT-TESTOW.md`.
 
 ## Licencja i źródła
 
