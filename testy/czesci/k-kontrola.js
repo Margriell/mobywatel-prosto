@@ -75,7 +75,7 @@ module.exports = {
     /* ---------- 3. Asystent: test zrozumienia (co najmniej 150 zdań × 3 osoby), 0 ślepych zaułków ---------- */
     const sb = zaladuj(ctx.katalog);
     const reg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'zdania-regresja.json'), 'utf8'));
-    const nowe = require('../zdania-nowe.js');
+    const nowe = require('../zdania-nowe.js').concat(require('../zdania-sprawy.js'));
     let naTemat = 0, naTematDobrze = 0, nieNaTemat = 0, nieNaTematDobrze = 0, zaulki = 0;
     const off = ['nieznane', 'obelga', 'obcy-jezyk', 'polityka', 'cudze-dane'];
     for (const o of ['halina', 'tomasz', 'ola']) {

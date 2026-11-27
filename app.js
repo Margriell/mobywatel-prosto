@@ -70,7 +70,8 @@
     dzwonek: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
     kalendarz: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
     edytuj: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>',
-    sukces: '<path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/>'
+    sukces: '<path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/>',
+    aparat: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>'
   };
   function ikona(nazwa, klasa) {
     return '<svg' + (klasa ? ' class="' + klasa + '"' : '') + ' viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (IKONY[nazwa] || '') + '</svg>';
@@ -371,8 +372,9 @@
     /* Po zgłoszeniu utraty (sprawa A) mDowód jest unieważniony */
     if (wynikiOsoby(o).dowodUniewazniony) {
       docs = docs.map(function (d) {
+        var wd = wynikiOsoby(o).wniosekDowod;
         return d.rodzaj !== 'dowod' ? d : Object.assign({}, d, { status: 'Unieważniony', ikonaStatusu: 'uwaga', alarm: true,
-          komunikat: 'Ten dowód jest unieważniony. Złóż wniosek o nowy dowód osobisty.' });
+          komunikat: wd ? 'Ten dowód jest unieważniony. Wizyta w urzędzie: ' + wd.wizyta + '.' : 'Ten dowód jest unieważniony. Złóż wniosek o nowy dowód osobisty.' });
       });
     }
     return docs;
@@ -384,14 +386,68 @@
   }
   /* Wiadomości: potwierdzenia załatwionych spraw (najnowsze na górze) + wiadomości z danych */
   function wiadomosciOsoby(o) { return wynikiOsoby(o).wiadomosci.concat(o.wiadomosci); }
-  /* Karta „Wymaga Twojej uwagi” zmienia się po załatwieniu sprawy */
-  function uwagaOsoby(o) {
+  /* Karty „Wymaga Twojej uwagi”: sprawy osoby po kolei (dane.js: uwagi). Każda karta prowadzi do działającej
+     ścieżki i zmienia się albo znika po załatwieniu sprawy. */
+  function zl(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0') + ' zł'; }
+  function kartaUwagiTyp(o, typ) {
     var w = wynikiOsoby(o);
-    if (o.szkicMeldunku && w.zameldowanie) {
-      return { styl: 'ok', ikona: 'ok', etykieta: 'Wniosek o zameldowanie wysłany', opis: 'Odpowiedź z urzędu dostaniesz w Skrzynce.', href: '#/skrzynka' };
+    if (typ === 'podatek') {
+      var p = o.platnosci && o.platnosci.podatek;
+      if (!p) return null;
+      var st = w.oplaty && w.oplaty.podatek, zostalo = p.kwota - (st ? st.zaplacono : 0);
+      if (zostalo <= 0) return { id: typ, styl: 'ok', ikona: 'ok', etykieta: 'Podatek opłacony', opis: 'Potwierdzenie płatności jest w Skrzynce.', href: '#/skrzynka' };
+      if (st) {
+        var rata = p.raty[st.raty];
+        return { id: typ, styl: 'nowe', ikona: 'portfel', etykieta: 'Podatek: następna rata', opis: rata ? rata[0] + ': ' + zl(rata[1]) + ' do ' + rata[2] : 'Zostało ' + zl(zostalo), href: '#/sprawa/podatek' };
+      }
+      var pismo = znajdz(wiadomosciOsoby(o), p.pismo);
+      if (pismo && czyNowa(o, pismo)) return { id: typ, styl: 'nowe', ikona: 'list', etykieta: 'Nowe pismo', opis: 'Urząd Miasta: podatek od nieruchomości', href: '#/skrzynka/' + p.pismo };
+      return { id: typ, styl: 'nowe', ikona: 'portfel', etykieta: 'Podatek do zapłaty', opis: zl(p.kwota) + ', pierwsza rata do ' + p.raty[0][2], href: '#/skrzynka/' + p.pismo };
     }
-    return o.uwaga;
+    if (typ === 'oc') {
+      var auto = znajdz(dokumentyOsoby(o), 'pojazdy');
+      if (!auto || !auto.pojazd) return null;
+      return { id: typ, styl: 'pilne', ikona: 'uwaga', etykieta: 'Kończy się OC', href: '#/sprawa/samochod',
+        opis: 'OC samochodu kończy się za ' + auto.pojazd.ocDni + ' dni (' + auto.pojazd.oc + ')' + (w.przypomnienie ? '. Przypomnienie ustawione.' : '') };
+    }
+    if (typ === 'urodzenie') {
+      var ku = o.rodzina && o.rodzina.kartaUrodzenia;
+      if (!ku) return null;
+      var zostaloDni = 21 - ku.dni;
+      if (!w.dziecko) return { id: typ, styl: 'pilne', ikona: 'rodzina', etykieta: 'Zgłoś urodzenie dziecka', href: '#/sprawa/urodzenie',
+        opis: 'Zostało ' + zostaloDni + ' ' + odmiana(zostaloDni, 'dzień', 'dni', 'dni') + ' na zgłoszenie. Karta urodzenia z ' + ku.data + '.' };
+      if (!w.swiadczenie800) return { id: typ, styl: 'nowe', ikona: 'rodzina', etykieta: 'Złóż wniosek o 800 plus', opis: 'Dla dziecka: ' + w.dziecko.imie + ' ' + w.dziecko.nazwisko + '.', href: '#/sprawa/800plus' };
+      if (!w.kartaRodziny) return { id: typ, styl: 'nowe', ikona: 'rodzina', etykieta: 'Karta Dużej Rodziny', opis: 'Masz troje dzieci. Złóż wniosek o kartę.', href: '#/sprawa/karta-rodziny' };
+      return null;
+    }
+    if (typ === 'zameldowanie') {
+      if (o.szkicMeldunku && w.zameldowanie) return { id: typ, styl: 'ok', ikona: 'ok', etykieta: 'Wniosek o zameldowanie wysłany', opis: 'Odpowiedź z urzędu dostaniesz w Skrzynce.', href: '#/skrzynka' };
+      if (!o.szkicMeldunku) return null;
+      return { id: typ, styl: 'nowe', ikona: 'dom', etykieta: 'Dokończ zameldowanie', opis: 'Nowy adres jest już wpisany. Sprawdź go i wyślij.', href: '#/sprawa/zameldowanie' };
+    }
+    if (typ === 'wizyta-dowod' && w.wniosekDowod) {
+      return { id: typ, styl: 'nowe', ikona: 'kalendarz', etykieta: 'Wizyta w urzędzie', opis: 'Dowód osobisty: ' + w.wniosekDowod.wizyta, href: '#/skrzynka/' + w.wniosekDowod.wiadomosc };
+    }
+    return null;
   }
+  function uwagiOsoby(o) {
+    return (o.uwagi || []).concat(['wizyta-dowod']).map(function (typ) { return kartaUwagiTyp(o, typ); }).filter(Boolean);
+  }
+  function uwagaOsoby(o) { return uwagiOsoby(o)[0] || null; }
+  /* Status pisma z płatnością (np. decyzja podatkowa): do zapłaty, opłacone częściowo, opłacone */
+  function statusPisma(o, w) {
+    if (!w.oplata || !o.platnosci || !o.platnosci[w.oplata]) return null;
+    var p = o.platnosci[w.oplata], st = wynikiOsoby(o).oplaty && wynikiOsoby(o).oplaty[w.oplata];
+    var zostalo = p.kwota - (st ? st.zaplacono : 0);
+    if (zostalo <= 0) return { ok: true, tekst: 'Opłacone' };
+    return { ok: false, tekst: st ? 'Opłacone częściowo, zostało ' + zl(zostalo) : 'Do zapłaty: ' + zl(zostalo) };
+  }
+  function dataUrodzenia(o) {
+    var t = wartoscDok(znajdz(o.dokumenty, 'dowod'), 'Data urodzenia').split('.');
+    return t.length === 3 ? new Date(+t[2], +t[1] - 1, +t[0], 12) : null;
+  }
+  /* Numer potwierdzenia sprawy, np. PL/2026/48213 (fikcyjny) */
+  function numerSprawy(przedrostek) { return przedrostek + '/' + D.dzis.slice(-4) + '/' + String(Date.now() % 100000 + 100000).slice(-5); }
   function ukladOsoby(o) { return stan.uklady[o.id] || 'duze'; }
   function idPrzodu(o, docs) {
     var p = przodPortfela[o.id];
@@ -555,8 +611,13 @@
     var btn = przodEl && przodEl.querySelector('.btn-pokaz');
     if (btn) btn.focus({ preventScroll: true });
   }
-  function kartaUwagi(o) {
-    var u = uwagaOsoby(o);
+  function kartyUwagi(o) {
+    var l = uwagiOsoby(o);
+    if (!l.length) return kartaUwagi({ styl: 'ok', ikona: 'ok', etykieta: 'Wszystko załatwione', opis: 'Nic nie wymaga teraz Twojej uwagi.' });
+    if (l.length === 1) return kartaUwagi(l[0]);
+    return '<ul class="lista-uwag">' + l.map(function (u) { return '<li>' + kartaUwagi(u) + '</li>'; }).join('') + '</ul>';
+  }
+  function kartaUwagi(u) {
     var srodek = '<span class="ikona-kolo">' + ikona(u.ikona) + '</span>' +
       '<span class="tekst"><span class="etykieta">' + u.etykieta + '</span><span class="opis">' + u.opis + '</span></span>';
     if (u.href) return '<a class="uwaga ' + u.styl + '" href="' + u.href + '">' + srodek + ikona('dalej', 'chevron') + '</a>';
@@ -685,7 +746,7 @@
           '<div class="tytul-akcje">' + przyciskCzytaj() +
           '<a class="btn-zarzadzaj" href="#/zarzadzaj" aria-label="Zarządzaj dokumentami">' + ikona('warstwy') + 'Zarządzaj</a></div></div>' +
         '<h2 class="ukryte">Twoje dokumenty</h2>' + portfel(o) + '</section>' +
-        '<section class="sekcja" data-flip="uwaga"><h2>Wymaga Twojej uwagi</h2>' + kartaUwagi(o) + '</section><div class="odstep-dol"></div>'
+        '<section class="sekcja" data-flip="uwaga"><h2>Wymaga Twojej uwagi</h2>' + kartyUwagi(o) + '</section><div class="odstep-dol"></div>'
     };
   }
 
@@ -704,9 +765,15 @@
     var o = osoba();
     var d = znajdz(dokumentyOsoby(o), id);
     if (!d) return ekranBrakDokumentu();
-    var a = D.akcje[d.rodzaj] || {};
+    var a = D.akcje[d.rodzaj] || {}, w = wynikiOsoby(o);
     var usun = { tekst: 'Usuń dokument', ikona: 'kosz', usun: d.id };
     var akcje = (a.akcje || []).concat(a.skroty ? [] : [usun]);
+    var skroty = a.skroty ? a.skroty.slice() : null;
+    /* Po zgłoszeniu utraty: wniosek o nowy dowód i „Dowód się znalazł” */
+    if (skroty && d.rodzaj === 'dowod') {
+      if (w.dowodUniewazniony && !w.wniosekDowod) skroty.unshift({ tekst: 'Złóż wniosek o nowy dowód', ikona: 'dowod', href: '#/sprawa/wniosek-dowod' });
+      if (w.dowodUniewazniony || w.pesel) skroty.push({ tekst: 'Dowód się znalazł', ikona: 'ok', href: '#/sprawa/zgubione/znaleziony' });
+    }
     return {
       tytul: d.nazwa, uklad: 'pod', zakladka: 'dokumenty', rodzic: '#/dokumenty',
       html: '<section class="sekcja">' + wstep() + '<h2 class="ukryte">Podgląd dokumentu</h2>' + kartaDokumentu(o, d, 'szczegoly') +
@@ -717,7 +784,7 @@
         '<p class="aktualizacja">' + ikona('zegarek') + '<span>Ostatnia aktualizacja: ' + d.aktualizacja + '</span></p>' +
         (d.komunikat ? '<p class="komunikat-dokumentu' + (d.alarm ? ' alarm' : '') + '">' + ikona('info') + '<span>' + d.komunikat + '</span></p>' : '') +
         (akcje.length ? '<h2 class="ukryte">Akcje</h2><ul class="lista akcje-dokumentu">' + akcje.map(wierszAkcji).join('') + '</ul>' : '') +
-        (a.skroty ? '<h2>Pozostałe skróty</h2><ul class="lista">' + a.skroty.concat([usun]).map(wierszAkcji).join('') + '</ul>' : '') +
+        (skroty ? '<h2>Pozostałe skróty</h2><ul class="lista">' + skroty.concat([usun]).map(wierszAkcji).join('') + '</ul>' : '') +
         '</section><div class="odstep-dol"></div>'
     };
   }
@@ -954,7 +1021,7 @@
   function kontekstAsystenta(dodatki) {
     var o = osoba();
     return { osoba: o, dokumenty: dokumentyOsoby(o), wyniki: wynikiOsoby(o), wiadomosci: wiadomosciOsoby(o),
-      nowe: wiadomosciOsoby(o).filter(function (w) { return czyNowa(o, w); }), uwaga: uwagaOsoby(o),
+      nowe: wiadomosciOsoby(o).filter(function (w) { return czyNowa(o, w); }), uwaga: uwagaOsoby(o), uwagi: uwagiOsoby(o),
       liczbaNowych: liczbaNowych(o), pismo: dodatki && dodatki.pismo };
   }
   function przyciskOdpowiedzi(p) {
@@ -1064,7 +1131,7 @@
   function odpowiedzNaWybor(idWyboru, idWiadomosci, wartosci) {
     var zrodlo = null;
     rozmowa.forEach(function (x) { if (x.id === idWiadomosci) zrodlo = x; });
-    var w = window.ASYSTENT.dalej(idWyboru, wartosci, kontekstAsystenta());
+    var w = window.ASYSTENT.dalej(idWyboru, wartosci, kontekstAsystenta(), zrodlo && zrodlo.wybor && zrodlo.wybor.dane);
     if (zrodlo && w.ty) {
       zrodlo.odpowiedziano = w.ty;
       zapiszSesje();
@@ -1134,10 +1201,18 @@
           return '<li><a class="wiersz-listy wiadomosc' + (nowa ? ' nowa' : '') + '" href="#/skrzynka/' + w.id + '">' +
             '<span class="ikona-kolo">' + ikona('list') + '</span><span class="tekst">' +
             (nowa ? '<span class="etykieta-nowa">Nowa</span>' : '') +
-            '<span class="tytul-wiersza">' + esc(w.tytul) + '</span><span class="opis">' + esc(w.nadawca) + ' · ' + (w.data === D.dzis ? 'dziś' : esc(w.data)) + '</span></span>' +
+            '<span class="tytul-wiersza">' + esc(w.tytul) + '</span><span class="opis">' + esc(w.nadawca) + ' · ' + (w.data === D.dzis ? 'dziś' : esc(w.data)) + '</span>' +
+            statusPismaHtml(o, w) + '</span>' +
             ikona('dalej', 'chevron') + '</a></li>';
         }).join('') + '</ul></section><div class="odstep-dol"></div>'
     };
+  }
+  function statusPismaHtml(o, w, klasa) {
+    var st = statusPisma(o, w);
+    return st ? '<span class="opis ' + (klasa || '') + '"><span class="' + (st.ok ? 'status-ok' : 'status-info') + '">' + ikona(st.ok ? 'ok' : 'portfel') + esc(st.tekst) + '</span></span>' : '';
+  }
+  function wierszePisma(lista, klasa) {
+    return '<dl class="' + klasa + '">' + lista.map(function (r) { return '<div><dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd></div>'; }).join('') + '</dl>';
   }
   function ekranWiadomosc(id) {
     var o = osoba();
@@ -1148,8 +1223,8 @@
       stan.przeczytane[o.id][w.id] = true;
       zapisz();
     }
-    var akcja = '';
-    if (w.akcja) {
+    var akcja = '', st = statusPisma(o, w);
+    if (w.akcja && !(st && st.ok)) {
       akcja = w.akcja.href ?
         '<a class="btn glowny" href="' + w.akcja.href + '">' + ikona(w.akcja.ikona) + w.akcja.tekst + '</a>' :
         '<button type="button" class="btn glowny" data-akcja="niedostepne" data-nazwa="' + esc(w.akcja.niedostepne) + '">' + ikona(w.akcja.ikona) + w.akcja.tekst + '</button>';
@@ -1158,7 +1233,14 @@
       tytul: w.tytul, h1: esc(w.tytul), uklad: 'pod', zakladka: null, rodzic: '#/skrzynka',
       /* Treść zawsze jako tekst (np. adres wpisany w sprawie C) — nigdy jako kod HTML */
       html: '<section class="sekcja">' + wstep() + '<p class="metryczka">' + esc(w.nadawca) + ' · ' + (w.data === D.dzis ? 'dziś' : esc(w.data)) + '</p>' +
-        '<div class="pismo">' + (w.tresc || []).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' +
+        (st ? '<p class="status-pisma' + (st.ok ? ' ok' : '') + '">' + ikona(st.ok ? 'ok' : 'portfel') + '<span>' + esc(st.tekst) + '</span></p>' : '') +
+        '<div class="pismo">' + (w.rodzaj ? '<p class="pismo-rodzaj">' + esc(w.rodzaj) + '</p>' : '') +
+          (w.metryczka ? wierszePisma(w.metryczka, 'pismo-metryczka') : '') +
+          (w.tresc || []).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
+          (w.sekcje || []).map(function (sek) {
+            return '<h2 class="pismo-h">' + esc(sek.tytul) + '</h2>' + (sek.akapity || []).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
+              (sek.tabela ? wierszePisma(sek.tabela, 'pismo-tabela') : '');
+          }).join('') + '</div>' +
         '<div class="przyciski-pion">' +
           (w.wyjasnienie ? '<button type="button" class="btn drugi" data-akcja="zapytaj" data-pytanie="Wytłumacz mi to pismo" data-pismo="' + w.id + '">' + ikona('iskry') + 'Wytłumacz prostym językiem</button>' : '') +
           akcja + '</div></section><div class="odstep-dol"></div>'
@@ -1171,7 +1253,7 @@
      osoba ich nie potwierdzi. Nic nie jest wysyłane bez potwierdzenia. */
   var SPRAWY_UI = {
     zgubione: { nazwa: 'Zgubione dokumenty', kroki: 4 },
-    samochod: { nazwa: 'Mój samochód: OC i badanie', kroki: 3 },
+    samochod: { nazwa: 'OC i badanie techniczne', kroki: 3 },
     zameldowanie: { nazwa: 'Zameldowanie na pobyt stały', kroki: 5 }
   };
   var zastosowaneParametry = {}, ostatnieZakonczenie = {};
@@ -1192,6 +1274,7 @@
     zastosowaneParametry[id] = location.hash;
     var s = szkic(id);
     if (p.get('z') === 'asystent') s.zAsystenta = true;
+    if (KREATORY[id] && KREATORY[id].parametry) KREATORY[id].parametry(s, p, osoba());
     if (id === 'zgubione' && p.get('zginelo') !== null) {
       s.zginelo = p.get('zginelo').split(',').filter(function (x) { return window.ASYSTENT.nazwy[x] && window.ASYSTENT.nazwy[x].rzecz; });
       s.dzialania = null;
@@ -1205,6 +1288,12 @@
   var infoKroku = false;
   function brakujacyKrok(id, krok, o, s) {
     if (krok === SPRAWY_UI[id].kroki) return ostatnieZakonczenie[o.id + ':' + id] ? 0 : 1;
+    if (KREATORY[id]) {
+      var def = KREATORY[id];
+      if (def.brak && def.brak(o, s, krok)) return 0;
+      for (var i = 1; i < krok; i++) { var st = def.kroki[i - 1]; if (st.gotowy && !st.gotowy(s, o)) return i; }
+      return 0;
+    }
     if (id === 'zgubione' && krok >= 3 && s.zginelo === undefined) return 1;
     if (id === 'zameldowanie') {
       if (krok >= 2 && !adresSzkicu(s.adres)) return 1;
@@ -1213,8 +1302,16 @@
     }
     return 0;
   }
-  function ekranSprawa(id, parametry, krok) {
-    krok = Math.min(Math.max(+krok || 1, 1), SPRAWY_UI[id].kroki);
+  function ekranSprawa(id, parametry, segment) {
+    if (!SPRAWY_UI[id]) return ekranNieZnaleziono();
+    /* Ekran dodatkowy sprawy bez numeru kroku (np. „Zadzwoń pod 112”, „Dowód się znalazł”, kalkulator PCC) */
+    if (segment && !/^krok-\d+$/.test(segment)) {
+      var dodatkowy = EKRANY_SPRAW[id + '/' + segment];
+      if (!dodatkowy) return ekranNieZnaleziono();
+      zastosujParametry(id, parametry);
+      return ekranDodatkowy(id, dodatkowy(osoba(), szkic(id)));
+    }
+    var krok = Math.min(Math.max(+(segment || '').replace('krok-', '') || 1, 1), SPRAWY_UI[id].kroki);
     zastosujParametry(id, parametry);
     var o = osoba(), s = szkic(id);
     var brak = brakujacyKrok(id, krok, o, s);
@@ -1224,9 +1321,33 @@
       return { przekierowanie: true };
     }
     if (krok === SPRAWY_UI[id].kroki) return ekranGotowe(id);
+    if (KREATORY[id]) return ekranKreatora(id, krok, o, s);
     if (id === 'zgubione') return [sprawaA1, sprawaA2, sprawaA3][krok - 1](o, s);
     if (id === 'samochod') return [sprawaB1, sprawaB2][krok - 1](o, s);
     return [sprawaC1, sprawaC2, sprawaC3, sprawaC4][krok - 1](o, s);
+  }
+
+  /* ---------- Nowe sprawy (sprawy.js): wspólny ekran kroku ---------- */
+  function ekranKreatora(id, krok, o, s) {
+    var def = KREATORY[id], st = def.kroki[krok - 1];
+    var brakHtml = def.brak && def.brak(o, s, krok);
+    if (brakHtml) return ekranKroku(id, krok, st.h1, brakHtml);
+    var w = st.widok(o, s), bez = !!st.bezFormularza, html;
+    if (w && typeof w === 'object') { bez = !!w.bezFormularza; w = w.html; }
+    if (st.potwierdzenie) html = w + przyciskiPotwierdzenia(id, st.wroc || '#/sprawa/' + id + (krok > 2 ? '/krok-' + (krok - 1) : ''), st.napis);
+    else if (bez) html = w;
+    else html = '<form class="krok-formularz" data-sprawa="' + id + '" data-krok="' + krok + '" novalidate>' + w + przyciskDalej(st.przycisk || 'Dalej') + '</form>';
+    var e = ekranKroku(id, krok, st.h1, html, { zAsystenta: s.zAsystenta });
+    if (st.po) e.po = function () { st.po(o, s); };
+    return e;
+  }
+  function ekranDodatkowy(id, e) {
+    var info = SPRAWY_UI[id];
+    return {
+      tytul: info.nazwa + ': ' + e.h1, h1: e.h1, uklad: 'krok', zakladka: null, rodzic: e.rodzic || '#/sprawa/' + id,
+      html: '<section class="sekcja">' + wstep() + '<p class="krok-nazwa-dodatkowa">' + info.nazwa + '</p>' + e.html + '</section><div class="odstep-dol"></div>',
+      po: e.po
+    };
   }
 
   /* ---------- Wspólne elementy kroków ---------- */
@@ -1267,9 +1388,18 @@
     o = o || {};
     return '<div class="pole-formularza"><label class="pole-etykieta" for="' + id + '">' + etykieta + '</label>' +
       (o.podpowiedz ? '<span class="pole-podpowiedz" id="' + id + '-opis">' + o.podpowiedz + '</span>' : '') + bladHtml(id) +
-      '<input class="pole-tekst" id="' + id + '" name="' + nazwa + '" type="text" value="' + esc(wartosc || '') + '"' +
+      '<input class="pole-tekst" id="' + id + '" name="' + nazwa + '" type="text" value="' + esc(wartosc === undefined || wartosc === null ? '' : wartosc) + '"' +
       (o.autocomplete ? ' autocomplete="' + o.autocomplete + '"' : ' autocomplete="off"') + (o.inputmode ? ' inputmode="' + o.inputmode + '"' : '') +
+      (o.zaznacz ? ' data-zaznacz="' + o.zaznacz + '"' : '') +
       ' aria-describedby="' + (o.podpowiedz ? id + '-opis ' : '') + 'blad-' + id + '"></div>';
+  }
+  /* Pole na dłuższy opis (kilka linijek) */
+  function poleOpisu(id, nazwa, etykieta, wartosc, o) {
+    o = o || {};
+    return '<div class="pole-formularza"><label class="pole-etykieta" for="' + id + '">' + etykieta + '</label>' +
+      (o.podpowiedz ? '<span class="pole-podpowiedz" id="' + id + '-opis">' + o.podpowiedz + '</span>' : '') + bladHtml(id) +
+      '<textarea class="pole-tekst pole-opisu" id="' + id + '" name="' + nazwa + '" rows="3" autocomplete="off"' +
+      ' aria-describedby="' + (o.podpowiedz ? id + '-opis ' : '') + 'blad-' + id + '">' + esc(wartosc || '') + '</textarea></div>';
   }
   function przyciskDalej(napis, ikonaNazwa) {
     return '<div class="przyciski-pion"><button type="submit" class="btn glowny">' + (ikonaNazwa ? ikona(ikonaNazwa) : '') + napis + (ikonaNazwa ? '' : ikona('dalej')) + '</button></div>';
@@ -1283,8 +1413,8 @@
   function podsumowanie(tytulListy, punkty) {
     return '<h2>' + tytulListy + '</h2><ul class="lista-zrobimy">' + punkty.map(function (p) { return '<li>' + ikona('ok') + '<span>' + p + '</span></li>'; }).join('') + '</ul>';
   }
-  function przyciskiPotwierdzenia(id, wroc) {
-    return '<div class="przyciski-pion"><button type="button" class="btn glowny" data-akcja="potwierdz" data-sprawa="' + id + '">' + ikona('wyslij') + 'Potwierdzam i wysyłam</button>' +
+  function przyciskiPotwierdzenia(id, wroc, napis) {
+    return '<div class="przyciski-pion"><button type="button" class="btn glowny" data-akcja="potwierdz" data-sprawa="' + id + '">' + ikona(napis ? 'portfel' : 'wyslij') + (napis || 'Potwierdzam i wysyłam') + '</button>' +
       '<a class="btn drugi" href="' + wroc + '">' + ikona('wstecz') + 'Wróć i popraw</a></div>';
   }
   function wartoscDok(d, etykieta) {
@@ -1300,7 +1430,7 @@
   /* Potwierdzenie przed wysłaniem — jak odcisk palca lub PIN */
   function oknoPotwierdzenia(id) {
     otworzOkno('<span class="ikona-kolo" aria-hidden="true">' + ikona('odcisk') + '</span>' +
-      '<h2 id="okno-tytul">Potwierdź odciskiem palca lub PIN-em</h2>' +
+      '<h2 id="okno-tytul">' + (KREATORY[id] && KREATORY[id].oknoTytul || 'Potwierdź odciskiem palca lub PIN-em') + '</h2>' +
       '<p>W prawdziwej aplikacji użyjesz odcisku palca albo PIN-u.</p>' +
       '<div class="przyciski-pion"><button type="button" class="btn glowny" data-akcja="potwierdz-wyslij" data-sprawa="' + id + '">' + ikona('odcisk') + 'Potwierdź (w prototypie wystarczy kliknąć)</button>' +
       '<button type="button" class="btn drugi" data-akcja="zamknij-okno">Anuluj</button></div>');
@@ -1310,9 +1440,9 @@
     var o = osoba();
     var z = ostatnieZakonczenie[o.id + ':' + id] || { zdanie: 'Sprawa jest załatwiona.', fakty: [], coDalej: [] };
     var html = '<div class="gotowe"><div class="ilustracja sukces" aria-hidden="true">' + ikona('sukces') + '</div>' +
-      '<p class="gotowe-zdanie">' + z.zdanie + '</p></div>' +
+      '<p class="gotowe-zdanie">' + esc(z.zdanie) + '</p></div>' +
       (z.fakty.length || z.coDalej.length ? '<h2>Co dalej</h2>' : '') +
-      (z.fakty.length ? '<ul class="lista-zrobimy">' + z.fakty.map(function (f) { return '<li>' + ikona(f[0]) + '<span>' + f[1] + '</span></li>'; }).join('') + '</ul>' : '') +
+      (z.fakty.length ? '<ul class="lista-zrobimy">' + z.fakty.map(function (f) { return '<li>' + ikona(f[0]) + '<span>' + esc(f[1]) + '</span></li>'; }).join('') + '</ul>' : '') +
       (z.coDalej.length ? '<ul class="lista">' + z.coDalej.map(wierszCoDalej).join('') + '</ul>' : '') +
       '<a class="link-skrzynka" href="' + (z.wiadomosc ? '#/skrzynka/' + z.wiadomosc : '#/skrzynka') + '">' + ikona('list') + '<span>Potwierdzenie jest w Skrzynce</span>' + ikona('dalej', 'chevron') + '</a>' +
       '<div class="przyciski-pion"><a class="btn glowny" href="#/dokumenty">' + ikona('dokumenty') + 'Wróć do Dokumentów</a></div>';
@@ -1329,10 +1459,17 @@
   function zakonczSprawe(id) {
     /* Wysyłamy tylko z kroku potwierdzenia — drugie kliknięcie (już po wysłaniu) nic nie robi */
     if (biezacyAdres().sciezka !== '/sprawa/' + id + '/krok-' + KROK_WYSYLKI[id]) return;
-    var o = osoba(), w = wynikiOsoby(o), s = szkic(id);
-    var z = id === 'zgubione' ? zakonczA(o, w, s) : id === 'samochod' ? zakonczB(o, w, s) : zakonczC(o, w, s);
-    var wiadomosc = { id: id + '-' + Date.now(), nowa: true, nadawca: 'mObywatel', tytul: z.tytulWiadomosci, data: D.dzis, tresc: z.trescWiadomosci };
+    var o = osoba(), w = wynikiOsoby(o), s = szkic(id), idW = id + '-' + Date.now();
+    var z = KREATORY[id] ? KREATORY[id].zakoncz(o, w, s, idW) : id === 'zgubione' ? zakonczA(o, w, s) : id === 'samochod' ? zakonczB(o, w, s) : zakonczC(o, w, s);
+    var wm = z.wiadomosc || {};
+    var wiadomosc = { id: idW, nowa: true, nadawca: wm.nadawca || 'mObywatel', tytul: wm.tytul || z.tytulWiadomosci, data: D.dzis, tresc: wm.tresc || z.trescWiadomosci,
+      metryczka: wm.metryczka, sekcje: wm.sekcje, rodzaj: wm.rodzaj };
     w.wiadomosci.unshift(wiadomosc);
+    /* Dokumenty z urzędu (np. odpis aktu) — osobne wiadomości nad potwierdzeniem */
+    (z.inne || []).forEach(function (m, i) { w.wiadomosci.unshift(Object.assign({ id: idW + '-' + (i + 1), nowa: true, data: D.dzis }, m)); });
+    delete z.inne;
+    z.fakty = (z.fakty || []).filter(Boolean);
+    z.coDalej = z.coDalej || [];
     z.wiadomosc = wiadomosc.id;
     ostatnieZakonczenie[o.id + ':' + id] = z;
     zapisz();
@@ -1349,7 +1486,11 @@
     var bledy = [];
     function zaznaczone(n) { return Array.prototype.filter.call(f.querySelectorAll('input[name="' + n + '"]'), function (i) { return i.checked; }).map(function (i) { return i.value; }); }
     function tekst(n) { var i = f.querySelector('[name="' + n + '"]'); return i ? i.value.trim() : ''; }
-    var wynik = (KROKI_FORMULARZA[id + '-' + krok] || function () { return null; })(o, s, zaznaczone, tekst, function (pole, opis) { bledy.push([pole, opis]); });
+    var fn = KROKI_FORMULARZA[id + '-' + krok] || (KREATORY[id] && KREATORY[id].kroki[krok - 1] && function () {
+      var st = KREATORY[id].kroki[krok - 1];
+      return (st.dalej ? st.dalej.apply(null, arguments) : null) || '#/sprawa/' + id + '/krok-' + (krok + 1);
+    }) || function () { return null; };
+    var wynik = fn(o, s, zaznaczone, tekst, function (pole, opis) { bledy.push([pole, opis]); });
     if (bledy.length) {
       var pierwszy = null, pierwszyBlok = null;
       bledy.forEach(function (b) {
@@ -1359,8 +1500,8 @@
         if (cel) {
           var blok = cel.closest('.pole-formularza') || cel;
           blok.classList.add('z-bledem');
-          var pole = cel.matches('input') ? cel : cel.querySelector('input, button');
-          if (cel.matches('input')) cel.setAttribute('aria-invalid', 'true');
+          var pole = cel.matches('input, textarea') ? cel : cel.querySelector('input, textarea, button');
+          if (cel.matches('input, textarea')) cel.setAttribute('aria-invalid', 'true');
           if (!pierwszy) { pierwszy = pole; pierwszyBlok = blok; }
         }
       });
@@ -1375,8 +1516,10 @@
 
   /* ---------- SPRAWA A: Zgubione dokumenty (4 kroki) ---------- */
   var DZIALANIA_A = {
-    dowod: { tytul: 'Unieważnimy dowód osobisty', opis: 'Nikt nie użyje go jako Twojego dokumentu.', podmiot: 'dowód', zrobione: 'unieważniony' },
-    pesel: { tytul: 'Zastrzeżemy PESEL', opis: 'Nikt nie weźmie kredytu na Twoje dane.', podmiot: 'PESEL', zrobione: 'zastrzeżony' },
+    dowod: { tytul: 'Unieważnimy dowód osobisty', opis: 'Nikt go już nie użyje. Tego nie da się cofnąć, nawet gdy dowód się znajdzie.', podmiot: 'dowód', zrobione: 'unieważniony',
+      znacznik: ['Na stałe', 'uwaga'] },
+    pesel: { tytul: 'Zastrzeżemy PESEL', opis: 'Nikt nie weźmie kredytu na Twoje dane. Cofniesz to w każdej chwili.', podmiot: 'PESEL', zrobione: 'zastrzeżony',
+      znacznik: ['Można cofnąć', 'powtorz'] },
     prawko: { tytul: 'Zgłosimy utratę prawa jazdy', opis: 'Zgłoszenie trafi do urzędu, który je wydał.', podmiot: 'utrata prawa jazdy', zrobione: 'zgłoszona' }
   };
   var GDZIE_ZGLOSIC = {
@@ -1408,12 +1551,15 @@
   function przelacznikDzialania(x, wlaczone) {
     var d = DZIALANIA_A[x];
     return '<button type="button" class="przelacznik" role="switch" aria-checked="' + !!wlaczone + '" data-akcja="przelacz-dzialanie" data-dzialanie="' + x + '">' +
-      '<span class="tekst"><span class="tytul-wiersza">' + d.tytul + '</span><span class="opis">' + d.opis + '</span></span>' +
+      '<span class="tekst"><span class="tytul-wiersza">' + d.tytul + '</span>' +
+        (d.znacznik ? '<span class="znacznik">' + ikona(d.znacznik[1]) + d.znacznik[0] + '</span>' : '') + '<span class="opis">' + d.opis + '</span></span>' +
       '<span class="przelacznik-stan"><span class="tor" aria-hidden="true"><span class="galka"></span></span><span class="slowo">' + (wlaczone ? 'Tak' : 'Nie') + '</span></span></button>';
   }
   function sprawaA2(o, s) {
     var N = window.ASYSTENT.nazwy, dostepne = dzialaniaA(o, s), zg = s.zginelo || [], w = wynikiOsoby(o);
     var html = '';
+    /* Z asystenta od razu tutaj: widać, co zginęło, i można to zmienić */
+    if (s.zAsystenta && zg.length) html += daneHtml([['Zginęło', zg.map(function (x) { return N[x].rzecz; }).join(', '), '#/sprawa/zgubione']]);
     if (dostepne.length) {
       html += '<h2>Zrobimy to za Ciebie</h2>' + '<div id="dzialania" class="dzialania" aria-describedby="blad-dzialania">' + bladHtml('dzialania') +
         dostepne.map(function (x) { return przelacznikDzialania(x, s.dzialania[x]); }).join('') + '</div>';
@@ -1462,8 +1608,9 @@
     });
     var zdanie = czesci.length === 1 ? czesci[0] : czesci.slice(0, -1).join(', ') + ', a ' + czesci[czesci.length - 1];
     var coDalej = [];
-    if (dz.indexOf('dowod') >= 0) coDalej.push({ tekst: 'Złóż wniosek o nowy dowód osobisty', ikona: 'dowod', niedostepne: 'Wniosek o dowód osobisty' });
-    if (dz.indexOf('pesel') >= 0) coDalej.push({ tekst: 'Jak cofnąć zastrzeżenie PESEL', ikona: 'info', info: ['Cofnięcie zastrzeżenia PESEL', 'Zastrzeżenie cofniesz w każdej chwili w aplikacji mObywatel albo w urzędzie gminy.'] });
+    if (dz.indexOf('dowod') >= 0) coDalej.push({ tekst: 'Złóż wniosek o nowy dowód osobisty', ikona: 'dowod', href: '#/sprawa/wniosek-dowod' });
+    if (zg.indexOf('dowod') >= 0) coDalej.push({ tekst: 'Dowód się znalazł', ikona: 'ok', href: '#/sprawa/zgubione/znaleziony' });
+    if (dz.indexOf('pesel') >= 0) coDalej.push({ tekst: 'Jak cofnąć zastrzeżenie PESEL', ikona: 'powtorz', href: '#/sprawa/cofnij-pesel' });
     if (zg.indexOf('karty') >= 0) coDalej.push({ tekst: 'Zastrzeż karty płatnicze: 828 828 828', ikona: 'telefon', href: 'tel:828828828' });
     return {
       zdanie: zdanie + '.', fakty: [], coDalej: coDalej,
@@ -1471,7 +1618,8 @@
       trescWiadomosci: ['Zgłoszenie z dnia ' + D.dzis + ' zostało przyjęte.'].concat(dz.map(function (x) {
         var d = DZIALANIA_A[x];
         return (x === 'prawko' ? 'Utrata prawa jazdy' : x === 'dowod' ? 'Dowód osobisty' : 'PESEL') + ' — ' + d.zrobione + '.';
-      })).concat(dz.indexOf('pesel') >= 0 ? ['Zastrzeżenie PESEL cofniesz w każdej chwili w aplikacji mObywatel.'] : [])
+      })).concat(dz.indexOf('dowod') >= 0 ? ['Unieważnienia dowodu nie da się cofnąć. Złóż wniosek o nowy dowód.'] : [])
+        .concat(dz.indexOf('pesel') >= 0 ? ['Zastrzeżenie PESEL cofniesz w każdej chwili w aplikacji mObywatel.'] : [])
     };
   }
 
@@ -1537,7 +1685,7 @@
       zdanie: 'Przypomnienie ustawione.', fakty: fakty, coDalej: [],
       tytulWiadomosci: 'Przypomnienie ustawione: ' + p.marka,
       trescWiadomosci: ['Przypomnimy Ci 7 dni przed terminem.'].concat(fakty.map(function (f) { return f[1]; }))
-        .concat(['Przypomnienie zmienisz w sprawie „Mój samochód: OC i badanie”.'])
+        .concat(['Przypomnienie zmienisz w sprawie „OC i badanie techniczne”.'])
     };
   }
 
@@ -1545,8 +1693,10 @@
   function adresSzkicu(a) { return a && a.ulica ? window.ASYSTENT.adresTekst(a) : ''; }
   function sprawaC1(o, s) {
     var a = s.adres || {};
+    var wyslany = wynikiOsoby(o).zameldowanie;
     return ekranKroku('zameldowanie', 1, 'Adres',
       (a.zapisany ? '<p class="z-asystenta">' + ikona('info') + '<span>Ten adres był już zapisany. Sprawdź, czy się zgadza.</span></p>' : '') +
+      (wyslany ? '<p class="z-asystenta">' + ikona('info') + '<span>Wniosek o zameldowanie wysłano ' + wyslany.data + '. Możesz wysłać nowy, jeśli znów się przeprowadzasz.</span></p>' : '') +
       '<form class="krok-formularz" data-sprawa="zameldowanie" data-krok="1" novalidate>' +
         '<p class="podtytul">Wpisz adres, pod którym mieszkasz na stałe.</p>' +
         poleTekstowe('m-ulica', 'ulica', 'Ulica i numer domu', a.ulica, { autocomplete: 'address-line1', podpowiedz: 'Na przykład: ul. Lipowa 5' }) +
@@ -1563,7 +1713,7 @@
         grupaPol('od', 'Od kiedy mieszkasz pod nowym adresem?',
           opcjaPola('radio', 'od', 'dzis', 'Od dziś', od.typ === 'dzis', D.dzis) +
           opcjaPola('radio', 'od', 'inna', 'Od innego dnia', od.typ === 'inna', 'Wpisz datę poniżej.')) +
-        poleTekstowe('m-data', 'data', 'Data, od której tu mieszkasz', od.typ === 'inna' ? od.data : '', { inputmode: 'numeric', podpowiedz: 'Dzień.miesiąc.rok, np. 01.11.2026' }) +
+        poleTekstowe('m-data', 'data', 'Data, od której tu mieszkasz', od.typ === 'inna' ? od.data : '', { inputmode: 'numeric', zaznacz: 'od:inna', podpowiedz: 'Dzień.miesiąc.rok, np. 01.11.2026' }) +
         przyciskDalej('Dalej') + '</form>',
       { zAsystenta: s.zAsystenta });
   }
@@ -1606,13 +1756,15 @@
     try { return new RegExp('\\p{L}', 'u'); } catch (e) { return /[A-Za-z\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF\u0590-\u05FF\u0600-\u06FF]/; }
   })();
   /* Data w formacie dd.mm.rrrr: sprawdza, czy istnieje i czy nie jest z przyszłości */
-  function sprawdzDate(t) {
+  function sprawdzDate(t, opcje) {
+    opcje = opcje || {};
     var m = String(t).match(/^(\d{1,2})[.\-\/ ](\d{1,2})[.\-\/ ](\d{4})$/);
     if (!m) return { blad: 'Wpisz datę jako dzień.miesiąc.rok, np. 01.11.2026.' };
     var d = new Date(+m[3], +m[2] - 1, +m[1], 12);
     if (d.getDate() !== +m[1] || d.getMonth() !== +m[2] - 1) return { blad: 'Taki dzień nie istnieje. Sprawdź datę.' };
     if (+m[3] < 1900) return { blad: 'Sprawdź rok. Wpisz datę, np. 01.11.2026.' };
-    if (d > D.dataZaDni(0)) return { blad: 'Ta data jest w przyszłości. Wpisz dzień, od którego już tu mieszkasz.' };
+    if (d > D.dataZaDni(0)) return { blad: opcje.przyszlosc || 'Ta data jest w przyszłości. Wpisz dzień, od którego już tu mieszkasz.' };
+    if (opcje.min && d < opcje.min) return { blad: 'Ta data jest wcześniejsza niż Twoja data urodzenia. Sprawdź rok.' };
     return { data: D.formatuj(d) };
   }
 
@@ -1648,6 +1800,8 @@
       else if (a.ulica.length > 100) zle('m-ulica', 'Ten adres jest za długi. Wpisz najwyżej 100 znaków, np. ul. Lipowa 5.');
       else if (!LITERA.test(a.ulica)) zle('m-ulica', 'Wpisz nazwę ulicy albo miejscowości i numer domu, np. ul. Lipowa 5.');
       else if (!/\d/.test(a.ulica)) zle('m-ulica', 'Dopisz numer domu, np. ul. Lipowa 5.');
+      /* „m. 5”, „lok. 5”, „/5” — zostawiamy sam numer */
+      a.mieszkanie = a.mieszkanie.replace(/^(m\.?|lok\.?|lokal|mieszk\.?|mieszkanie|nr\.?|\/)\s*/i, '');
       if (a.mieszkanie && !/^[0-9]{1,4}[a-zA-Z]?$/.test(a.mieszkanie)) zle('m-mieszkanie', 'Wpisz sam numer mieszkania, np. 5.');
       if (!a.kod) zle('m-kod', 'Wpisz kod pocztowy, np. 80-180.');
       else if (!/^\d{2}-?\d{3}$/.test(kod)) zle('m-kod', 'Kod pocztowy ma 5 cyfr, np. 80-180.');
@@ -1667,7 +1821,7 @@
       if (typ === 'dzis') { s.od = { typ: 'dzis', data: D.dzis }; return '#/sprawa/zameldowanie/krok-3'; }
       var t = tekst('data');
       if (!t) return blad('m-data', 'Wpisz datę, np. 01.11.2026.');
-      var d = sprawdzDate(t);
+      var d = sprawdzDate(t, { min: dataUrodzenia(o) });
       if (d.blad) return blad('m-data', d.blad);
       s.od = { typ: 'inna', data: d.data };
       return '#/sprawa/zameldowanie/krok-3';
@@ -1679,6 +1833,21 @@
       return '#/sprawa/zameldowanie/krok-4';
     }
   };
+
+  /* Nowe sprawy z sprawy.js: każda dostaje licznik kroków, krok wysyłki i ekrany dodatkowe */
+  var NOWE = window.NOWE_SPRAWY ? window.NOWE_SPRAWY({
+    D: D, ikona: ikona, esc: esc, odmiana: odmiana, znajdz: znajdz, LITERA: LITERA,
+    wyniki: wynikiOsoby, dokumenty: dokumentyOsoby, daneOsoby: daneOsoby, pojazd: pojazdOsoby,
+    grupaPol: grupaPol, opcjaPola: opcjaPola, poleTekstowe: poleTekstowe, poleOpisu: poleOpisu, bladHtml: bladHtml,
+    daneHtml: daneHtml, podsumowanie: podsumowanie, sprawdzDate: sprawdzDate, numer: numerSprawy
+  }) : { kreatory: {}, ekrany: {} };
+  var KREATORY = NOWE.kreatory, EKRANY_SPRAW = NOWE.ekrany;
+  Object.keys(KREATORY).forEach(function (id) {
+    var def = KREATORY[id];
+    SPRAWY_UI[id] = { nazwa: def.nazwa, kroki: def.kroki.length + 1 };
+    def.kroki.forEach(function (st, i) { if (st.potwierdzenie) KROK_WYSYLKI[id] = i + 1; });
+    Object.keys(def.ekrany || {}).forEach(function (n) { EKRANY_SPRAW[id + '/' + n] = def.ekrany[n]; });
+  });
 
   /* Adres #/asystent/rozmowa?pytanie=… (np. z zewnątrz): zadaje pytanie raz i pokazuje rozmowę */
   function ekranRozmowa(id, parametry) {
@@ -1720,7 +1889,7 @@
     [/^\/wyglad$/, ekranWyglad],
     [/^\/skrzynka$/, ekranSkrzynka],
     [/^\/skrzynka\/([\w-]+)$/, ekranWiadomosc],
-    [/^\/sprawa\/(zgubione|samochod|zameldowanie)(?:\/krok-(\d))?$/, ekranSprawa]
+    [/^\/sprawa\/([\w-]+)(?:\/([\w-]+))?$/, ekranSprawa]
   ];
   function biezacyAdres() {
     var h = location.hash.replace(/^#/, '');
@@ -1948,6 +2117,7 @@
       '<div class="przyciski-pion">' + D.dzialajace.map(function (s) {
         return '<a class="btn drugi" href="' + s.href + '" data-akcja="zamknij-okno">' + ikona(s.ikona) + s.nazwa + '</a>';
       }).join('') +
+      '<a class="btn drugi" href="#/uslugi" data-akcja="zamknij-okno">' + ikona('uslugi') + 'Wszystkie działające sprawy w Usługach</a>' +
       '<button type="button" class="btn glowny" data-akcja="zamknij-okno">Zamknij</button></div>');
   }
   function oknoInformacja(tytulOkna, tekst) {
@@ -2098,7 +2268,8 @@
         break;
       case 'potwierdz': oknoPotwierdzenia(el.getAttribute('data-sprawa')); break;
       case 'potwierdz-wyslij': zakonczSprawe(el.getAttribute('data-sprawa')); break;
-      case 'info': oknoInformacja(el.getAttribute('data-tytul'), el.getAttribute('data-tekst')); break;
+      case 'info': oknoInformacja(esc(el.getAttribute('data-tytul')), esc(el.getAttribute('data-tekst'))); break;
+      case 'kreator': akcjaKreatora(el); break;
       case 'wyczysc-szukanie':
         var pole = document.getElementById('szukaj');
         if (pole) { pole.value = ''; pole.dispatchEvent(new Event('input')); pole.focus(); }
@@ -2113,6 +2284,23 @@
         break;
     }
   });
+  /* Akcja w kroku nowej sprawy (np. „Zeskanuj kod”, „Zrób zdjęcie”): zmienia tylko część ekranu */
+  function akcjaKreatora(el) {
+    var id = el.getAttribute('data-sprawa'), def = KREATORY[id], co = el.getAttribute('data-co');
+    if (!def || !def.akcje || !def.akcje[co]) return;
+    var r = def.akcje[co](osoba(), szkic(id), el) || {};
+    zapiszSesje();
+    if (r.pola) Object.keys(r.pola).forEach(function (n) { var i = document.querySelector('[name="' + n + '"]'); if (i) i.value = r.pola[n]; });
+    if (r.cel) { var c = document.getElementById(r.cel); if (c) c.innerHTML = r.html; }
+    function ukryj(b) { if (!b) return; b.hidden = true; var blok = document.getElementById(b.id.replace(/^blad-/, '')); if (blok) blok.classList.remove('z-bledem'); }
+    if (r.ukryjBlad) ukryj(document.getElementById('blad-' + r.ukryjBlad));
+    if (r.ukryjBledy) Array.prototype.forEach.call(document.querySelectorAll('.blad-pola'), ukryj);
+    if (r.ukryjBledy) Array.prototype.forEach.call(document.querySelectorAll('[aria-invalid]'), function (x) { x.removeAttribute('aria-invalid'); });
+    var ogl = document.getElementById('ogloszenia');
+    if (ogl && r.ogloszenie) ogl.textContent = r.ogloszenie;
+    var f = r.fokus && document.querySelector(r.fokus);
+    if (f) { f.focus({ preventScroll: true }); przewinDo(f, 'nearest'); }
+  }
   /* Formularze: wybór w rozmowie z asystentem i kroki spraw */
   document.addEventListener('submit', function (e) {
     var f = e.target;
@@ -2125,11 +2313,38 @@
       wyslijKrok(f);
     }
   });
-  /* Wpisanie daty zameldowania zaznacza „Od innego dnia” */
+  /* Wpisanie daty (np. zameldowania) zaznacza pasującą opcję, np. „Od innego dnia” */
   document.addEventListener('input', function (e) {
-    if (e.target.id !== 'm-data' || !e.target.value) return;
-    var inna = document.querySelector('input[name="od"][value="inna"]');
-    if (inna && !inna.checked) { inna.checked = true; inna.dispatchEvent(new Event('change', { bubbles: true })); }
+    var z = e.target.getAttribute && e.target.getAttribute('data-zaznacz');
+    if (!z || !e.target.value) return;
+    var cz = z.split(':'), r = document.querySelector('input[name="' + cz[0] + '"][value="' + cz[1] + '"]');
+    if (r && !r.checked) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }
+  });
+  /* Wklejony tekst z nowymi liniami (np. adres z maila): słowa się nie sklejają.
+     Cały adres wklejony w pole ulicy rozdzielamy na pola: ulica, mieszkanie, kod, miejscowość. */
+  function rozdzielAdres(t) {
+    var m = t.match(/^(.*?\d+[a-zA-Z]?)(?:\s*(?:\/|m\.?|lok\.?)\s*(\d{1,4}[a-zA-Z]?))?\s*,?\s*(\d{2}\s*[-\u2013]?\s*\d{3})\s+(\D+)$/);
+    return m ? { ulica: m[1].trim().replace(/,$/, ''), mieszkanie: m[2] || '', kod: m[3].replace(/\s/g, '').replace('\u2013', '-'), miejscowosc: m[4].trim() } : null;
+  }
+  document.addEventListener('paste', function (e) {
+    var el = e.target, dane = e.clipboardData || window.clipboardData;
+    if (!el || el.tagName !== 'INPUT' || el.type !== 'text' || !dane) return;
+    var t = dane.getData('text');
+    if (!t || !/[\r\n\t]/.test(t)) return;
+    e.preventDefault();
+    var czesci = t.split(/\s*[\r\n\t]+\s*/).filter(Boolean);
+    var adres = el.id === 'm-ulica' && rozdzielAdres(czesci.join(', '));
+    function wpisz(id, w) { var p = document.getElementById(id); if (p) { p.value = w; p.dispatchEvent(new Event('input', { bubbles: true })); } }
+    if (adres) {
+      wpisz('m-ulica', adres.ulica); if (adres.mieszkanie) wpisz('m-mieszkanie', adres.mieszkanie); wpisz('m-kod', adres.kod); wpisz('m-miejscowosc', adres.miejscowosc);
+      var ogl = document.getElementById('ogloszenia');
+      if (ogl) ogl.textContent = 'Wklejony adres rozdzieliliśmy na pola. Sprawdź je.';
+      return;
+    }
+    var start = el.selectionStart, koniec = el.selectionEnd, wklej = czesci.join(' ');
+    el.value = el.value.slice(0, start) + wklej + el.value.slice(koniec);
+    el.setSelectionRange(start + wklej.length, start + wklej.length);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
   });
   /* Pola wyboru i opcje: zaznaczona opcja jest wyróżniona (nie tylko kolorem — także ramką i pogrubieniem) */
   document.addEventListener('change', function (e) {
@@ -2184,6 +2399,28 @@
     zastosujUstawienia();
     wczytajSesje();
     window.addEventListener('pagehide', zapiszSesje);
+    /* Dwie karty przeglądarki naraz: gdy druga karta coś zapisze, ta karta wczytuje te same dane
+       (osoba, wygląd, skutki spraw) — nic nie nadpisuje się starszą wersją */
+    window.addEventListener('storage', function (e) {
+      if (e.key !== KLUCZ) return;
+      var poprzednia = stan.osoba;
+      stan = wczytaj();
+      zastosujUstawienia();
+      if (stan.osoba !== poprzednia) {
+        rozmowa = []; szkice = {}; zastosowaneParametry = {}; ostatnieZakonczenie = {}; przodPortfela = {};
+        zapiszSesje();
+        if (!stan.osoba) { location.hash = '#/osoba'; return; }
+        komunikatPoPrzejsciu = 'W innej karcie wybrano osobę: ' + osoba().imie + '.';
+        if (location.hash === '#/dokumenty') pokaz(); else location.hash = '#/dokumenty';
+        return;
+      }
+      /* Ta sama osoba: odświeżamy ekran, chyba że ktoś właśnie coś wpisuje albo ma otwarte okno */
+      var a = document.activeElement;
+      if (okno.open || (a && a.matches && a.matches('input[type="text"], textarea'))) return;
+      var y = tresc.scrollTop;
+      pokaz();
+      tresc.scrollTop = y;
+    });
     if (!biezacyAdres().sciezka) {
       try { history.replaceState(null, '', '#' + (stan.osoba ? '/dokumenty' : '/osoba')); }
       catch (e) { location.replace('#' + (stan.osoba ? '/dokumenty' : '/osoba')); return; }

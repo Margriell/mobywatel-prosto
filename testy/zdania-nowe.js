@@ -25,7 +25,7 @@ module.exports = [
   ['samochód', 'kiedy muszę zrobić przegląd skodą', ['samochod']],
   ['samochód', 'ile kosztuje oc', ['samochod']],
   ['samochód', 'przypomnij mi o ubezpieczeniu auta', ['samochod']],
-  ['samochód', 'mam stłuczkę co robić', ['samochod', 'nieznane']],
+  ['samochód', 'mam stłuczkę co robić', ['stluczka']],
   ['samochód', 'zgubiłem kluczyki do auta', ['zgubione', 'nieznane']],
   ['samochód', 'sprzedaję motocykl', ['usluga-sprzedaz']],
   ['samochód', 'kupiłam używane auto od sąsiada', ['usluga-rejestracja']],

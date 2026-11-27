@@ -27,6 +27,7 @@ const CZESCI = [
   ['6', './czesci/6-dostepnosc.js'],
   ['7', './czesci/7-tresc.js'],
   ['8', './czesci/8-zgodnosc.js'],
+  ['9', './czesci/9-nowe-sprawy.js'],
   ['kontrola', './czesci/k-kontrola.js']
 ];
 

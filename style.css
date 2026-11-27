@@ -861,6 +861,44 @@ html, a, button, summary, label, input { -webkit-tap-highlight-color: transparen
 [data-motyw="kontrast"] .mow { border: 2px solid #FFE500; }
 [data-motyw="kontrast"] .etykieta-nowa { color: #000; }
 
+/* ---------- Nowe sprawy: płatności, stłuczka, urodzenie, odpisy, pisma urzędowe ---------- */
+.lista-uwag { display: flex; flex-direction: column; gap: 10px; }
+.znacznik { display: flex; align-items: center; gap: 4px; width: fit-content; font-size: 16px; font-weight: 700; color: var(--akcent); line-height: 1.3; }
+.znacznik svg { width: 18px; height: 18px; flex: none; }
+.status-info { display: inline-flex; align-items: center; gap: 6px; color: var(--akcent); }
+.status-info svg { width: 20px; height: 20px; flex: none; }
+.status-pisma {
+  display: flex; align-items: center; gap: 8px; margin: -4px 0 14px; padding: 10px 14px; line-height: 1.4;
+  border: 1px solid var(--akcent); border-radius: 12px; background: var(--akcent-jasny); color: var(--tekst); font-weight: 700;
+}
+.status-pisma svg { width: 22px; height: 22px; color: var(--akcent); flex: none; }
+.status-pisma.ok { border-color: var(--sukces); background: var(--sukces-jasny); }
+.status-pisma.ok svg { color: var(--sukces); }
+.pismo-rodzaj { font-size: 1.1rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.pismo-metryczka, .pismo-tabela { margin: 8px 0 12px; border-top: 1px solid var(--linia); }
+.pismo-metryczka > div, .pismo-tabela > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 12px; padding: 6px 0; border-bottom: 1px solid var(--linia); }
+.pismo-metryczka dt, .pismo-tabela dt { color: var(--tekst-2); }
+.pismo-metryczka dd, .pismo-tabela dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; min-width: 0; }
+.pismo .pismo-h { font-size: 1.05rem; line-height: 1.3; margin: 16px 0 6px; }
+.pole-opisu { min-height: 104px; resize: vertical; line-height: 1.5; font-family: inherit; padding-top: 10px; }
+.alarm-duzy {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 16px; padding: 18px 16px; text-align: center; line-height: 1.45;
+  border: 3px solid var(--pilne); border-radius: 16px; background: var(--pilne-jasne); color: var(--tekst);
+}
+.alarm-duzy > svg { width: 48px; height: 48px; color: var(--pilne); }
+.alarm-duzy b { font-size: 1.2rem; }
+.zdjecia { display: grid; grid-template-columns: repeat(auto-fill, minmax(8em, 1fr)); gap: 10px; margin-bottom: 12px; }
+.zdjecia li { display: flex; flex-direction: column; gap: 6px; line-height: 1.35; }
+.zdjecie { display: grid; place-items: center; aspect-ratio: 4 / 3; border-radius: 12px; border: 1px solid var(--linia); background: var(--akcent-jasny); color: var(--akcent); }
+.zdjecie svg { width: 36px; height: 36px; }
+.skan { margin-bottom: 8px; }
+.skan .dane { margin-bottom: 8px; }
+.status-wiersz.info svg, .lista-zrobimy.info svg { color: var(--akcent); }
+.wynik-pcc { margin: 0 0 16px; padding: 12px 14px; border-radius: 12px; background: var(--akcent-jasny); color: var(--tekst); font-weight: 700; font-size: 1.1rem; line-height: 1.4; }
+.krok-nazwa-dodatkowa { color: var(--tekst-2); margin-bottom: 12px; line-height: 1.4; }
+.sekcja .dane + h2, .sekcja .dane + .z-asystenta, .sekcja .z-asystenta + .dane { margin-top: 14px; }
+[data-motyw="kontrast"] .status-pisma, [data-motyw="kontrast"] .zdjecie, [data-motyw="kontrast"] .wynik-pcc { border: 2px solid #fff; }
+
 /* ---------- Ogranicz ruch ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }

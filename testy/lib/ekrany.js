@@ -105,7 +105,7 @@ function trasa(osoba, o) {
   dodaj('Sprawa A, krok 3', async (s) => { await s.js(`document.querySelectorAll('[data-akcja="przelacz-dzialanie"][aria-checked="false"]').forEach((b) => b.click())`); await wyslijFormularz(s); });
   dodaj('Okno: Potwierdź odciskiem palca', (s) => klikJs(s, '[data-akcja="potwierdz"]'));
   dodaj('Sprawa A, Gotowe', async (s) => { await klikJs(s, '[data-akcja="potwierdz-wyslij"]'); await czekaj(100); });
-  dodaj('Okno: Jak cofnąć zastrzeżenie PESEL', (s) => klikJs(s, '[data-akcja="info"]'));
+  dodaj('Sprawa A: Dowód się znalazł', (s) => idzDo(s, '#/sprawa/zgubione/znaleziony'));
   dodaj('Dokumenty po sprawie A (mDowód unieważniony)', async (s) => { await zamknijOkno(s); await idzDo(s, '#/dokumenty'); });
   dodaj('Szczegóły mDowodu po sprawie A', (s) => idzDo(s, '#/dokument/dowod'));
   /* Sprawa B — samochód */
@@ -131,6 +131,7 @@ function trasa(osoba, o) {
   dodaj('Sprawa C, krok 3 z błędem', (s) => wyslijFormularz(s));
   dodaj('Sprawa C, krok 4', async (s) => { await zaznacz(s, 'podstawa', 'wynajem'); await wyslijFormularz(s); });
   dodaj('Sprawa C, Gotowe', async (s) => { await klikJs(s, '[data-akcja="potwierdz"]'); await klikJs(s, '[data-akcja="potwierdz-wyslij"]'); await czekaj(100); });
+  if (o.nowe !== false) require('./ekrany-nowe').dodajNowe(dodaj, osoba, { idzDo, klikJs, zamknijOkno, ustawPole, zaznacz, wyslijFormularz, zapytaj });
   dodaj('Skrzynka po sprawach', (s) => idzDo(s, '#/skrzynka'));
   dodaj('Wiadomość: potwierdzenie sprawy', async (s) => { await idzDo(s, '#/skrzynka'); await klikJs(s, '.lista a.wiersz-listy'); });
   dodaj('Dokumenty po sprawach', (s) => idzDo(s, '#/dokumenty'));

@@ -123,7 +123,7 @@
   /* Silne znaki (wystarczy jeden): prośba o pieniądze, dane, kod albo kliknięcie, „wygrana”.
      Słabe (potrzeba dwóch albo linku): paczka, kurier, pośpiech — bywają też w prawdziwych SMS-ach. */
   var SILNE_OSZUSTWA = ['doplat', 'doplac', 'oplat', 'oplac', 'zablok', 'zawiesz', 'blik', 'kliknij', 'wygral', 'nagrod', 'potwierdz dane', 'zaktualizuj',
-    'dane karty', 'haslo', 'konto zostanie', 'odlacz', 'zaleglos', 'pozycz', 'przelew', 'wyslij kod', 'nowy numer', 'zmienilam numer', 'zmienilem numer',
+    'dane karty', 'haslo', 'konto zostanie', 'odlacz', 'zalegl', 'pozycz', 'przelew', 'wyslij kod', 'nowy numer', 'zmienilam numer', 'zmienilem numer',
     'z banku', 'konsultant', 'pieniadz', 'pieniedz'];
   var SLABE_OSZUSTWA = ['paczk', 'przesylk', 'kurier', 'pilne', 'pilnie', '24 h', '24h', 'faktur', 'mamo', 'tato', 'babciu', 'dziadku'];
   function znakiOszustwa(surowy) {
@@ -140,7 +140,8 @@
   }
 
   /* Kanały, którymi przychodzi oszustwo */
-  var KANALY = ['sms', 'smsa', 'smsy', 'esemes', 'esemesa', 'wiadomosc', '=mail', '=maila', '=maile', 'email', 'link', 'linka', 'dzwoni', 'zadzwoni', 'telefon', 'numeru', 'numer'];
+  var KANALY = ['sms', 'smsa', 'smsy', 'esemes', 'esemesa', 'wiadomosc', '=mail', '=maila', '=maile', 'email', 'link', 'linka', 'dzwoni', 'zadzwoni', 'telefon', 'numeru', 'numer',
+    'messenger', 'whatsapp', 'whatsappie', 'facebook', 'fejsbuk', '=czat', '=czacie', 'komunikator', 'olx', 'vinted'];
   /* Słowa dokumentów — do rozpoznania utraty opisanej nietypowo („pies zjadł mi dowód”) */
   var RZECZY = ['dowod', 'dowodu', 'portfel', 'portfela', 'dokument', 'prawo jazdy', 'prawka', 'prawko', 'legitymacj', 'paszport', '=karta', '=karte', '=karty', 'torebk', '=torba', '=torby', '=torbe', 'plecak'];
 
@@ -174,6 +175,19 @@
   function uslugi() { return link('Zobacz wszystkie usługi', '#/uslugi', 'uslugi'); }
   function dokumenty() { return link('Wróć do Dokumentów', '#/dokumenty', 'dokumenty'); }
   function sam(href) { return link('Wolę przejść krok po kroku sam(a)', href, 'klik'); }
+  /* Karta sprawy: „Zacznij” (z odpowiedziami z rozmowy) i „Wolę przejść krok po kroku sam(a)” */
+  function kartaSprawy(tytul, opis, href, parametry) {
+    return { tytul: tytul, opis: opis, zacznij: link('Zacznij', href + (href.indexOf('?') < 0 ? '?' : '&') + 'z=asystent' + (parametry || ''), 'dalej'), sam: sam(href.split('?')[0]) };
+  }
+  /* Sama treść SMS-a z cudzysłowu („…”), bez pytania wokół niej */
+  function cytatSms(t) { var m = String(t || '').match(/[„"«]([^”"»]{5,})[”"»]/); return m ? m[1] : String(t || ''); }
+  function nicBezZgody(n) { return n + ' ' + odmiana(n, 'krok', 'kroki', 'kroków') + '. Nic nie wyślemy bez Twojej zgody.'; }
+  function zostaloDoZaplaty(k, klucz) {
+    var p = k.osoba.platnosci && k.osoba.platnosci[klucz];
+    if (!p) return null;
+    var st = k.wyniki.oplaty && k.wyniki.oplaty[klucz];
+    return p.kwota - (st ? st.zaplacono : 0);
+  }
   function dok(k, rodzaj) {
     for (var i = 0; i < k.dokumenty.length; i++) if (k.dokumenty[i].rodzaj === rodzaj) return k.dokumenty[i];
     return null;
@@ -232,31 +246,74 @@
   var USLUGI_ASYSTENTA = [
     ['wniosek-dowod', [['nowy dowod', 'nowego dowodu', 'wyrobic dowod', 'wyrobienie dowodu', 'wymiana dowodu', 'wymienic dowod', 'wniosek o dowod', 'wniosek dowod', 'odebrac dowod', 'odbior dowodu']],
       'Tu złożysz wniosek o nowy dowód osobisty, np. gdy kończy się ważność starego.', 3, null,
-      [['wniosek', 'wyrobic', 'zlozyc', 'nowy', 'nowego', 'wymienic'], ['dowod', 'dowodu', 'dowodzik']]],
+      [[['wniosek', 'wyrobic', 'zlozyc', 'nowy', 'nowego', 'wymienic', 'wizyt', 'odciski', 'odcisk'], ['dowod', 'dowodu', 'dowodzik']],
+        [['slub', 'slubie', 'zmian', 'zmienil', 'nowe', 'nowym', 'inne'], ['nazwisk']],
+        [['konczy mi sie', 'skonczyl mi sie', 'skonczyl sie', 'niewazny', 'przeterminow', 'stracil waznosc', 'wygasl'], ['dowod', 'dowodu', 'dowodzik']],
+        [['urzed', 'urzad', 'wizyt', 'umow'], ['dowod', 'dowodu', 'dowodzik']]],
+      function (k) {
+        var wd = k.wyniki.wniosekDowod;
+        if (wd) return { zdania: ['Wizyta w urzędzie jest umówiona: ' + wd.wizyta + '.', 'Zabierz aktualne zdjęcie 35 × 45 mm.'], przyciski: [link('Pokaż potwierdzenie', '#/skrzynka/' + wd.wiadomosc, 'list'), dokumenty()] };
+        return { zdania: ['Przygotuję wniosek o nowy dowód i umówię wizytę w urzędzie.', 'W urzędzie pobiorą odciski palców.'],
+          karta: kartaSprawy('Wniosek o dowód osobisty', nicBezZgody(5), '#/sprawa/wniosek-dowod') };
+      }],
     ['paszport', [['paszport', 'paszportu', 'paszporty']], 'Tu sprawdzisz sprawy paszportu, np. czy jest gotowy do odbioru.', 2],
     ['dane-pesel', [['rejestr pesel', 'rejestrze pesel', 'dane w pesel', 'moje dane osobowe', 'dane osobowe', 'jakie dane ma urzad', 'jakie dane o mnie']],
       'Tu zobaczysz, jakie dane o Tobie są w rejestrze PESEL.', 2],
     ['rejestracja', [['zarejestrowac', 'zarejestruj', 'rejestracja auta', 'rejestracja samochodu', 'rejestracja pojazdu', 'rejestracji auta', 'tablice rejestracyjne',
-      'kupil samochod', 'kupil auto', 'kupila samochod', 'kupila auto', 'kupno auta', 'kupno samochodu', 'przerejestrowac']],
-      'Tu zarejestrujesz samochód, np. po zakupie.', 3, null,
-      [['kupil', 'kupila', 'kupno', 'zakup', 'zakupie'], ['=auto', '=autko', '=auta', 'samochod', 'pojazd']]],
+      'kupil samochod', 'kupil auto', 'kupila samochod', 'kupila auto', 'przerejestrowac']],
+      'Tu zarejestrujesz samochód, np. po zakupie.', 3, ['dziecko', 'dziecka', 'noworod', 'niemowl', 'corke', 'syna'],
+      [['=kupil', '=kupila', '=kupilem', '=kupilam', '=kupilismy', 'zakupie'], ['=auto', '=autko', '=auta', 'samochod', 'pojazd']]],
     ['sprzedaz', [['sprzedal', 'sprzedala', 'sprzedaz', 'sprzedac', 'sprzedaje', 'zbycie']], 'Tu powiadomisz urząd, że sprzedajesz samochód.', 3],
     ['wymeldowanie', [['wymeld', 'wymelduj', 'wymeldowac', 'wymeldowanie', 'wyprowadz']], 'Tu wymeldujesz się, gdy się wyprowadzasz.', 3],
     ['ogrzewanie', [['ogrzewan', 'ogrzewam', '=piec', '=pieca', '=piecu', 'kociol', 'kotla', 'ceeb', 'kopciuch', 'czym grzeje', 'deklaracja o zrodle', 'zrodlo ciepla']],
       'Tu zgłosisz, czym ogrzewasz dom lub mieszkanie.', 2],
-    ['wniosek-kdr', [['wniosek', 'wyrobic', 'wyrobienie', 'dostac', 'zalozyc', 'zlozyc', 'uzyskac', 'starac'],
+    ['wniosek-kdr', [['wniosek', 'wyrobic', 'wyrobienie', 'dostac', 'zalozyc', 'zaloz', 'zlozyc', 'uzyskac', 'starac', 'wyrobie', 'dla dziecka', 'dla corki', 'dla syna', 'dla rodziny', 'chce',
+        '=dziecka', '=dziecko', '=dzieci', 'dopisa', 'dopisz', 'nalezy', 'nalez', 'przyslug', 'dostaniemy', 'dostane', 'dla nowego'],
       ['karte duzej rodziny', 'karty duzej rodziny', 'karta duzej rodziny', 'kdr', 'duzej rodziny', 'duza rodzina']],
-      'Tu złożysz wniosek o Kartę Dużej Rodziny.', 3],
-    ['800plus', [['800', '800+', 'osiemset', 'swiadczenie na dziecko', 'swiadczenia na dziecko', 'zasilek na dziecko', 'pieniadze na dziecko', 'wychowawcze', 'rodzina 800']],
-      'Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.', 2],
+      'Tu złożysz wniosek o Kartę Dużej Rodziny.', 3, ['gdzie', 'uzyc', 'uzywac', 'znizk', 'rabat', 'taniej', 'wazn', 'pokaz'], null,
+      function (k) {
+        var d = dok(k, 'kdr') || (k.osoba.dokumenty || []).filter(function (x) { return x.rodzaj === 'kdr'; })[0];
+        if (d) return { zdania: ['Masz już Kartę Dużej Rodziny.', 'Znajdziesz ją w Dokumentach.'], przyciski: [link('Pokaż Kartę Dużej Rodziny', '#/dokument/' + d.id, 'oko'), dokumenty()] };
+        if (!k.osoba.rodzina) return { zdania: ['Kartę dostaje rodzina z co najmniej trojgiem dzieci.', 'W aplikacji nie ma Twoich dzieci.'], przyciski: [link('Usługi: Rodzina', '#/uslugi/rodzina', 'rodzina'), dokumenty()] };
+        if (!k.wyniki.dziecko) return { zdania: ['Najpierw zgłoś urodzenie dziecka.', 'Potem złożysz wniosek o kartę dla całej rodziny.'], przyciski: [link('Zgłoś urodzenie dziecka', '#/sprawa/urodzenie?z=asystent', 'rodzina'), dokumenty()] };
+        if (k.wyniki.kartaRodziny) return { zdania: ['Wniosek o Kartę Dużej Rodziny wysłano ' + k.wyniki.kartaRodziny.data + '.', 'Odpowiedź z gminy dostaniesz w Skrzynce.'], przyciski: [link('Otwórz Skrzynkę', '#/skrzynka', 'list'), dokumenty()] };
+        return { zdania: ['Masz troje dzieci, więc Twoja rodzina może dostać kartę.', 'Złożymy wniosek do gminy.'], karta: kartaSprawy('Karta Dużej Rodziny', nicBezZgody(4), '#/sprawa/karta-rodziny') };
+      }],
+    ['800plus', [['800', '800+', 'osiemset', 'swiadczenie na dziecko', 'swiadczenia na dziecko', 'zasilek na dziecko', 'pieniadze na dziecko', 'wychowawcze', 'rodzina 800', 'osiemsetk', 'osiemset plus', '800plus']],
+      'Tu złożysz wniosek o świadczenie Rodzina 800 plus na dziecko.', 3, null,
+      [[['swiadczeni', 'zasilek', 'zasilk', 'pieniadze', 'pieniedzy', 'osiemset'], ['zus', 'dziec', '=malej', '=malego', 'corke', 'corki', '=syna', 'najmlodsz', 'noworod']]],
+      function (k) {
+        var w = k.wyniki;
+        if (!k.osoba.rodzina) return { zdania: ['Świadczenie przysługuje na dziecko do 18 lat.', 'W aplikacji nie masz dziecka, na które złożysz wniosek.'], przyciski: [link('Usługi: Rodzina', '#/uslugi/rodzina', 'rodzina'), dokumenty()] };
+        if (!w.dziecko) return { zdania: ['Najpierw zgłoś urodzenie dziecka.', 'Potem złożysz wniosek o 800 plus.'], przyciski: [link('Zgłoś urodzenie dziecka', '#/sprawa/urodzenie?z=asystent', 'rodzina'), dokumenty()] };
+        if (w.swiadczenie800) return { zdania: ['Wniosek o 800 plus wysłano ' + w.swiadczenie800.data + '.', 'Odpowiedź z ZUS dostaniesz w Skrzynce.'], przyciski: [link('Otwórz Skrzynkę', '#/skrzynka', 'list'), dokumenty()] };
+        return { zdania: ['Złożę wniosek o 800 plus dla dziecka: ' + w.dziecko.imie + '.', 'Wniosek trafi do ZUS.'], karta: kartaSprawy('Rodzina 800 plus', nicBezZgody(4), '#/sprawa/800plus') };
+      }],
     ['narodziny', [['urodzil', 'urodzila', 'urodzilo', 'urodzenie dziecka', 'narodzin', 'noworodek', 'noworodka', 'pesel dla dziecka', 'pesel dziecka',
-      'zglosic dziecko', 'zameldowac dziecko', 'mam dziecko', 'urodzi mi sie']],
-      'Tu zgłosisz narodziny dziecka i nadasz mu numer PESEL.', 3],
-    ['odpis', [['odpis', 'akt urodzenia', 'aktu urodzenia', 'akt malzenstwa', 'aktu malzenstwa', 'akt slubu', 'aktu slubu', 'akt zgonu', 'aktu zgonu', 'metryk', 'swiadectwo slubu']],
-      'Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.', 3],
+      'zglosic dziecko', 'zameldowac dziecko', 'mam dziecko', 'urodzi mi sie', 'zostalem tata', 'zostalam mama', 'zostalem ojcem', 'zostalam matka', 'mamy dziecko', 'mamy corke', 'mamy syna',
+      'mamy coreczke', 'mamy synka', 'jestesmy rodzicami', 'zostalismy rodzicami', 'zostalam rodzicem', 'zostalem rodzicem',
+      'karta urodzenia', 'karte urodzenia', 'zglos urodzenie', 'zglosic urodzenie', 'zgloszenie urodzenia', 'imie dla dziecka', 'imie dziecka', 'nadac imie', 'bobas', 'bobasa', 'maluch', 'malucha', '=porod', '=porodzie', '=porodu']],
+      'Tu zgłosisz urodzenie dziecka i nadasz mu numer PESEL.', 4, ['800', '800+', '800plus', 'duzej rodziny', 'kdr', 'odpis', '=akt', '=aktu'],
+      [[['zarejestr', 'zglos', 'zapisa'], ['dziecko', 'dziecka', 'noworod', 'niemowl', '=corke', 'coreczk', '=syna', 'synka']], [['zameld'], ['dziecko', 'dziecka', 'noworod', 'niemowl', 'coreczk', 'synka']]],
+      function (k) {
+        var ku = k.osoba.rodzina && k.osoba.rodzina.kartaUrodzenia, d = k.wyniki.dziecko;
+        if (!ku) return { zdania: ['Urodzenie zgłosisz, gdy szpital przekaże kartę urodzenia.', 'W Twojej aplikacji nie ma takiej karty.'], przyciski: [link('Usługi: Rodzina', '#/uslugi/rodzina', 'rodzina'), dokumenty()] };
+        if (d) return { zdania: ['Urodzenie dziecka jest już zgłoszone: ' + d.imie + ' ' + d.nazwisko + '.', 'Teraz możesz złożyć wniosek o 800 plus.'], przyciski: [link('Złóż wniosek o 800 plus', '#/sprawa/800plus?z=asystent', 'rodzina'), dokumenty()] };
+        var n = 21 - ku.dni;
+        return { zdania: ['Gratulacje! Zgłośmy urodzenie dziecka.', 'Masz na to jeszcze ' + n + ' ' + odmiana(n, 'dzień', 'dni', 'dni') + '.'], karta: kartaSprawy('Zgłoś urodzenie dziecka', nicBezZgody(4), '#/sprawa/urodzenie') };
+      }],
+    ['odpis', [['odpis', 'akt urodzenia', 'aktu urodzenia', 'akt malzenstwa', 'aktu malzenstwa', 'akt slubu', 'aktu slubu', 'akt zgonu', 'aktu zgonu', 'metryk', 'swiadectwo slubu', 'akt stanu cywilnego', 'usc']],
+      'Tu zamówisz odpis aktu urodzenia, małżeństwa lub zgonu.', 3, null, null,
+      function (k, r) {
+        var akt = gdzie(r.tokeny, 'zgon') ? 'zgonu' : gdzie(r.tokeny, 'malzenstw') || gdzie(r.tokeny, 'slub') ? 'malzenstwa' : gdzie(r.tokeny, 'urodzeni') ? 'urodzenia' : null;
+        var nazwy = { zgonu: 'aktu zgonu', malzenstwa: 'aktu małżeństwa', urodzenia: 'aktu urodzenia' };
+        var pasujace = akt ? (k.osoba.akty || []).filter(function (a) { return a.rodzaj === akt; }) : [], jeden = pasujace.length === 1 ? pasujace[0] : null;
+        return { zdania: ['Zamówię odpis ' + (akt ? nazwy[akt] : 'aktu stanu cywilnego') + '.', 'Odpis dostaniesz do Skrzynki.'],
+          karta: kartaSprawy('Odpis aktu stanu cywilnego', nicBezZgody(6), '#/sprawa/odpis', (akt ? '&akt=' + akt : '') + (jeden ? '&czyj=' + jeden.id : '')) };
+      }],
     ['recepty', [['recept', 'erecept', 'lekarstw', '=leki', '=lekow', 'apteka', 'apteki', 'aptece', 'kod do apteki']],
       'Tu zobaczysz swoje e-recepty i kod do apteki.', 2],
-    ['skierowania', [['skierowan', 'eskierowan', 'do specjalisty', 'do lekarza', 'do szpitala', 'na badania']],
+    ['skierowania', [['skierowan', 'eskierowan', 'do specjalisty', 'do lekarza', 'do szpitala', 'na badania', 'wizyte u lekarza', 'wizyta u lekarza', 'wizyty u lekarza', 'umowic lekarza', 'umow lekarza']],
       'Tu sprawdzisz swoje e-skierowania, np. do lekarza specjalisty.', 2, ['techniczn', 'auta', 'samochod']],
     ['ubezpieczenie-zdrowotne', [['zdrowotn', 'nfz', 'ewus', 'czy jestem ubezpieczon', 'czy mam ubezpieczenie zdrowotne', 'ubezpieczenie w nfz']],
       'Tu sprawdzisz, czy masz ubezpieczenie zdrowotne.', 4],
@@ -264,7 +321,18 @@
       'zwrot podatku', 'skarbowk', 'urzad skarbowy', 'urzedu skarbowego', 'fiskus', 'rozliczyc sie', 'rozliczenie']],
       'Tu sprawdzisz i rozliczysz swój PIT.', 2, ['niezalegan', 'zaswiadcz']],
     ['podatek-nieruchomosci', [['podatek od nieruchomosci', 'podatku od nieruchomosci', 'podatek od domu', 'podatek od mieszkania', 'podatek od dzialki', 'podatek gruntowy']],
-      'Tu sprawdzisz, ile i do kiedy zapłacić podatek od nieruchomości.', 1],
+      'Tu sprawdzisz, ile i do kiedy zapłacić podatek od nieruchomości.', 5,
+      ['ile', 'do kiedy', 'kiedy', 'termin', 'wytlumacz', 'wyjasnij', 'pcc', '=auto', '=auta', 'samochod', 'kupn', 'mandat', 'co to', 'co znaczy', 'pit', 'skarbow'],
+      [[['zaplac', 'oplac', 'placic', '=place', '=zaplace', '=placi', 'wplac', 'uregul', 'zaplate', 'splac', 'zaplacenie', 'platnosc', 'platnos'], ['podatek', 'podatk', '=rate', '=rata', '=raty', '=ratke']]],
+      function (k) {
+        var r = zostaloDoZaplaty(k, 'podatek');
+        if (r === null) return { zdania: ['Nie masz podatku od nieruchomości do zapłaty w aplikacji.', 'Decyzje z urzędu znajdziesz w Skrzynce.'],
+          przyciski: [link('Otwórz Skrzynkę', '#/skrzynka', 'list'), link('Usługi: Podatki', '#/uslugi/podatki', 'paragon')] };
+        if (r <= 0) return { zdania: ['Podatek od nieruchomości jest opłacony.', 'Potwierdzenie płatności jest w Skrzynce.'], przyciski: [link('Otwórz Skrzynkę', '#/skrzynka', 'list'), dokumenty()] };
+        return { zdania: ['Masz do zapłaty ' + r + ' zł podatku od nieruchomości.', 'Zapłacisz całość albo ratę.'],
+          karta: { tytul: 'Zapłać podatek', opis: '4 kroki. Nic nie zapłacimy bez Twojej zgody.', zacznij: link('Zacznij', '#/sprawa/podatek?z=asystent', 'dalej'), sam: sam('#/sprawa/podatek') },
+          przyciski: [link('Pokaż pismo z urzędu', '#/skrzynka/' + k.osoba.platnosci.podatek.pismo, 'list')] };
+      }],
     ['zaswiadczenie', [['niezalegani', 'zaswiadczenie z urzedu skarbowego', 'zaswiadczenie skarbowe', 'zaswiadczenie o niezaleganiu', 'zaleglosci podatkow']],
       'Tu pobierzesz zaświadczenie z urzędu skarbowego, że nie masz zaległości w podatkach.', 3, null,
       [['zaleglos', 'zaleg', 'dlug'], ['skarbow', 'podatk', 'podatek', 'urzad skarbowy', 'fiskus']]],
@@ -281,7 +349,8 @@
     D.kategorie.forEach(function (k) { k.uslugi.forEach(function (x) { if (x.id === id) u = x; }); });
     return u;
   }
-  function odpowiedzUslugi(id, zdanie) {
+  function odpowiedzUslugi(id, zdanie, wlasna, k, r) {
+    if (wlasna) return wlasna(k, r);
     var u = znajdzUsluge(id);
     var otworz = u && u.href ? link('Otwórz usługę', u.href, 'dalej') : niedostepne('Otwórz usługę', u ? u.nazwa : 'Usługa', 'dalej');
     return { zdania: [zdanie], przyciski: [otworz, uslugi()] };
@@ -317,20 +386,121 @@
             przyciski: [pytaj('Sprawdź przykładowy SMS', 'Czy ten SMS to oszustwo? „' + D.smsPrzyklad + '”'), dokumenty()] };
         }
         var telefon = !znaki.link && !znaki.cytat && (gdzie(r.tokeny, 'dzwoni') || gdzie(r.tokeny, 'zadzwoni') || gdzie(r.tokeny, 'telefon'));
+        var rodzaj = telefon ? 'telefon' : gdzie(r.tokeny, '=mail') || gdzie(r.tokeny, '=maila') || gdzie(r.tokeny, 'email') ? 'email' : 'sms';
+        /* Po ostrzeżeniu: czy podano dane (wtedy najpierw zastrzeżenie karty), potem zgłoszenie do CERT Polska */
+        var pytanieODane = { id: 'sms-dane', typ: 'jeden', pytanie: telefon ? 'Czy podano w tej rozmowie kod BLIK, hasło albo dane karty?' : 'Czy wpisano na tej stronie dane karty albo hasło?',
+          opcje: [{ wartosc: 'tak', etykieta: 'Tak' }, { wartosc: 'nie', etykieta: 'Nie' }], dane: { rodzaj: rodzaj, tresc: cytatSms(r.tekst).slice(0, 500) } };
         if (znaki.podejrzany && telefon) {
           return { ostrzezenie: true, zdania: ['To wygląda na oszustwo. Rozłącz się.', 'Bank nie prosi przez telefon o kod BLIK ani hasło.'],
             listy: [{ tytul: 'Co zrobić:', punkty: ['Nie podawaj kodów BLIK, haseł ani danych karty.', 'Oddzwoń do banku na numer z jego strony albo z karty.'] }],
+            wybor: pytanieODane,
             przyciski: [link('Podano dane karty? Zastrzeż ją: 828 828 828', 'tel:828828828', 'telefon'), dokumenty()] };
         }
         if (znaki.podejrzany) {
           return { ostrzezenie: true, zdania: ['To wygląda na oszustwo. Nie klikaj w link.', 'Oszuści często podszywają się pod kurierów, banki i urzędy.'],
             listy: [listaZnakow, czegoNie],
+            wybor: pytanieODane,
             przyciski: [link('Przekaż SMS na numer 8080 (CERT Polska)', 'sms:8080', 'wyslij'),
               link('Podano dane karty? Zastrzeż ją: 828 828 828', 'tel:828828828', 'telefon')] };
         }
         return { zdania: ['Nie widzę typowych znaków oszustwa.', 'Mimo to nie klikaj w linki od nieznanych nadawców.'],
           listy: [listaZnakow],
           przyciski: [link('Przekaż SMS na numer 8080 (CERT Polska)', 'sms:8080', 'wyslij'), dokumenty()] };
+      },
+      dalej: function (k, wartosci, dane) {
+        dane = dane || { rodzaj: 'sms', tresc: '' };
+        var tak = wartosci[0] === 'tak';
+        var karta = kartaSprawy('Zgłoś oszustwo do CERT Polska', nicBezZgody(4), '#/sprawa/cert/krok-3',
+          '&rodzaj=' + dane.rodzaj + '&dane=' + (tak ? 'tak' : 'nie') + '&tresc=' + encodeURIComponent(dane.tresc || 'Podejrzana wiadomość'));
+        var sms8080 = dane.rodzaj === 'sms' ? [link('Przekaż SMS na numer 8080 (CERT Polska)', 'sms:8080', 'wyslij')] : [];
+        if (tak) {
+          return { ty: 'Tak, podano dane.', odpowiedz: { ostrzezenie: true, zdania: ['Zastrzeż kartę od razu: zadzwoń pod 828 828 828.', 'Zadzwoń też do banku i zmień hasło.'],
+            karta: karta, przyciski: [link('Zadzwoń i zastrzeż kartę: 828 828 828', 'tel:828828828', 'telefon')].concat(sms8080) } };
+        }
+        return { ty: 'Nie, nie podano danych.', odpowiedz: { zdania: ['To dobrze. Nie klikaj w link i usuń wiadomość.', 'Zgłoś oszustwo, żeby ostrzec innych.'],
+          karta: karta, przyciski: sms8080 } };
+      } },
+
+    /* --- Zgłoś oszustwo do CERT Polska --- */
+    { id: 'cert', opis: 'Zgłoszenie oszustwa do CERT Polska', priorytet: 7,
+      slowa: [['cert', 'certu', 'cert polska']],
+      lub: [[['zglos', 'zgloszenie', 'powiadom', 'poinformow', 'donies', 'zawiadom', 'ostrzec', 'ostrzez innych'], ['oszust', 'oszuk', 'phishing', 'falszyw', 'podejrzan', '=sms', '=smsa', 'esemes', 'strone', 'stronke', 'link', 'naciag', 'wyludz', 'scam', '=sciem']]],
+      odpowiedz: function () {
+        return { zdania: ['Zgłoszenie do CERT Polska pomaga ostrzec innych.', 'Zrobimy je w widocznych krokach.'],
+          karta: kartaSprawy('Zgłoś oszustwo do CERT Polska', nicBezZgody(4), '#/sprawa/cert'),
+          przyciski: [link('Przekaż SMS na numer 8080 (CERT Polska)', 'sms:8080', 'wyslij')] };
+      } },
+
+    /* --- Stłuczka (mStłuczka): najpierw „Czy ktoś jest ranny?” --- */
+    { id: 'stluczka', opis: 'Stłuczka: oświadczenie o zdarzeniu', priorytet: 6,
+      slowa: [['stluczk', 'stluczce', 'kolizj', '=wypadek', '=wypadku', '=wypadkiem', '=wypadki', 'zderzen', 'zderzyl', 'zderzyla', 'zderzyli', 'wjechal', 'wjechala', 'wjechali',
+        'najechal', 'najechala', 'mstluczk', 'oswiadczenie sprawcy', 'sprawca zdarzenia', 'sprawce zdarzenia', 'wspolne oswiadczenie', 'spisac oswiadczenie', 'bluczk', 'stlucz',
+        '=dzwona', '=dzwonie', 'stukniecie']],
+      lub: [[['uderzyl', 'uderzyla', 'uderzylem', 'uderzylam', 'uderzyli', 'stuknal', 'stuknela', 'stuknalem', 'stuknelam', 'stukniec', 'otarl', 'otarla', 'otarlem', 'otarlam', 'obtarl', 'obtarla',
+        'zarysowal', 'zarysowala', 'porysowal', 'porysowala', 'zahaczyl', 'zahaczyla', 'zahaczylem', 'zahaczylam', 'rozbil', 'rozbila', 'rozbilem', 'rozbilam', 'wgniotl', 'wgniotla', 'puknal', 'puknela', 'cofal', 'cofala'],
+        ['=auto', '=auta', '=autem', '=autko', 'samochod', 'pojazd', 'zderzak', 'blotnik', 'lusterk', 'parking', 'drzwi', 'maske', 'maska', 'octavi', 'skoda', 'tyl', '=bok',
+          'swiatlach', 'skrzyzowan', 'rondzie', '=rondo', 'drodze', 'zakrecie', 'ulicy', 'jezdni', 'pasie', '=mnie']]],
+      dodatkowe: ['auto', 'samochod', 'parking'],
+      odpowiedz: function () {
+        return { zdania: ['Spokojnie, pomogę Ci krok po kroku.', 'Najpierw najważniejsze pytanie.'],
+          wybor: { id: 'stluczka-ranny', typ: 'jeden', pytanie: 'Czy ktoś jest ranny?', opcje: [{ wartosc: 'tak', etykieta: 'Tak, ktoś jest ranny' }, { wartosc: 'nie', etykieta: 'Nie, nikt nie jest ranny' }] },
+          przyciski: [sam('#/sprawa/stluczka')] };
+      },
+      dalej: function (k, wartosci) {
+        if (wartosci[0] === 'tak') {
+          return { ty: 'Tak, ktoś jest ranny.', odpowiedz: { ostrzezenie: true, zdania: ['Zadzwoń pod 112.', 'Powiedz, gdzie jesteś i co się stało.'],
+            przyciski: [link('Zadzwoń pod 112', 'tel:112', 'telefon'), dokumenty()] } };
+        }
+        var d = dok(k, 'pojazdy');
+        if (!d || !d.pojazd) {
+          var b = brakDokumentu(k, 'pojazdy');
+          return { ty: 'Nikt nie jest ranny.', odpowiedz: { zdania: ['To dobrze. Nie masz jednak pojazdu w aplikacji.', 'Sprawy kierowców znajdziesz w Usługach.'], przyciski: b.przyciski } };
+        }
+        return { ty: 'Nikt nie jest ranny.', odpowiedz: { zdania: ['To dobrze.', 'Spiszmy z drugim kierowcą wspólne oświadczenie o zdarzeniu.'],
+          karta: kartaSprawy('Zgłoś stłuczkę (mStłuczka)', nicBezZgody(7), '#/sprawa/stluczka/krok-2', '&ranny=nie') } };
+      } },
+
+    /* --- Kupno używanego auta: historia pojazdu, podatek PCC, umowa --- */
+    { id: 'kupno-auta', opis: 'Kupno używanego auta', priorytet: 5,
+      slowa: [['=kupic', '=kupuje', '=kupujemy', '=kupie', '=kupimy', '=kupowac', 'kupno', 'kupna', '=zakup', '=zakupu', '=zakupie', 'przed kupnem', 'przed zakupem', 'oglada', 'ogladam', 'chce kupic'],
+        ['=auto', '=auta', '=autko', '=autka', 'samochod', 'pojazd', 'uzywan', 'z drugiej reki', 'drugiej reki', 'z ogloszenia', 'ogloszeni', 'komis']],
+      lub: [[['historia pojazdu', 'historie pojazdu', 'historii pojazdu', 'historia auta', 'historie auta', 'historii auta', 'historia samochodu', 'historie samochodu', 'historii samochodu',
+        '=vin', 'numer vin', 'cofniety licznik', 'cofniety przebieg', 'przekrecony licznik', 'krecony licznik', 'umowa kupna', 'umowe kupna', 'umowy kupna', 'kupna sprzedazy',
+        '=pcc', 'podatek od kupna', 'podatek od zakupu', 'podatek za kupione', 'sprawdzic przebieg', 'sprawdz przebieg', 'sprawdzic auto', 'sprawdz auto', 'sprawdzic samochod', 'sprawdz samochod']],
+        [['licznik', 'przebieg'], ['cofni', 'cofan', 'krecon', 'przekrecon', 'sprawdz', 'oszuk']],
+        [['kradzion', 'kradziony', 'kradzione', 'kradziona'], ['=auto', '=auta', 'samochod', 'pojazd', 'zakup', 'kupi']],
+        [['sprzedawca', 'sprzedajacy', 'bezwypadkow', 'komis', 'ogloszeni', 'otomoto'], ['=auto', '=auta', 'samochod', 'pojazd', 'sprawdz', 'kupi', '=kupic']]],
+      wykluczenia: ['=kupilem', '=kupilam', '=kupil', '=kupila', '=kupilismy', 'zarejestr', '=sprzedalem', '=sprzedalam', '=sprzedal', '=sprzedala', '=sprzedaje'],
+      odpowiedz: function (k, r) {
+        var pcc = gdzie(r.tokeny, '=pcc') || gdzie(r.tokeny, 'podatek') || gdzie(r.tokeny, 'podatk');
+        return { zdania: pcc ? ['Przy kupnie auta od osoby prywatnej płacisz podatek PCC: 2% wartości.', 'Masz na to 14 dni od zakupu.'] : ['Sprawdzę historię auta, zanim je kupisz.', 'Potem pomogę przygotować umowę.'],
+          karta: kartaSprawy('Sprawdź auto przed zakupem', 'Historia pojazdu, podatek PCC i umowa. Nic nie wyślemy bez Twojej zgody.', '#/sprawa/kupno-auta'),
+          przyciski: pcc ? [link('Policz podatek PCC', '#/sprawa/kupno-auta/pcc', 'paragon')] : [] };
+      } },
+
+    /* --- Dowód się znalazł / cofnij zastrzeżenie PESEL --- */
+    { id: 'znaleziony', opis: 'Dokument się znalazł, cofnięcie zastrzeżenia', priorytet: 6,
+      slowa: [['znalazl', 'znalazla', 'znalazlo', 'znalezion', 'odnalazl', 'odnalazla', 'odnalezion', 'jednak mam', 'jednak jest', 'wrocil mi', '=oddal', '=oddala', '=oddali', 'zwrocil', 'zwrocila', 'zwrocili',
+        'przyniosl', 'przyniosla', 'odzyskal', 'odzyskala'],
+        ['dowod', 'dowodu', 'portfel', 'portfela', 'dokument', 'prawo jazdy', 'prawko', 'legitymacj', 'torebk', 'plecak', 'mdowod']],
+      lub: [[['cofnij', 'cofnac', 'cofniecie', 'odwolac', 'odwolaj', 'anulowac', 'anuluj', 'odblokuj', 'odblokowac', 'odwies', 'zdjac', 'zdejmij', 'wylaczyc', 'wylacz', 'odzastrz'],
+        ['zastrzez', 'zastrzezen', 'blokad', 'pesel', 'peselu']],
+        [['=jednak', 'w szufladzie', 'w kurtce', 'w samochodzie', 'w domu'], ['dowod', 'dowodu', 'portfel', 'dokument', 'prawo jazdy']]],
+      wykluczenia: ['zgubi', 'zgin', 'ukradl', 'ukradzi', 'kradz'],
+      chyba: ['znalazl', 'znalazla', 'znalezion', 'odnalazl', 'odnalazla', '=oddal', '=oddala', 'zwrocil', 'zwrocila', 'cofnij', 'cofnac', 'zastrzez', 'zastrzezen'],
+      odpowiedz: function (k, r) {
+        var w = k.wyniki, znalazl = !!gdzie(r.tokeny, 'znal') || !!gdzie(r.tokeny, 'odnal') || !!gdzie(r.tokeny, 'jednak');
+        if (w.dowodUniewazniony && znalazl) {
+          return { zdania: ['Unieważnionego dowodu nie da się przywrócić.', 'Złóż wniosek o nowy dowód.'],
+            przyciski: [link('Złóż wniosek o nowy dowód', '#/sprawa/wniosek-dowod?z=asystent', 'dowod'), w.pesel ? link('Cofnij zastrzeżenie PESEL', '#/sprawa/cofnij-pesel?z=asystent', 'powtorz') : dokumenty()] };
+        }
+        if (w.pesel) {
+          return { zdania: ['Twój PESEL jest zastrzeżony od ' + w.pesel + '.', 'Zastrzeżenie cofniesz w kilku krokach.'],
+            karta: kartaSprawy('Cofnij zastrzeżenie PESEL', nicBezZgody(3), '#/sprawa/cofnij-pesel') };
+        }
+        var d = dok(k, 'dowod');
+        return { zdania: znalazl ? ['To dobrze, że się znalazł.', 'Twój dowód jest ważny. Nie musisz nic robić.'] : ['Twój PESEL nie jest zastrzeżony.', 'Nie ma czego cofać.'],
+          przyciski: (d ? [link('Pokaż mDowód', '#/dokument/' + d.id, 'oko')] : []).concat([dokumenty()]) };
       } },
 
     /* --- Czy mój PESEL jest zastrzeżony? --- */
@@ -339,7 +509,12 @@
       odpowiedz: function (k) {
         if (k.wyniki.pesel) {
           return { zdania: ['Tak, Twój PESEL jest zastrzeżony od ' + k.wyniki.pesel + '.', 'Nikt nie weźmie na niego kredytu.'],
-            przyciski: [niedostepne('Jak cofnąć zastrzeżenie?', 'Cofnięcie zastrzeżenia PESEL', 'powtorz'), dokumenty()] };
+            przyciski: [link('Cofnij zastrzeżenie PESEL', '#/sprawa/cofnij-pesel?z=asystent', 'powtorz'), dokumenty()] };
+        }
+        var c = k.wyniki.peselCofniety;
+        if (c) {
+          return { zdania: ['Twój PESEL nie jest teraz zastrzeżony.', c.do ? 'Zastrzeżenie wróci samo po ' + c.do + '.' : 'Zastrzeżenie cofnięto ' + c.data + '.'],
+            przyciski: [link('Zastrzeż PESEL', '#/sprawa/zgubione/krok-2?tylko=pesel&z=asystent', 'tarcza'), dokumenty()] };
         }
         return { zdania: ['Twój PESEL nie jest zastrzeżony.', 'Zastrzeżenie chroni Cię przed kredytem na Twoje dane.'],
           przyciski: [link('Zastrzeż PESEL', '#/sprawa/zgubione/krok-2?tylko=pesel&z=asystent', 'tarcza'), dokumenty()] };
@@ -361,7 +536,8 @@
       slowa: [['zgubi', 'zgub', 'zgin', 'zginal', 'zginel', 'ukradl', 'ukradzi', 'ukradz', 'kradziez', 'kradz', 'skradzi', 'okradl', 'okradzi',
         'stracil', 'zagin', 'wypadl', 'nie moge znalezc', 'nie moge znalesc', 'nie mam portfel', 'zostawil', 'zgubion', 'utrat', 'zapodzial', 'skradl', 'wyrwal', 'wyrwala',
         'kieszonkow', 'okradzion', 'przepadl', 'przepadla', 'gdzies mi sie podzial', 'nie ma portfel', 'nie ma dowodu', 'zabral', 'zabrala', 'zabrali', 'nigdzie', 'zwinel', 'zwineli', 'gwizdnel',
-        'buchn', 'zwedzil', 'zakosil', 'rabnal', 'rabnel', 'capnal', 'capnel', 'ograbi', 'obrabow', 'napadl', 'napadnieto', 'podprowadzil']],
+        'buchn', 'zwedzil', 'zakosil', 'rabnal', 'rabnel', 'capnal', 'capnel', 'ograbi', 'obrabow', 'napadl', 'napadnieto', 'podprowadzil', 'posial', 'posialam', 'posialem', 'posiala']],
+      wykluczenia: ['do utraty', 'znalazl', 'znalazla', 'znalezion', 'odnalazl', 'odnalazla'],
       lub: [[['zjadl', 'zjadla', 'pogryz', 'spali', 'splonel', 'splonal', 'splonela', 'zniszcz', 'zalal', 'zalala', 'zamok', 'wypral', 'wyprala', 'wpadl', 'wpadla', 'podarl', 'podarla',
         'polamal', 'zlamal', 'wyciagn', 'nie wiem gdzie', 'nie mam pojecia gdzie', 'nie pamietam gdzie', 'gdzie sie podzial', 'gdzie sie podziala'], RZECZY]],
       dodatkowe: ['portfel', 'torebk', 'dowod', 'dokument', 'plecak', 'karta', 'karty', 'prawo jazdy'],
@@ -387,7 +563,7 @@
         return { ty: 'Zginęło: ' + nazwy.join(', ') + '.',
           odpowiedz: { zdania: karty ? ['Sprawa jest gotowa do sprawdzenia.', 'Karty płatnicze zastrzeż od razu: 828 828 828.'] : ['Dziękuję.', 'Sprawa jest gotowa do sprawdzenia.'],
             karta: { tytul: 'Zgubione dokumenty', opis: '4 kroki. Nic nie wyślemy bez Twojej zgody.', punkty: nazwy,
-              zacznij: link('Zacznij', '#/sprawa/zgubione?zginelo=' + wartosci.join(',') + '&z=asystent', 'dalej'), sam: sam('#/sprawa/zgubione') },
+              zacznij: link('Zacznij', '#/sprawa/zgubione/krok-2?zginelo=' + wartosci.join(',') + '&z=asystent', 'dalej'), sam: sam('#/sprawa/zgubione') },
             przyciski: karty ? [link('Zadzwoń i zastrzeż karty: 828 828 828', 'tel:828828828', 'telefon')] : [] } };
       } },
 
@@ -397,6 +573,8 @@
       lub: [[['podatek', 'podatk'], ['ile', 'zaplac', 'termin', 'do kiedy', 'rata', 'raty', 'nieruchomosc']],
         [['zaplac', 'placic', 'oplacic', 'zaplate', 'zaplacenia'], ['=zl', 'zlotych', 'zlote', 'kwot']]],
       wykluczenia: ['przyszl', 'nowe pism', 'nowe wiadomosc', 'jakies pismo', 'jakis list'],
+      /* …chyba że osoba prosi o wyjaśnienie („przysłali jakieś pismo, nie rozumiem o co chodzi”) */
+      chyba: ['nie rozumiem', 'o co chodzi', 'wytlumacz', 'wyjasnij', 'objasnij', 'co to znaczy', 'co znaczy', 'prostym jezykiem'],
       dodatkowe: ['urzad', 'podatek', 'nieruchomosc'],
       odpowiedz: function (k, r) {
         var listy = k.wiadomosci.filter(function (w) { return w.wyjasnienie; });
@@ -415,9 +593,14 @@
           return { zdania: ['W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.', 'Gdy przyjdzie, pomogę je zrozumieć.'],
             przyciski: [link('Otwórz Skrzynkę', '#/skrzynka', 'list'), r.podatek ? link('Usługi: Podatki', '#/uslugi/podatki', 'paragon') : dokumenty()] };
         }
+        var zostalo = w.wyjasnienie.platnosc ? zostaloDoZaplaty(k, w.wyjasnienie.platnosc) : null;
+        if (zostalo !== null && zostalo <= 0) {
+          return { zdania: [w.wyjasnienie.wstep, 'Ten podatek jest już opłacony.'], fakty: w.wyjasnienie.fakty,
+            przyciski: [link('Pokaż pismo', '#/skrzynka/' + w.id, 'list'), link('Otwórz Skrzynkę', '#/skrzynka', 'list')] };
+        }
         return { zdania: [w.wyjasnienie.wstep], fakty: w.wyjasnienie.fakty,
-          przyciski: [link('Pokaż pismo', '#/skrzynka/' + w.id, 'list'),
-            w.wyjasnienie.platnosc ? niedostepne('Jak zapłacić?', w.wyjasnienie.platnosc, 'portfel') : dokumenty()] };
+          przyciski: zostalo !== null ? [link('Zapłać podatek', '#/sprawa/' + w.wyjasnienie.platnosc + '?z=asystent', 'portfel'), link('Pokaż pismo', '#/skrzynka/' + w.id, 'list')] :
+            [link('Pokaż pismo', '#/skrzynka/' + w.id, 'list'), dokumenty()] };
       } },
 
     /* --- SPRAWA B: OC i badanie techniczne --- */
@@ -446,7 +629,8 @@
     /* --- SPRAWA C: zameldowanie na pobyt stały --- */
     { id: 'zameldowanie', opis: 'Sprawa C: zameldowanie', priorytet: 3,
       slowa: [['zameld', 'zamelduj', 'meldun', 'meldowa', 'przemeldow', 'przeprowadz', 'nowy adres', 'nowym adresem', 'zmiana adresu',
-        'zmienic adres', 'pobyt staly', 'pobyt stal', 'nowe mieszkanie', 'nowym mieszkaniu', 'przeprowadzil', 'przeprowadzam', 'meldowanie', 'zameldowanie', 'zamieszk', 'mieszkam u']],
+        'zmienic adres', 'pobyt staly', 'pobyt stal', 'nowe mieszkanie', 'nowym mieszkaniu', 'przeprowadzil', 'przeprowadzam', 'meldowanie', 'zameldowanie', 'zamieszk', 'mieszkam u',
+        'nowym miejscu', 'nowe miejsce', 'nowego miejsca', 'nowym domu', 'nowy dom']],
       wykluczenia: ['wymeld'],
       odpowiedz: function (k) {
         var wynik = k.wyniki.zameldowanie;
@@ -508,19 +692,25 @@
         }
         var n = k.osoba.punktyKarne;
         return { zdania: ['Masz ' + n + ' ' + odmiana(n, 'punkt karny', 'punkty karne', 'punktów karnych') + '.', 'Szczegóły znajdziesz w usłudze Punkty karne.'],
-          przyciski: [niedostepne('Punkty karne', 'Punkty karne', 'paragon'), link('Pokaż mPrawo jazdy', '#/dokument/prawko', 'oko')] };
+          przyciski: [link('Mandaty i punkty karne', '#/sprawa/mandat', 'paragon'), link('Pokaż mPrawo jazdy', '#/dokument/prawko', 'oko')] };
       } },
 
     /* --- Mandaty --- */
     { id: 'mandat', opis: 'Mandaty do zapłaty', priorytet: 2,
       slowa: [['mandat', 'grzywn', 'mandacik']],
+      lub: [[['=kare', '=kara', '=kary', '=kar'], ['predkos', 'fotoradar', 'parkowan', 'policj', 'drogow', 'szybk']]],
       odpowiedz: function (k) {
         var m = k.osoba.mandaty || [];
         if (!m.length) {
-          return { zdania: ['Nie masz mandatów do zapłaty.'], przyciski: [niedostepne('Mandaty w aplikacji', 'Mandaty', 'paragon'), dokumenty()] };
+          return { zdania: ['Nie masz mandatów do zapłaty.'], przyciski: [link('Mandaty i punkty karne', '#/sprawa/mandat', 'paragon'), dokumenty()] };
+        }
+        var zostalo = zostaloDoZaplaty(k, 'mandat');
+        if (zostalo !== null && zostalo <= 0) {
+          var op = k.wyniki.oplaty.mandat.platnosci.slice(-1)[0];
+          return { zdania: ['Nie masz mandatów do zapłaty.', 'Mandat ' + m[0].kwota + ' opłacono ' + op.data + '.'], przyciski: [link('Otwórz Skrzynkę', '#/skrzynka', 'list'), dokumenty()] };
         }
         return { zdania: ['Masz 1 mandat do zapłaty: ' + m[0].kwota + ' za ' + m[0].za + '.', 'Termin płatności: ' + m[0].termin + '.'],
-          przyciski: [niedostepne('Zapłać mandat', 'Mandaty', 'portfel'), dokumenty()] };
+          przyciski: [link('Zapłać mandat', '#/sprawa/mandat?z=asystent', 'portfel'), dokumenty()] };
       } },
 
     /* --- Gdzie głosuję --- */
@@ -588,7 +778,7 @@
         if (rodzaj === 'dowod') {
           if (k.wyniki.dowodUniewazniony) {
             return { zdania: ['Twój dowód osobisty jest unieważniony.', 'Złóż wniosek o nowy dowód.'],
-              przyciski: [niedostepne('Wniosek o nowy dowód', 'Wniosek o dowód osobisty', 'dowod'), dokumenty()] };
+              przyciski: [link('Złóż wniosek o nowy dowód', '#/sprawa/wniosek-dowod?z=asystent', 'dowod'), dokumenty()] };
           }
           return { zdania: ['Twój dowód osobisty jest ważny do ' + wartosc(d, 'Termin ważności') + '.'], przyciski: [pokaz, dokumenty()] };
         }
@@ -622,13 +812,19 @@
     /* --- Co mam do załatwienia? (karta „Wymaga Twojej uwagi” + nieprzeczytane wiadomości) --- */
     { id: 'do-zalatwienia', opis: 'Co czeka na osobę', priorytet: 2,
       slowa: [['do zalatwienia', 'do zrobienia', 'jakie mam sprawy', 'moje sprawy', 'mam sprawy', 'na mnie czeka', 'czeka na mnie', 'cos czeka',
-        'co czeka', 'cos pilnego', 'co musze', 'co powinnam', 'co powinienem', 'co mam zalatwic', 'co mam zrobic', 'zaleglosci']],
+        'co czeka', 'cos pilnego', 'co musze', 'co powinnam', 'co powinienem', 'co mam zalatwic', 'co mam zrobic', 'zaleglosci', 'sprawy czek', 'sprawy oczek', 'czekajace sprawy',
+        'pozalatwia', 'zalatwione', 'zalatwiona', 'wszystko zalatw']],
+      lub: [[['co jeszcze', 'czy wszystko', 'co zostalo', 'przypomnij'], ['musze', 'powinienem', 'powinnam', 'zrobic', 'zalatwi', 'zostalo', 'gotowe']]],
       odpowiedz: function (k) {
         var przyciski = [];
-        var u = k.uwaga;
-        if (u && u.styl !== 'ok') przyciski.push(link(u.etykieta + ': ' + u.opis, u.href || '#/dokumenty', u.ikona));
+        (k.uwagi || (k.uwaga ? [k.uwaga] : [])).forEach(function (u) {
+          if (u.styl !== 'ok') przyciski.push(link(u.etykieta + ': ' + u.opis, u.href || '#/dokumenty', u.ikona));
+        });
+        var m = k.osoba.mandaty || [], doZaplaty = zostaloDoZaplaty(k, 'mandat');
+        if (m.length && (doZaplaty === null || doZaplaty > 0)) przyciski.push(link('Mandat do zapłaty: ' + m[0].kwota + ', termin ' + m[0].termin, '#/sprawa/mandat', 'portfel'));
         (k.nowe || []).forEach(function (w) {
-          if (!u || u.href !== '#/skrzynka/' + w.id) przyciski.push(link('Pismo: ' + w.tytul, '#/skrzynka/' + w.id, 'list'));
+          var h = '#/skrzynka/' + w.id;
+          if (!przyciski.some(function (p) { return p.href === h; })) przyciski.push(link('Wiadomość: ' + w.tytul, h, 'list'));
         });
         if (!przyciski.length) {
           return { zdania: ['Nic na Ciebie nie czeka.', 'Wszystko jest w porządku.'], przyciski: podpowiedziJakoPrzyciski(k, 3).concat([dokumenty()]) };
@@ -643,7 +839,7 @@
       slowa: [['jakie', 'moje', 'lista', 'wszystkie', 'ile mam', 'co mam', 'pokaz', 'wymien'], ['dokumenty', 'dokumentow', 'portfel', 'portfelu']],
       odpowiedz: function (k) {
         var n = k.dokumenty.length;
-        if (!n) return brakDokumentu(k, 'dowod');
+        if (!n) return { zdania: ['Nie masz dokumentów w aplikacji.', 'W prototypie wrócą, gdy wybierzesz osobę jeszcze raz.'], przyciski: [link('Zmień osobę', '#/osoba', 'rodzina'), uslugi()] };
         return { zdania: ['Masz w aplikacji ' + n + ' ' + odmiana(n, 'dokument', 'dokumenty', 'dokumentów') + '.'],
           przyciski: k.dokumenty.map(function (d) { return link(d.nazwa, '#/dokument/' + d.id, 'oko'); })
             .concat([link('Zarządzaj dokumentami', '#/zarzadzaj', 'warstwy')]) };
@@ -662,8 +858,8 @@
     /* --- USŁUGI z zakładki Usługi: jedno zdanie, czym jest usługa (ogólnie), i „Otwórz usługę” ---
        Usługi działające w prototypie (sprawy A, B, C) mają własne wpisy wyżej. */
   ].concat(USLUGI_ASYSTENTA.map(function (u) {
-    return { id: 'usluga-' + u[0], opis: 'Usługa: ' + u[0], priorytet: u[3] || 1, slowa: u[1], wykluczenia: u[4] || undefined, lub: u[5],
-      odpowiedz: function () { return odpowiedzUslugi(u[0], u[2]); } };
+    return { id: 'usluga-' + u[0], opis: 'Usługa: ' + u[0], priorytet: u[3] || 1, slowa: u[1], wykluczenia: u[4] || undefined, lub: u[5] || undefined,
+      odpowiedz: function (k, r) { return odpowiedzUslugi(u[0], u[2], u[6], k, r); } };
   })).concat([
     /* --- Co umiesz? / Pomoc --- */
     { id: 'co-umiesz', opis: 'Co umiesz / pomoc', slaby: true,
@@ -761,12 +957,12 @@
     var najlepszy = null, najlepszyWynik = -1, slaby = null, slabyWynik = -1, dopasowane = {};
     SPRAWY.forEach(function (s) {
       if (s.wewnetrzny) return;
-      if (s.wykluczenia && ileTrafien(tok, s.wykluczenia)) return;
+      if (s.wykluczenia && ileTrafien(tok, s.wykluczenia) && !(s.chyba && ileTrafien(tok, s.chyba))) return;
       var p = grupyPasuja(tok, s.slowa);
       /* „lub”: jeden albo kilka zapasowych zestawów grup słów */
       var zapasowe = !s.lub ? [] : Array.isArray(s.lub[0][0]) ? s.lub : [s.lub];
       for (var z = 0; p < 0 && z < zapasowe.length; z++) p = grupyPasuja(tok, zapasowe[z]);
-      if (s.id === 'sms' && p < 0 && wynik.sms.mocny) p = 1;
+      if (s.id === 'sms' && p < 0 && wynik.sms.mocny && (wynik.sms.link || wynik.sms.cytat || !(gdzie(tok, 'mandat') || gdzie(tok, 'podatek') || gdzie(tok, 'podatk')))) p = 1;
       if (p < 0) return;
       var punkty = (s.priorytet || 0) * 100 + p * 10 + ileTrafien(tok, s.dodatkowe);
       dopasowane[s.id] = punkty;
@@ -788,11 +984,13 @@
 
   /* Dwie sprawy w jednym zdaniu („zgubiłam portfel i nie wiem co z OC”): dzielimy zdanie
      na części po spójnikach i rozpoznajemy każdą. Najpierw pilniejsza sprawa, druga jako przycisk. */
-  var SPOJNIKI = ['i', 'oraz', 'a', 'ale', 'tez', 'takze', 'jeszcze', 'plus', 'poza tym', 'a takze', 'no i'];
+  var SPOJNIKI = ['i', 'oraz', 'a', 'ale', 'tez', 'takze', 'jeszcze', 'poza tym', 'a takze', 'no i'];
   var RODZINY = { 'zastrzez-pesel': 'A', 'pesel-status': 'A', zgubione: 'A' };
-  var PILNOSC = { zgubione: 10, 'zastrzez-pesel': 9, sms: 9, samochod: 7, mandat: 6, pismo: 5, zameldowanie: 4, polityka: 1, 'cudze-dane': 1 };
+  var PILNOSC = { stluczka: 11, zgubione: 10, 'zastrzez-pesel': 9, sms: 9, cert: 8, samochod: 7, 'usluga-narodziny': 7, mandat: 6, pismo: 5, 'usluga-podatek-nieruchomosci': 5,
+    znaleziony: 5, zameldowanie: 4, 'kupno-auta': 3, polityka: 1, 'cudze-dane': 1 };
   var KROTKO = { zgubione: 'zgubione dokumenty', 'zastrzez-pesel': 'zastrzeżenie PESEL', 'pesel-status': 'zastrzeżenie PESEL', sms: 'sprawdzenie SMS-a',
-    samochod: 'OC i badanie auta', zameldowanie: 'zameldowanie', pismo: 'wyjaśnienie pisma', punkty: 'punkty karne', mandat: 'mandat',
+    samochod: 'OC i badanie techniczne', zameldowanie: 'zameldowanie', stluczka: 'stłuczka', 'kupno-auta': 'kupno auta', znaleziony: 'dokument się znalazł',
+    cert: 'zgłoszenie oszustwa', 'usluga-podatek-nieruchomosci': 'zapłata podatku', 'usluga-narodziny': 'zgłoszenie urodzenia', pismo: 'wyjaśnienie pisma', punkty: 'punkty karne', mandat: 'mandat',
     wybory: 'lokal wyborczy', znizka: 'zniżki', polityka: 'pytanie o wybory', 'cudze-dane': 'dane innej osoby', kdr: 'Karta Dużej Rodziny', waznosc: 'ważność dokumentu', 'kod-qr': 'kod QR', 'dokumenty-lista': 'Twoje dokumenty' };
   function nazwaSprawy(s) {
     if (KROTKO[s.id]) return KROTKO[s.id];
@@ -834,6 +1032,7 @@
   /* kontekst: { osoba, dokumenty, wyniki, wiadomosci, nowe (nieprzeczytane), liczbaNowych, uwaga (karta „Wymaga Twojej uwagi”), pismo } */
   function odpowiedz(tekst, kontekst) {
     var r = rozpoznajSprawe(tekst);
+    r.tekst = tekst;
     var w = SPRAWA(r.sprawa).odpowiedz(kontekst, r);
     w.sprawa = r.sprawa;
     /* Druga sprawa z tego samego zdania — od razu przycisk, żeby nic nie umknęło */
@@ -844,10 +1043,11 @@
     return w;
   }
   /* Odpowiedź na wybór w wiadomości (np. „Co zginęło?”) */
-  function dalej(idWyboru, wartosci, kontekst) {
-    var s = idWyboru === 'zgubione-co' ? SPRAWA('zgubione') : idWyboru === 'meldunek-podstawa' ? SPRAWA('zameldowanie') : null;
+  var WYBORY = { 'zgubione-co': 'zgubione', 'meldunek-podstawa': 'zameldowanie', 'stluczka-ranny': 'stluczka', 'sms-dane': 'sms' };
+  function dalej(idWyboru, wartosci, kontekst, dane) {
+    var s = WYBORY[idWyboru] ? SPRAWA(WYBORY[idWyboru]) : null;
     if (!s) return { ty: null, odpowiedz: SPRAWA('nieznane').odpowiedz(kontekst) };
-    var w = s.dalej(kontekst, wartosci);
+    var w = s.dalej(kontekst, wartosci, dane);
     w.odpowiedz.sprawa = s.id;
     return w;
   }

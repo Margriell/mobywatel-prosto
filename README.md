@@ -43,6 +43,7 @@ Warto też zapytać asystenta jako Halina: „Wytłumacz mi pismo” i „Czy te
 | `style.css` | wygląd, motywy, rozmiary tekstu |
 | `app.js` | ekrany, sprawy A, B, C, rozmowa z asystentem |
 | `asystent.js` | asystent: jedna sprawa = jeden wpis, rozpoznawanie w `rozpoznajSprawe(tekst)` |
+| `sprawy.js` | nowe sprawy D–K (płatność podatku i mandatu, stłuczka, wniosek o dowód, cofnięcie zastrzeżenia PESEL, kupno auta, urodzenie dziecka, 800 plus, Karta Dużej Rodziny, zgłoszenie do CERT Polska, odpis aktu): jedna sprawa = jeden wpis, wspólny mechanizm kroków w `app.js` |
 | `dane.js` | fikcyjne osoby, dokumenty, wiadomości i usługi |
 | `media/` | ikona i obrazek podglądu linku |
 | `SPECYFIKACJA.md`, `POSTEP.md` | specyfikacja i dziennik prac |

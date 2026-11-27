@@ -57,10 +57,10 @@ function scenariusze() {
       A_GOTOWE, 'Twój dowód jest unieważniony, a PESEL zastrzeżony.', { dowodUniewazniony: true, pesel: true }]);
     L.push([o, 'A', 'mDowód → Pokaż szczegóły → Zastrzeż PESEL', ['s:.karta.przod .btn-pokaz', 't:Zastrzeż PESEL', 't:Dalej', ...POTWIERDZ],
       A_GOTOWE, 'Twój PESEL jest zastrzeżony.', { pesel: true }]);
-    L.push([o, 'A', 'Asystent (pisanie): „ukradli mi torebkę z dowodem i kartą”', ['pisz:ukradli mi torebkę z dowodem i kartą', 't:Dalej', 't:Zacznij', 't:Dalej', 't:Dalej', ...POTWIERDZ],
+    L.push([o, 'A', 'Asystent (pisanie): „ukradli mi torebkę z dowodem i kartą”', ['pisz:ukradli mi torebkę z dowodem i kartą', 't:Dalej', 't:Zacznij', 't:Dalej', ...POTWIERDZ],
       A_GOTOWE, 'Twój dowód jest unieważniony, a PESEL zastrzeżony.', { dowodUniewazniony: true, pesel: true }]);
     if (o !== 'ola') {
-      L.push([o, 'A', 'Zakładka Asystent → podpowiedź „Zginął mi portfel”', ['nav:Asystent', 't:Zginął mi portfel', 't:Dowód osobisty', 't:Dalej', 't:Zacznij', 't:Dalej', 't:Dalej', ...POTWIERDZ],
+      L.push([o, 'A', 'Zakładka Asystent → podpowiedź „Zginął mi portfel”', ['nav:Asystent', 't:Zginął mi portfel', 't:Dowód osobisty', 't:Dalej', 't:Zacznij', 't:Dalej', ...POTWIERDZ],
         A_GOTOWE, 'Twój dowód jest unieważniony, a PESEL zastrzeżony.', { dowodUniewazniony: true }]);
     } else {
       L.push([o, 'A', 'Zakładka Asystent → podpowiedź „Czy mój PESEL jest zastrzeżony?” → Zastrzeż PESEL', ['nav:Asystent', 't:Czy mój PESEL jest zastrzeżony?', 't:Zastrzeż PESEL', 't:Dalej', ...POTWIERDZ],
@@ -97,10 +97,10 @@ function scenariusze() {
 function pytania() {
   const L = [];
   const P = (o, droga, kroki, oczek) => L.push([o, droga, kroki, oczek]);
-  P('halina', 'podpowiedź „Wytłumacz mi pismo”', ['pole:', 't:Wytłumacz mi pismo'], 'To pismo z urzędu o podatku od nieruchomości na 2027 rok.');
+  P('halina', 'podpowiedź „Wytłumacz mi pismo”', ['pole:', 't:Wytłumacz mi pismo'], 'To decyzja z urzędu: masz zapłacić podatek od mieszkania na 2027 rok.');
   P('halina', 'podpowiedź „Czy ten SMS to oszustwo?”', ['pole:', 't:Czy ten SMS to oszustwo?'], 'To wygląda na oszustwo. Nie klikaj w link.');
   P('halina', 'podpowiedź „Gdzie użyć Karty Dużej Rodziny?”', ['nav:Asystent', 't:Gdzie użyć Karty Dużej Rodziny?'], 'Kartą Dużej Rodziny zapłacisz mniej');
-  P('halina', 'Skrzynka → pismo → Wytłumacz prostym językiem', ['s:a.ikona-btn[href="#/skrzynka"]', 't:Podatek od nieruchomości na 2027 rok', 't:Wytłumacz prostym językiem'], 'To pismo z urzędu o podatku od nieruchomości na 2027 rok.');
+  P('halina', 'Skrzynka → pismo → Wytłumacz prostym językiem', ['s:a.ikona-btn[href="#/skrzynka"]', 't:Decyzja: podatek od nieruchomości na 2027 rok', 't:Wytłumacz prostym językiem'], 'To decyzja z urzędu: masz zapłacić podatek od mieszkania na 2027 rok.');
   P('halina', 'SMS bez znaków oszustwa', ['pisz:Czy ten SMS to oszustwo? „Dzień dobry, jutro o 10 wizyta u lekarza rodzinnego. Przychodnia”'], 'Nie widzę typowych znaków oszustwa.');
   P('tomasz', 'podpowiedź „Do kiedy mam OC?”', ['pole:', 't:Do kiedy mam OC?'], 'OC samochodu Skoda Octavia jest ważne do');
   P('tomasz', 'podpowiedź „Ile mam punktów karnych?”', ['pole:', 't:Ile mam punktów karnych?'], 'Masz 4 punkty karne.');
@@ -118,7 +118,7 @@ function pytania() {
     P(o, 'zniżki z legitymacji', ['pisz:jaką zniżkę daje legitymacja'], o === 'ola' ? 'Legitymacja studencka daje zniżki' : o === 'halina' ? 'Legitymacja emeryta-rencisty daje zniżki' : 'Nie masz');
     P(o, 'Karta Dużej Rodziny', ['pisz:gdzie użyć Karty Dużej Rodziny'], o === 'halina' ? 'Kartą Dużej Rodziny zapłacisz mniej' : 'Nie masz Karty Dużej Rodziny w aplikacji.');
     P(o, 'status PESEL', ['pisz:czy mój PESEL jest zastrzeżony'], 'Twój PESEL nie jest zastrzeżony.');
-    P(o, 'wytłumacz pismo', ['pisz:wytłumacz mi pismo'], o === 'halina' ? 'To pismo z urzędu o podatku' : o === 'tomasz' ? 'To przypomnienie z aplikacji mObywatel, nie rachunek.' : 'W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.');
+    P(o, 'wytłumacz pismo', ['pisz:wytłumacz mi pismo'], o === 'halina' ? 'To decyzja z urzędu: masz zapłacić podatek' : o === 'tomasz' ? 'To przypomnienie z aplikacji mObywatel, nie rachunek.' : 'W Twojej Skrzynce nie ma pisma z urzędu do wytłumaczenia.');
     P(o, 'ogólne: Co mam do załatwienia?', ['pisz:Co mam do załatwienia?'], 'Czeka na Ciebie');
     P(o, 'ogólne: Jakie mam dokumenty?', ['pisz:Jakie mam dokumenty?'], 'Masz w aplikacji');
     P(o, 'ogólne: Co umiesz?', ['pisz:Co umiesz?'], 'Pomogę załatwić sprawę krok po kroku albo odpowiem na pytanie.');

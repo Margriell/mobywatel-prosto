@@ -160,7 +160,8 @@ module.exports = {
       czasy.push(opis + ': gotowa po ' + t.dcl + ' ms, wszystko z czcionką po ' + t.load + ' ms');
       if (warunki) await s.wyslij('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
     }
-    W('Czas ładowania i rozmiar', razem < 400 * 1024, czasy.join('; ') + '; pliki: ' + Math.round(razem / 1024) + ' KB (spakowane ok. ' + Math.round(gz / 1024) + ' KB)', 'drobny');
+    /* Limit 600 KB (27.11.2026: doszło 12 nowych spraw w sprawy.js); ważniejszy jest czas ładowania na wolnym internecie */
+    W('Czas ładowania i rozmiar', razem < 600 * 1024, czasy.join('; ') + '; pliki: ' + Math.round(razem / 1024) + ' KB (spakowane ok. ' + Math.round(gz / 1024) + ' KB)', 'drobny');
     /* Bez internetu (poza serwerem z plikami): aplikacja działa z czcionką systemową */
     await s.blokuj(['*fonts.googleapis.com*', '*fonts.gstatic.com*']);
     await otworz(s, ctx.baza, { osoba: 'halina', trasa: '/dokumenty' });

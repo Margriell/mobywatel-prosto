@@ -50,9 +50,10 @@ Folder `testy/wyniki/` nie trafia do GitHuba (jest w `.gitignore`) — zawsze mo
 | `czesci/6-dostepnosc.js` | 6 — dostępność | sprawy wyłącznie klawiaturą, widoczny fokus, okna (pułapka fokusu, Esc, powrót fokusu), nazwy dla czytnika ekranu, ogłaszanie |
 | `czesci/7-tresc.js` | 7 — treść i jakość | typografia, formy neutralne płciowo, wołacz, spójne nazwy, martwe kliknięcia, wyjście z każdego ekranu, zapytania sieciowe, czas ładowania, rozmiar plików, błędy w konsoli |
 | `czesci/8-zgodnosc.js` | 8 — konkurs | publiczny link w oknie prywatnym, licencje, brak zdjęć i godła, fikcyjne numery PESEL, podgląd linku, działanie z pliku (dwuklik) |
+| `czesci/9-nowe-sprawy.js` | 9 — nowe sprawy | każda nowa sprawa każdą drogą (karta uwagi, Usługi, asystent, Skrzynka, szczegóły dokumentu, „Co dalej”), licznik kroków, podsumowanie i okno potwierdzenia, Gotowe, wiadomość w Skrzynce, skutki (np. status „Opłacone”); „nie dotyczy” bez ślepego zaułka; „Co mam do załatwienia?”; podwójne kliknięcie przy płatności; odświeżenie i wejście adresem w środek; kod HTML jako tekst; wklejony adres; zdania asystenta dla nowych spraw |
 | `czesci/k-kontrola.js` | Kontrola | pełna „Kontrola” ze specyfikacji: 3 osoby × 3 rozmiary × 3 motywy przy 390 i 320 px, tryb prosty, 200%, ramka na komputerze; brak przewijania na Dokumentach; test zrozumienia asystenta |
 
-Pomocnicze: `lib/` (sterowanie przeglądarką, serwer, sprawdzanie ekranu, trasa po ekranach), `zdania-regresja.json`, `zdania-nowe.js`, `zdania-sprawdzian.js` (zdania do asystenta z oczekiwanymi odpowiedziami), `pusta.html` (pusta strona pomocnicza).
+Pomocnicze: `lib/` (sterowanie przeglądarką, serwer, sprawdzanie ekranu, trasa po ekranach), `zdania-regresja.json`, `zdania-nowe.js`, `zdania-sprawdzian.js`, `zdania-sprawy.js` (min. 15 zdań na każdą nową sprawę), `zdania-sprawy-sprawdzian.js` (zdania do asystenta z oczekiwanymi odpowiedziami); `lib/ekrany-nowe.js` (trasa po ekranach nowych spraw), `pusta.html` (pusta strona pomocnicza).
 
 ## Gdy coś się zmieni w aplikacji
 

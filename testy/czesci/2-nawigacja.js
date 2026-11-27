@@ -213,20 +213,30 @@ module.exports = {
     });
 
     /* ---------- 2.5 Dwie karty przeglądarki naraz ---------- */
-    await sprobuj('Dwie karty: zmiana osoby w jednej, sprawa w drugiej', async () => {
+    await sprobuj('Dwie karty: zmiana osoby w jednej karcie widać w drugiej, a sprawa z drugiej nie nadpisuje wyboru', async () => {
       const s2 = await ctx.przegladarka.nowaStrona({ szer: 390, wys: 844 });
       await otworz(s, ctx.baza, { osoba: 'tomasz', trasa: '/sprawa/zgubione' });
       await s2.idz(ctx.baza + 'index.html#/dokumenty'); await s2.js(wstrzyknij);
       await idzDo(s2, '#/osoba'); await klikJs(s2, '[data-osoba="ola"]'); await idzDo(s2, '#/dokumenty');
-      /* Karta 1 kończy sprawę A Tomasza */
-      await zaznacz(s, 'zginelo', 'dowod'); await wyslijFormularz(s); await wyslijFormularz(s);
+      await czekaj(300);
+      /* Karta 1 dostała zmianę: jest u Oli, z informacją o zmianie osoby w innej karcie */
+      const k1 = await s.js(`(() => { const h = document.querySelector('#tresc h1'); const k = document.querySelector('.komunikat-ok'); return (h ? h.textContent : '') + ' | ' + (k ? k.textContent : ''); })()`);
+      /* Karta 1 załatwia sprawę (już jako Ola): zastrzega PESEL; karta 2 widzi skutek bez odświeżania */
+      await idzDo(s, '#/sprawa/zgubione/krok-2?tylko=pesel'); await wyslijFormularz(s);
       await klikJs(s, '[data-akcja="potwierdz"]'); await klikJs(s, '[data-akcja="potwierdz-wyslij"]');
-      const g = await tekstGlowny(s);
+      await czekaj(300);
+      await idzDo(s2, '#/asystent'); await zapytaj(s2, 'czy mój PESEL jest zastrzeżony');
+      const odp = await s2.js(`[...document.querySelectorAll('.wiad.asystent')].pop().textContent`);
       await s2.przeladuj();
       const os2 = await s2.js(`document.querySelector('#tresc h1') ? document.querySelector('#tresc h1').textContent : ''`);
       const bl = s2.bledyKonsoli.splice(0);
       await s2.zamknij();
-      return { ok: 'karta 1: „' + g.slice(0, 50) + '”; karta 2 po odświeżeniu: „' + os2 + '”', blad: bl.length ? 'błędy: ' + bl.join(', ') : (/Olu/.test(os2) ? '' : 'karta 2 po odświeżeniu pokazuje „' + os2 + '” — wybór Oli z karty 2 nadpisała karta 1 (wygrywa ostatni zapis)'), waga: 'drobny' };
+      let blad = '';
+      if (!/Olu/.test(k1) || !/W innej karcie wybrano osobę: Ola/.test(k1)) blad = 'karta 1 nie przeszła na Olę: „' + k1 + '”';
+      else if (odp.indexOf('Tak, Twój PESEL jest zastrzeżony') < 0) blad = 'karta 2 nie widzi zastrzeżenia z karty 1: „' + odp.slice(0, 80) + '”';
+      else if (!/Olu/.test(os2)) blad = 'karta 2 po odświeżeniu pokazuje „' + os2 + '”';
+      if (bl.length) blad = 'błędy: ' + bl.join(', ');
+      return { ok: 'karta 1: „' + k1 + '”; karta 2: „' + odp.slice(0, 60) + '”, po odświeżeniu „' + os2 + '”', blad: blad, waga: 'poważny' };
     });
 
     /* ---------- 2.6 Zablokowana pamięć przeglądarki (localStorage i sessionStorage) ---------- */
